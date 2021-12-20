@@ -1,0 +1,11 @@
+{
+    "applicationId": "1dffa667-9bee-4f16-b243-25ad4151475e",
+    "messageSource": "deviceTemplateLifecycle",
+    "messageType": "created",
+    "schema": "default@v1",
+    "templateId": "urn:qugj6vbw5:___qbj_27r",
+    "enqueuedTime": "2021-01-01T22:26:55.455Z",
+    "enrichments": {
+        "userSpecifiedKey": "sampleValue"
+    }
+}
