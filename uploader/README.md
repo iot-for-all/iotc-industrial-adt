@@ -5,7 +5,7 @@ This repo provides a containerized version of the official "UploadModels" tool (
 The container can run on all x64 platforms.
 
 ## Usage
-`docker run -v <ontology_path>:/app/ontology -e ADT_INSTANCE="<adt-host>" adt-uploader`
+`docker run -v <ontology_path>:/app/ontology -e ADT_INSTANCE="<adt-host>" lukdj/adt-uploader`
 
 With no authentication parameters, the tool will use "DefaultAzureCredentials".
 

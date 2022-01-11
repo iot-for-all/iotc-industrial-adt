@@ -8,7 +8,6 @@ let client: DigitalTwinsClient | null = null;
 const TENANT_ID = process.env['TENANT_ID'];
 const CLIENT_ID = process.env['CLIENT_ID'];
 const CLIENT_SECRET = process.env['CLIENT_SECRET'];
-const DEFAULT_MODEL = process.env['DEFAULT_MODEL'];
 
 type Payload = {
     applicationId: string,
@@ -44,19 +43,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     const payload: Payload = req.body;
 
     try {
-        if (payload.parent && payload.parentModel) {
-            // check parent first
-            const { body: parentTwin } = await client.upsertDigitalTwin(payload.parent, JSON.stringify({
-                $metadata: {
-                    $model: payload.parentModel
-                }
-            }));
-            context.log(`Received parent information. Creating if does not exist.`);
-            response.push(`[INFO] - Created parent twin ${JSON.stringify(parentTwin)}`);
-        }
-
         if (payload.id) {
-            // check parent first
+            // fetch digital twin instance first. 
+            // That is useful to get list of current properties for the right add/replace operation
+
             let twin;
             Object.entries(payload.properties).forEach(prop => (prop[1] === null ? delete payload.properties[prop[0]] : 0));
             try {
@@ -66,7 +56,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 response.push(`Twin ${payload.id} does not exists. Creating...`);
                 // twin not existing
                 ({ body: twin } = await client.upsertDigitalTwin(payload.id, JSON.stringify({
-                    $dtId:payload.id,
+                    $dtId: payload.id,
                     $metadata: {
                         $model: payload.model,
                         ...payload.raw_id ? { raw_id: payload.raw_id } : {}
@@ -130,7 +120,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         };
     }
     catch (ex) {
-        response.push(`[ERROR] - ${ex.message} - ${ex.stack}`);
+        response.push(`[ERROR] - ${ex.message} - ${getStackTrace(ex)}`);
         context.res = {
             status: 200,
             body: JSON.stringify(response),
@@ -143,5 +133,11 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
 
 };
+
+function getStackTrace(ex: Error) {
+    let stack = ex.stack || '';
+    const stackLines = stack.split('\n').map(function (line) { return line.trim(); });
+    return stackLines.splice(stack[0] == 'Error' ? 2 : 1);
+}
 
 export default httpTrigger;

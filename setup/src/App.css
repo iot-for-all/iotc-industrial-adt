@@ -1,0 +1,97 @@
+.flex-center,
+div.rsw_2Y,
+div.rsw_3G {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    /* text-align: center; */
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-start {
+    text-align: start;
+}
+
+.padding-vertical {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.wizard-buttons {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    margin-top: 40px;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+.inline {
+    display: inline
+}
+
+.inline-block {
+    display: inline-block
+}
+
+.vertical-center-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 130px;
+}
+
+.link {
+    cursor: pointer;
+}
+
+.height-30 {
+    height: 30px;
+}
+
+.height-60 {
+    height: 60px;
+}
+
+.icon-30 {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    font-size: medium;
+}
+
+.icon-40 {
+    width: 30px;
+    height: 30px;
+    font-size: medium;
+}
