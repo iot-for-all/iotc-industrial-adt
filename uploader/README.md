@@ -23,6 +23,10 @@ When operating on behalf of the user, authentication parameters must be specifie
 - `ADT_INSTANCE`: The host name of your Azure Digital Twins service instance (with https prefix).
 - `TENANT_ID`: The id (GUID) of your tenant or directory in Azure.
 - `CLIENT_ID`: The id (GUID) of an Azure Active Directory app registration. See [Create an app registration to use with Azure  Digital Twins](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-create-app-registration) for more information.
+
+> NOTE: the app principal must have the "Data Owner" permission for the Digital Twins instance.
+The role can be assigned through Powershell CLI or Azure CLI [see below](#assign-an-access-role-azure-cli).
+
 - `CLIENT_SECRET`: The Azure Active Directory app secret. When not provided, the tool fall backs to interactive authentication on the browser.
 
 #### Configuration file
@@ -40,4 +44,16 @@ The format of the configuration file is the following:
 }
 ```
 
+## Assign an access role (Azure CLI)
+>This section must be completed by an Azure user who has permissions to manage user access to Azure resources, including granting and delegating permissions. Common roles that meet this requirement are Owner, Account admin, or the combination of User Access Administrator and Contributor. For more information about permission requirements for Azure Digital Twins roles, see [Set up an instance and authentication](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance-portal#prerequisites-permission-requirements).
 
+Use the principalId of the created AAD application to give it the Azure Digital Twins Data Owner role for your Azure Digital Twins instance.
+```sh
+az dt role-assignment create --dt-name <your-Azure-Digital-Twins-instance> --assignee "<principal-ID>" --role "Azure Digital Twins Data Owner"
+```
+
+To list all roles assigned to the instance just run:
+```sh
+az dt role-assignment list --dt-name <your-Azure-Digital-Twins-instance>
+```
+> Command above will not show managed identities assigned to the instance.
