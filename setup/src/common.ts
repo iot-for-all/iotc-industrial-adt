@@ -1,14 +1,15 @@
 import { useCallback, useState } from "react";
 
 export const strings = {
-    transformData: 'Add conditions to assign the desired values for "Model Id" and "Parent-Child relation Id".'
+    transformData: 'Add your mappings here. Map telemetry data to digital twins based on data values.',
+    transformDataDetails: 'Each telemetry item contains the node ID and value, its parent node ID and an optional node name. Based on these information, the mapping defines the target twin to create or update.'
 }
 
 export const variables = [
-    { key: 'name', text: 'Name' },
-    { key: 'parent', text: 'Parent' },
-    { key: 'id', text: 'Id' },
-    { key: 'value', text: 'Value' },
+    { key: 'name', text: 'Node name' },
+    { key: 'parent', text: 'Parent node Id' },
+    { key: 'id', text: 'Node Id' },
+    { key: 'value', text: 'Node value' },
 ] as const;
 
 
@@ -25,7 +26,9 @@ export const assignments = [
     { key: 'model', text: 'Model Id' },
     { key: 'twinId', text: 'Twin Id' },
     { key: 'parentTwinId', text: 'Parent Twin Id' },
-    { key: 'relId', text: 'Parent-Child Id' }
+    { key: 'relId', text: 'Parent-Child Id' },
+    { key: 'propertyId', text: 'Property Id' },
+    { key: 'propertyValue', text: 'Property Value' }
 ] as const;
 
 export type VariableKey = typeof variables[number]['key'];

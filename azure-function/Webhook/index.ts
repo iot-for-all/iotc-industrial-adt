@@ -3,136 +3,279 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { ClientSecretCredential, ManagedIdentityCredential } from "@azure/identity";
 import { v4 as uuid4 } from 'uuid';
 
+
+const Errors = {
+    NOT_FOUND: 'DigitalTwinNotFound'
+}
+
 const ADT_INSTANCE = process.env['ADT_INSTANCE']
 let client: DigitalTwinsClient | null = null;
 const TENANT_ID = process.env['TENANT_ID'];
 const CLIENT_ID = process.env['CLIENT_ID'];
 const CLIENT_SECRET = process.env['CLIENT_SECRET'];
 
+/**
+ * Properties is an object containing key/value pairs where the key can be a property Id or a component Id.
+ * Components use the same iothub conventions:
+ * e.g. { "comp_name":{"__t":"c","prop1":"value1"}}
+ */
+
 type Payload = {
-    applicationId: string,
-    component?: string,
-    messageSource: string,
-    model: string,
-    parent?: string,
-    parentChildRel: string,
-    parentModel?: string,
+    applicationId?: string,
+    deviceId?: string,
+    parentChildRel?: string,
+    parentId?: string,
     id: string,
-    raw_id?: string,
-    properties?: any,
-    telemetries?: any
+    model?: string,
+    properties?: {
+        [propertyId: string]: any
+    }
 }
 
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    const response = [];
+    context.res = {
+        status: 200,
+        body: [],
+        headers: {
+            "Content-Type": 'application/json'
+        }
+    }
     if (!client) {
-        response.push('Client initialized');
+        context.log('Client initialized');
         let credentials;
         if (TENANT_ID && CLIENT_ID && CLIENT_SECRET) {
             credentials = new ClientSecretCredential(TENANT_ID, CLIENT_ID, CLIENT_SECRET);
             client = new DigitalTwinsClient(ADT_INSTANCE, credentials);
+            context.log(`Client connected through secret credentials. Endpoint: ${ADT_INSTANCE}`);
         }
         else {
             credentials = new ManagedIdentityCredential('https://digitaltwins.azure.net');
             client = new DigitalTwinsClient(ADT_INSTANCE, credentials);
+            context.log('Client connected through managed identity.')
         }
 
     }
     const payload: Payload = req.body;
 
+    if (!payload.id) {
+        context.res = { body: `Wrong payload received. Missing "id" property.\n${JSON.stringify(payload)}`, status: 400 }
+        return;
+    }
+
+
+    /**
+     * GET TWIN
+     *
+     */
+    let twin;
     try {
-        if (payload.id) {
-            // fetch digital twin instance first. 
-            // That is useful to get list of current properties for the right add/replace operation
-
-            let twin;
-            Object.entries(payload.properties).forEach(prop => (prop[1] === null ? delete payload.properties[prop[0]] : 0));
-            try {
-                ({ body: twin } = await client.getDigitalTwin(payload.id));
+        twin = (await client.getDigitalTwin(payload.id)).body;
+        context.res.status = 200;
+        context.res.body = [...context.res.body, {
+            operation: 'GetTwin',
+            status: 'Success',
+            data: twin,
+            request: {
+                id: payload.id
             }
-            catch (ex) {
-                response.push(`Twin ${payload.id} does not exists. Creating...`);
-                // twin not existing
-                ({ body: twin } = await client.upsertDigitalTwin(payload.id, JSON.stringify({
-                    $dtId: payload.id,
-                    $metadata: {
-                        $model: payload.model,
-                        ...payload.raw_id ? { raw_id: payload.raw_id } : {}
-                    },
-                    ...payload.component ? {} : payload.properties // remove if properties are not known in advance
-
-                })));
-                response.push(`[INFO] - Created twin ${JSON.stringify(twin)}`);
-            }
-
-            const patch = Object.keys(payload.properties).map(capabilityId => ({
-                op: twin[capabilityId] ? 'replace' : 'add',
-                path: `/${capabilityId}`,
-                value: payload.properties[capabilityId]
-            }));
-            if (payload.component) {
-                await client.updateComponent(payload.id, payload.component, patch);
-            }
-            else {
-                await client.updateDigitalTwin(payload.id, patch);
-            }
-
+        }];
+    }
+    catch (e) {
+        if (e.statusCode === 404 && e.code === Errors.NOT_FOUND) {
+            context.res.body = [...context.res.body, {
+                operation: 'GetTwin',
+                status: 'Fail',
+                data: Errors.NOT_FOUND,
+                request: {
+                    id: payload.id
+                }
+            }];
+            await createTwin(payload, context);
         }
+    }
 
-        if (payload.telemetries) {
-            if (payload.component) {
-                await client.publishComponentTelemetry(payload.id, payload.component, JSON.stringify(payload.telemetries), uuid4());
-            }
-            else {
-                await client.publishTelemetry(payload.id, JSON.stringify(payload.telemetries), uuid4());
-            }
+    /**
+     * UPDATE TWIN
+     *
+     */
+    if (twin && payload.properties) {
+        const patch = buildPatchBody(twin, payload.properties);
+        try {
+            const update = await client.updateDigitalTwin(payload.id, patch);
+            context.res.status = 200;
+            context.res.body = [...context.res.body, {
+                operation: 'UpdateProperties',
+                status: 'Success',
+                data: update,
+                request: {
+                    patch
+                }
+            }];
         }
+        catch (e) {
+            context.res.status = 500;
+            context.res.body = [...context.res.body, {
+                operation: 'UpdateProperties',
+                status: 'Fail',
+                data: e.message,
+                request: {
+                    patch
+                }
+            }];
+        }
+    }
 
-
-
-        if (payload.parent && payload.parentChildRel) {
-            const relationships = client.listRelationships(payload.parent);
-            let relExists = false;
-            for await (const relationship of relationships) {
-                if (relationship.$relationshipName === payload.parentChildRel && relationship.$targetId === payload.id) {
-                    relExists = true;
+    /**
+     * CREATE RELATIONSHIP
+     */
+    if (payload.parentId && payload.parentChildRel) {
+        // fetch existing relationships
+        let relationship;
+        if (twin) {
+            const rels = client.listIncomingRelationships(twin.$dtId);
+            for await (const rel of rels) {
+                if (rel.sourceId === payload.parentId && rel.relationshipName === payload.parentChildRel) {
+                    relationship = rel;
+                    context.res.body = [...context.res.body, {
+                        operation: 'GetRelationship',
+                        status: 'Success',
+                        data: rel,
+                        request: {
+                            parent: payload.parentId,
+                            relationshipName: payload.parentChildRel
+                        }
+                    }];
                 }
             }
-            if (!relExists) {
+        }
+
+        if (!relationship) {
+            try {
                 const $relationshipId = uuid4();
-                await client.upsertRelationship(payload.parent, $relationshipId, {
-                    $sourceId: payload.parent,
-                    $targetId: payload.id,
+                const relResponse = await client.upsertRelationship(payload.parentId, $relationshipId, {
+                    $sourceId: payload.parentId,
+                    $targetId: twin.$dtId,
                     $relationshipName: payload.parentChildRel,
                     $relationshipId
                 });
-                response.push(`[INFO] - Created relationship.`);
+                context.res.status = 201;
+                context.res.body = [...context.res.body, {
+                    operation: 'CreateRelationship',
+                    status: 'Success',
+                    data: relResponse.body,
+                    request: {
+                        parent: payload.parentId,
+                        relationshipName: payload.parentChildRel
+                    }
+                }];
+            }
+            catch (e) {
+                context.res.status = 400;
+                context.res.body = [...context.res.body, {
+                    operation: 'CreateRelationship',
+                    status: 'Fail',
+                    data: e.message,
+                    request: {
+                        parent: payload.parentId,
+                        relationshipName: payload.parentChildRel
+                    }
+                }];
             }
         }
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: JSON.stringify(response),
-            headers: {
-                "Content-Type": 'application/json'
+    }
+};
+
+
+
+function buildPatchBody(twin: object, properties: object, componentName?: string) {
+    return Object.entries(properties).reduce((obj, prop) => {
+        const [propKey, propValue] = prop;
+        const { '__t': comp, ...otherProps } = propValue
+        if (comp && comp === 'c') {
+            return [...obj, ...buildPatchBody(twin, otherProps, propKey)];
+        }
+        return [
+            ...obj,
+            {
+                op: twin[propKey] ? 'replace' : 'add',
+                path: `/${componentName ? `${componentName}/` : ''}${propKey}`,
+                value: propValue
+            }
+        ]
+    }, [])
+}
+
+async function createTwin(payload: Payload, context: Context) {
+    /**
+     * CREATE
+     * Support twin creation when model is passed
+     */
+    if (payload.id && payload.model) {
+        context.log(`Model has been passed. Creating the twin if does not exists.`);
+
+        // fetch model to init right values
+        const modelDef = await client.getModel(payload.model, true);
+        const modelComponents = modelDef.model.contents?.filter((content) => content['@type'] === 'Component');
+        const modelProperties = modelDef.model.contents?.filter((content) => content['@type'] === 'Property');
+
+        let createOpts = {
+            $dtId: payload.id,
+            $metadata: {
+                $model: payload.model
             }
         };
-    }
-    catch (ex) {
-        response.push(`[ERROR] - ${ex.message} - ${getStackTrace(ex)}`);
-        context.res = {
-            status: 200,
-            body: JSON.stringify(response),
-            headers: {
-                "Content-Type": 'application/json'
+
+        // init components
+        modelComponents.forEach(component => {
+            let comp: string;
+            let compValue: any;
+            if (payload.properties[component.name]) {
+                ({ '__t': comp, ...compValue } = payload.properties[component.name]);
             }
+            createOpts[component.name] = {
+                $metadata: {},
+                ...(comp ? compValue : {})
+            }
+        });
+
+        //init properties
+        modelProperties.forEach(property => {
+            if (payload.properties[property.name]) {
+                createOpts[property.name] = payload.properties[property.name]
+            }
+        });
+
+        try {
+            const twinResponse = await client.upsertDigitalTwin(payload.id, JSON.stringify(createOpts));
+            context.res.status = 201;
+            context.res.body = [...context.res.body, {
+                operation: 'CreateTwin',
+                status: 'Success',
+                data: twinResponse,
+                request: {
+                    id: payload.id,
+                    options: createOpts
+                }
+            }]
+        }
+        catch (e) {
+            context.log(`Error creating digital twin with id '${payload.id}'.`);
+            context.res.status = 400;
+            context.res.body = [...context.res.body, {
+                operation: 'CreateTwin',
+                status: 'Fail',
+                data: e.message,
+                request: {
+                    id: payload.id,
+                    options: createOpts
+                }
+            }]
+            return;
         }
     }
-
-
-
-};
+}
 
 function getStackTrace(ex: Error) {
     let stack = ex.stack || '';

@@ -1,97 +1,181 @@
 .flex-center,
 div.rsw_2Y,
 div.rsw_3G {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    /* text-align: center; */
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  /* text-align: center; */
+}
+
+.flex-align-right {
+  margin-left: auto;
+}
+
+.masthead {
+  height: 3rem;
+  width: 100%;
+  background-color: #3c3c41;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.full-height {
+  height: 100%;
+}
+.flex1 {
+  flex: 1;
 }
 
 .text-center {
-    text-align: center;
+  text-align: center;
+}
+
+.margin-right-sm {
+  margin-right: 1em;
+}
+.right-align-flex,
+.margin-right-lg {
+  margin-right: 2rem;
 }
 
 .text-start {
-    text-align: start;
+  text-align: start;
+}
+
+.padding-horizontal {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .padding-vertical {
-    padding-top: 5px;
-    padding-bottom: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.padding-vertical-10 {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .wizard-buttons {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 80%;
-    margin-top: 40px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  margin-top: 40px;
 }
 
 .App-logo {
-    height: 40vmin;
-    pointer-events: none;
+  height: 40vmin;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
 }
 
 .App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
 .App-link {
-    color: #61dafb;
+  color: #61dafb;
 }
 
 .inline {
-    display: inline
+  display: inline;
 }
 
 .inline-block {
-    display: inline-block
+  display: inline-block;
 }
 
 .vertical-center-text {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 130px;
 }
 
 .link {
-    cursor: pointer;
+  cursor: pointer;
 }
 
+/* heights */
+
 .height-30 {
-    height: 30px;
+  height: 30px;
 }
 
 .height-60 {
-    height: 60px;
+  height: 60px;
+}
+
+.height-100 {
+  height: 100px;
+}
+
+.height-200 {
+  height: 200px;
+}
+
+.height-300 {
+  height: 300px;
+}
+
+.height-400 {
+  height: 400px;
+}
+
+/* widths */
+.width-100 {
+  width: 100px;
+}
+
+.width-200 {
+  width: 200px;
+}
+
+.width-300 {
+  width: 300px;
+}
+
+.width-400 {
+  width: 400px;
 }
 
 .icon-30 {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    font-size: medium;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  font-size: medium;
 }
 
 .icon-40 {
-    width: 30px;
-    height: 30px;
-    font-size: medium;
+  width: 30px;
+  height: 30px;
+  font-size: medium;
+}
+
+.round-border {
+  border: 1px solid white;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.box {
+  border: 1px solid black;
 }
