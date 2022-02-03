@@ -1,0 +1,8 @@
+{
+  "ns=2;i=2": "Factory01",
+  "ns=2;i=3": "Floor01",
+  "ns=2;i=4": "Building01",
+  "ns=2;i=5": "Room01",
+  "ns=2;i=6": "Machine01",
+  "ns=2;i=7": "Temperature"
+}
