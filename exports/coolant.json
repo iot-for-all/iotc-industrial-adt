@@ -1,0 +1,44 @@
+{
+    "enqueuedTime": "2022-02-07T18:19:07.339Z",
+    "messageProperties": {},
+    "device": {
+        "modules": [],
+        "types": [
+            "Device"
+        ],
+        "cloudProperties": [],
+        "organizations": [],
+        "blocked": false,
+        "id": "opcua01",
+        "properties": {
+            "reported": []
+        },
+        "approved": true,
+        "provisioned": true,
+        "name": "opcua01",
+        "templateId": null,
+        "templateName": "",
+        "simulated": false
+    },
+    "applicationId": "8a3e370e-cf59-430e-bd35-07fd96add7c3",
+    "messageSource": "telemetry",
+    "enrichments": {},
+    "telemetry": [
+        {
+            "name": "nodeid",
+            "value": "ns=2;i=11"
+        },
+        {
+            "name": "name",
+            "value": "coolant_temp"
+        },
+        {
+            "name": "source_time_stamp",
+            "value": "02/07/2022, 18:19:02"
+        },
+        {
+            "value": 27.13945570755832,
+            "name": "value"
+        }
+    ]
+}

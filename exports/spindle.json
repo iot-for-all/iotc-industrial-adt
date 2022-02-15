@@ -1,0 +1,44 @@
+{
+    "enrichments": {},
+    "telemetry": [
+        {
+            "value": "ns=2;i=10",
+            "name": "nodeid"
+        },
+        {
+            "name": "name",
+            "value": "spindle_rpm"
+        },
+        {
+            "name": "source_time_stamp",
+            "value": "02/07/2022, 18:19:02"
+        },
+        {
+            "name": "value",
+            "value": 1002.8372051471387
+        }
+    ],
+    "device": {
+        "id": "opcua01",
+        "approved": true,
+        "modules": [],
+        "name": "opcua01",
+        "provisioned": true,
+        "blocked": false,
+        "types": [
+            "Device"
+        ],
+        "templateId": null,
+        "templateName": "",
+        "cloudProperties": [],
+        "organizations": [],
+        "simulated": false,
+        "properties": {
+            "reported": []
+        }
+    },
+    "applicationId": "8a3e370e-cf59-430e-bd35-07fd96add7c3",
+    "enqueuedTime": "2022-02-07T18:19:07.167Z",
+    "messageProperties": {},
+    "messageSource": "telemetry"
+}

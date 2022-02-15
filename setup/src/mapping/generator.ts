@@ -1,3 +1,12 @@
+export type MappingProps = {
+  "Node name": string,
+  "Node id": string,
+  "Twin id": string,
+  "Twin name": string,
+  "Property": string,
+  "Component"?: string
+}
+
 export function generateQuery(data: string) {
   let query = `import "iotc" as iotc;
 (.telemetry | iotc::find(.name=="name").value) as $name |empty,
@@ -5,16 +14,13 @@ export function generateQuery(data: string) {
 (.telemetry | iotc::find(.name=="value").value) as $value | empty,
 (`;
 
-  const mappings = JSON.parse(data);
-  Object.keys(mappings).forEach((nodeid, index) => {
-    query += `${index === 0 ? "if" : "elif"} $id=="${nodeid}" then "${
-      mappings[nodeid]
-    }" `;
+  const mappings: MappingProps[] = JSON.parse(data);
+  mappings.forEach((mapping, index) => {
+    query += `${index === 0 ? "if" : "elif"} $id=="${mapping["Node id"]}" then "${mapping["Twin id"]}/${mapping.Component ? mapping.Component + '/' : ''}${mapping.Property}" `;
   });
   query += `else $id end) as $id | empty,
   {
-      id:$id,
-      name:$name,
+      twinRawId:$id,
       value:$value
   }
   `;

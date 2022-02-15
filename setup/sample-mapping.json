@@ -1,8 +1,30 @@
-{
-  "ns=2;i=2": "Factory01",
-  "ns=2;i=3": "Floor01",
-  "ns=2;i=4": "Building01",
-  "ns=2;i=5": "Room01",
-  "ns=2;i=6": "Machine01",
-  "ns=2;i=7": "Temperature"
-}
+[
+  {
+    "Node name": "spindle_rpm",
+    "Node id": "ns=2;i=10",
+    "Twin id": "wmbl01fl01",
+    "Twin name": "Widget-Maker-Building01",
+    "Property": "spindle_rpm"
+  },
+  {
+    "Node name": "widget_count",
+    "Node id": "ns=2;i=9",
+    "Twin id": "wmbl01fl01",
+    "Twin name": "Widget-Maker-Building01",
+    "Property": "widget_count"
+  },
+  {
+    "Node name": "coolant_temp",
+    "Node id": "ns=2;i=11",
+    "Twin id": "wmbl01fl01",
+    "Twin name": "Widget-Maker-Building01",
+    "Property": "coolant_temp"
+  },
+  {
+    "Node name": "error_count",
+    "Node id": "ns=2;i=12",
+    "Twin id": "wmbl01fl01",
+    "Twin name": "Widget-Maker-Building01",
+    "Property": "error_count"
+  }
+]

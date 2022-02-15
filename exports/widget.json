@@ -1,0 +1,44 @@
+{
+    "messageSource": "telemetry",
+    "messageProperties": {},
+    "device": {
+        "simulated": false,
+        "blocked": false,
+        "properties": {
+            "reported": []
+        },
+        "cloudProperties": [],
+        "organizations": [],
+        "modules": [],
+        "types": [
+            "Device"
+        ],
+        "id": "opcua01",
+        "approved": true,
+        "provisioned": true,
+        "name": "opcua01",
+        "templateId": null,
+        "templateName": ""
+    },
+    "applicationId": "8a3e370e-cf59-430e-bd35-07fd96add7c3",
+    "enqueuedTime": "2022-02-07T18:19:07.011Z",
+    "enrichments": {},
+    "telemetry": [
+        {
+            "name": "nodeid",
+            "value": "ns=2;i=9"
+        },
+        {
+            "name": "name",
+            "value": "widget_count"
+        },
+        {
+            "name": "source_time_stamp",
+            "value": "02/07/2022, 18:19:02"
+        },
+        {
+            "name": "value",
+            "value": 4
+        }
+    ]
+}

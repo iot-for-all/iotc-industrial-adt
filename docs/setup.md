@@ -7,7 +7,51 @@ Clone this repository to get sample code for the Azure Function to be used as ex
 1. Azure Digital Twin
 2. Azure Function
 
-## Provision a function
+## 1. Deploy Azure Digital Twins
+
+If you already have an ADT instance you can skip to step 2, otherwise follow the instructions in ["Set up an instance and authentication"](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance-portal).
+
+After you set up your instance, make a note of the following values. You'll need these values to connect to the instance later:
+
+- The instance's host name or endpoint. You can find the host name in the Azure portal.
+- The Azure subscription that you used to create the instance. Either its name or its ID will work. You can find the subscription on your instance's Overview page in the Azure portal.
+
+## 2. Deploy the sample function
+
+Before deploying function code, you need to create an app in your subscription. A consumption plan is the preferred choice for the kind of the load expected in the current scenario.
+Instructions are available for creating the function app through [Azure Portal](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-app-portal#create-a-function-app), [Azure CLI](https://docs.microsoft.com/en-us/azure/azure-functions/scripts/functions-cli-create-serverless) or [Powershell](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-cli-powershell?tabs=azure-cli%2Cbrowser#create-supporting-azure-resources-for-your-function).
+
+For Azure CLI, this become as simple as running this script:
+
+```bash
+#!/bin/bash
+
+# Function app and storage account names must be unique.
+storageName=mystorageaccount$RANDOM
+functionAppName=myserverlessfunc$RANDOM
+region=westeurope
+
+# Create a resource group.
+az group create --name myResourceGroup --location $region
+
+# Create an Azure storage account in the resource group.
+az storage account create \
+  --name $storageName \
+  --location $region \
+  --resource-group myResourceGroup \
+  --sku Standard_LRS
+
+# Create a serverless function app in the resource group.
+az functionapp create \
+  --name $functionAppName \
+  --storage-account $storageName \
+  --consumption-plan-location $region \
+  --resource-group myResourceGroup \
+  --os-type linux \
+  --runtime node \
+  --runtime-version 14
+  --functions-version 4
+```
 
 ### Setup development environment
 
@@ -38,19 +82,27 @@ _e.g._
 
 ### Deployment
 
-Make sure Azure CLI is logged in and the right subscription has been selected.
+Make sure Azure CLI is logged in and the right subscription has been selected, otherwise run _"az login"_ and _"az account set"_ to select it.
 
-Move to the function sample folder and run
+Move to the sample function folder and build the project before publishing it.
+```sh
+cd sample-fn
+npm install
+npm run build
+```
+Then deploy the function over the app previously created.
 
 ```sh
-func azure functionapp publish <FUNCTION-NAME> --publish-local-settings
+func azure functionapp publish $functionAppName --publish-local-settings --nozip
 ```
 
 > The "_--publish-local-settings_" is required to publish the edited configuration as Application Settings for the function in the cloud.
 
-Note down the "Invoke url" from the command output. This is the URL to be used later in IoT Central.
+If creation succeeds, you will see an "Invoke Url" from the command output.
+Note it down as it will be used as export destination in the Azure IoT Central application
 
 ![publish](../media/function_publish.png)
+
 
 ### Authentication
 
@@ -58,6 +110,10 @@ In order to have the function authenticate against the ADT endpoint we will use 
 Follow [instructions](https://docs.microsoft.com/en-us/azure/digital-twins/tutorial-end-to-end#prepare-your-environment-for-the-azure-cli) on how to prepare your environment for the Azure CLI if you don't have it installed yet.
 
 1. Use the following command to show the system-managed identity for the function. Take note of the **principalId** field in the output.
+
+```sh
+az functionapp identity show --resource-group <FUNCTION_RESOURCE_GROUP_NAME> --name <FUNCTION_NAME>
+```
 
 > **_NOTE_**: If the result of the command above is empty, create a new identity using this command:
 >
