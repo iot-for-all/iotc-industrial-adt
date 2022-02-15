@@ -136,8 +136,7 @@ Create a new destination of "Webhook" type and provide the Azure Function "Invok
 
 ![destination](../media/destination.png)
 
-Save and create an export of telemetry targeting the new destination. You can add a data transformation now or after saving the export. For transformation guidance see ["Configure Data Transformation".]
-(#configure-data-transformation)
+Save and create an export of telemetry targeting the new destination. You can add a data transformation now or after saving the export. For transformation guidance see ["Configure Data Transformation"](#configure-data-transformation).
 
 ![export](../media/export.png)
 
