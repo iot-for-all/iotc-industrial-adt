@@ -37,21 +37,34 @@ _e.g._
 ```
 
 ### Deployment
+
 Make sure Azure CLI is logged in and the right subscription has been selected.
+
+Move to the function sample folder and run
+
 ```sh
-func azure functionapp publish sample-fn --publish-local-settings
+func azure functionapp publish <FUNCTION-NAME> --publish-local-settings
 ```
->The "_--publish-local-settings_" is required to publish the edited configuration as Application Settings for the function in the cloud.
+
+> The "_--publish-local-settings_" is required to publish the edited configuration as Application Settings for the function in the cloud.
+
+Note down the "Invoke url" from the command output. This is the URL to be used later in IoT Central.
+
+![publish](../media/function_publish.png)
+
 ### Authentication
+
 In order to have the function authenticate against the ADT endpoint we will use a managed identity and assign it to the "Data Owner" role of the ADT instance.
 Follow [instructions](https://docs.microsoft.com/en-us/azure/digital-twins/tutorial-end-to-end#prepare-your-environment-for-the-azure-cli) on how to prepare your environment for the Azure CLI if you don't have it installed yet.
 
 1. Use the following command to show the system-managed identity for the function. Take note of the **principalId** field in the output.
 
 > **_NOTE_**: If the result of the command above is empty, create a new identity using this command:
->```sh
->az functionapp identity assign --resource-group <FUNCTION_RESOURCE_GROUP_NAME> --name <FUNCTION_NAME>
->```
+>
+> ```sh
+> az functionapp identity assign --resource-group <FUNCTION_RESOURCE_GROUP_NAME> --name <FUNCTION_NAME>
+> ```
+>
 > The output will then display details of the identity, including the **principalId** value required for the next step.
 
 2. Use the **principalId** value in the following command to assign the function app's identity to the Azure Digital Twins Data Owner role for your Azure Digital Twins instance.
@@ -60,12 +73,15 @@ Follow [instructions](https://docs.microsoft.com/en-us/azure/digital-twins/tutor
 az dt role-assignment create --dt-name <ADT_NAME> --assignee "<principal-ID>" --role "Azure Digital Twins Data Owner"
 ```
 
+## Create a compatible IoT Central Export
 
+Create a new destination of "Webhook" type and provide the Azure Function "Invoke url" obtained before.
 
+![destination](../media/destination.png)
 
-## Authorize function
+Save and create an export of telemetry targeting the new destination. You can add a data transformation now or after saving the export. For transformation guidance see ["Configure Data Transformation".]
+(#configure-data-transformation)
 
-## Create export in Central
+![export](../media/export.png)
 
-##
-```
+## Configure data transformation
