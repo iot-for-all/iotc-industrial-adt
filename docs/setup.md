@@ -85,11 +85,13 @@ _e.g._
 Make sure Azure CLI is logged in and the right subscription has been selected, otherwise run _"az login"_ and _"az account set"_ to select it.
 
 Move to the sample function folder and build the project before publishing it.
+
 ```sh
 cd sample-fn
 npm install
 npm run build
 ```
+
 Then deploy the function over the app previously created.
 
 ```sh
@@ -102,7 +104,6 @@ If creation succeeds, you will see an "Invoke Url" from the command output.
 Note it down as it will be used as export destination in the Azure IoT Central application
 
 ![publish](../media/function_publish.png)
-
 
 ### Authentication
 
@@ -141,3 +142,19 @@ Save and create an export of telemetry targeting the new destination. You can ad
 ![export](../media/export.png)
 
 ## Configure data transformation
+
+The sample function requires a specific type of payload to be used from IoT Central CDE in order to update Digital Twins data.
+
+```json
+{
+  "twinRawId": "<digital_twin_id>/<propertyName>",
+  "value": "<propertyValue>"
+}
+```
+
+- "twinRawId" represents a unique identifier for a property of the digital twin to be updated. If the property is inside a component the syntax becomes "<digital_twin_id>/<component_name>/<property_name>".
+- "value" is the value of the property and can be of any type.
+
+The sample function does not create twins, so transformation query can assume all twins to exist. Here's a sample transformation.
+
+![transformation](../media/transformation.png)
