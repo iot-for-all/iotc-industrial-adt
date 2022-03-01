@@ -1,0 +1,49 @@
+.row {
+    display: flex;
+    width: 100%;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.menu-icon {
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dt-viewer-card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: content-box;
+    word-wrap: break-word;
+    padding: 0.5rem;
+}
+
+.font-small {
+    font-size: small;
+}
+
+.font-medium {
+    font-size: medium;
+}
+
+.selected {
+    background-color: lightyellow;
+}
+
+.unselected {
+    background-color: inherit;
+}
+
+.selectable:hover {
+    font-weight: bold;
+}
+
+.interface, .model {
+    padding-top: 0.25rem;
+    border-top: solid 1px #dbdad9;
+}
