@@ -400,10 +400,10 @@ function ModelsList({ nodeRows, onSelect, indentPixels, onMenuClick, styles }: M
         if (!node.hide) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
-                <div key={fullName} title={fullName} className={'row font-small margin-bottom-xsmall'} style={style}>
+                <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedNode === node.key ? 'selected' : 'unselected'}`} style={style}>
                     {!!node.children.length && <MenuIcon />}
                     <div 
-                        className={`${select ? ' clickable selectable' : ''} ${selectedNode === node.key ? 'selected' : 'unselected'}`} 
+                        className={`${select ? ' clickable selectable' : ''}`} 
                         onClick={select}>
                             {node.type.toLowerCase() === 'interface' && <div className='interface'>{node.type}: <span style={styles?.interfaceId}>{node.name ?? node.id}</span></div>}
                             {node.type.toLowerCase() === 'property' && <div>

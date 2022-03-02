@@ -41,7 +41,7 @@
 }
 
 .selected {
-    background-color: lightyellow;
+    background-color:rgb(208, 234, 255);
 }
 
 .selectable:hover {
