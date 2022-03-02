@@ -4,12 +4,10 @@ import {
   getTheme,
   mergeStyleSets,
   FontWeights,
-  ContextualMenu,
   Modal,
-  IDragOptions,
   IIconProps,
 } from '@fluentui/react';
-import { IconButton, IButtonStyles } from '@fluentui/react/lib/Button';
+import { IconButton, IButtonStyles, PrimaryButton } from '@fluentui/react/lib/Button';
 import { MappingGridItem } from './mappingGrid';
 
 export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss }: { 
@@ -21,6 +19,21 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
   // Use useId() to ensure that the IDs are unique on the page.
   // (It's also okay to use plain strings and manually ensure uniqueness.)
   const titleId = useId('title');
+  const jqText = generateQuery(jq);
+  const [copyResult, setCopyResult] = React.useState<string>();
+  const [resultClass, setResultClass] = React.useState<string>();
+
+  const copyAppInfo = React.useCallback(() => {
+    navigator.clipboard.writeText(jqText).then(function() {
+      /* clipboard successfully set */
+      setCopyResult('Copied!');
+      setResultClass('success');
+    }, function(e) {
+      /* clipboard write failed */
+      setCopyResult(`Copy failed ${e}`);
+      setResultClass('fail');
+    });
+  }, []);
 
   return (
     <div>
@@ -42,8 +55,19 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
         </div>
         <div className={contentStyles.body}>
           <div className='jq-modal'>
-              <div>{generateQuery(jq)}</div>
+            <div>{jqText}</div>
+          </div>
+          <div className='horizontal-group copy-footer'>
+            <div className='copy-button'>
+              <PrimaryButton
+                  text='Copy Jq'
+                  className='margin-start-xsmall'
+                  onClick={copyAppInfo}
+                  title='Copy Jq transformation' 
+              />
             </div>
+            <div className={`margin-start-xsmall ${resultClass}`}>{copyResult}</div>
+          </div>
         </div>
       </Modal>
     </div>
@@ -56,8 +80,7 @@ const theme = getTheme();
 const contentStyles = mergeStyleSets({
   container: {
     display: 'flex',
-    flexFlow: 'column nowrap',
-    alignItems: 'stretch',
+    flexFlow: 'column nowrap'
   },
   header: [
     theme.fonts.xLargePlus,

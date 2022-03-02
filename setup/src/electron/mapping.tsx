@@ -269,7 +269,7 @@ export const Mapping = React.memo(function Mapping() {
                         <div className='anchor-bottom expand'>
                             <PrimaryButton
                                 text={selectedKey ? 'Update' : 'Add'}
-                                className='margin-start-xsmall margin-end-'
+                                className='margin-start-xsmall'
                                 onClick={onUpdateGrid}
                                 disabled={!opcuaItem || !dtItem?.propertyName || !dtItem?.twinId || !dtItem?.modelId}
                             />

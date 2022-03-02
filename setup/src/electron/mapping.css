@@ -68,10 +68,24 @@
 
 .jq-modal {
     width: 800px;
+    position: relative;
 }
 
 .arrow {
     min-width: 1.25rem;
+}
+
+.copy-footer {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.success {
+    color: green;
+}
+
+.fail {
+    color: red;
 }
 
 /** Common component classes */
