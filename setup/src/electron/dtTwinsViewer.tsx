@@ -190,7 +190,7 @@ function TwinsList({ nodeRows, onSelect, onMenuClick, styles }: TwinsListProps) 
                 <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedNode === node.key ? 'selected' : 'unselected'}`}>
                     {node.isModel && <MenuIcon />}
                     <div 
-                        className={`${select ? ' clickable selectable' : ''}`} 
+                        className={`viewer-row-label ${select ? ' clickable selectable' : ''}`} 
                         onClick={select}>
                             {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
                             {!node.isModel && <div>

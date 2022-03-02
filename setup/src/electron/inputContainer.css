@@ -51,3 +51,7 @@
 .unselected {
     background-color: inherit;
 }
+
+.struct-type {
+    text-decoration: underline;
+}

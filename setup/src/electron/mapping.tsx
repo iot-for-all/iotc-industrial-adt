@@ -182,19 +182,21 @@ export const Mapping = React.memo(function Mapping() {
             <div>Node id: {opcuaItem?.nodeId}</div>
             <div>Path: {opcuaItem?.namespace.join('.')}</div>
         </>);
+
+    // TODO move input list styles to config file
     const opcuaStyles: OpcuaStyleScheme = React.useMemo(() => ({
         leafName: { color: 'crimson' },
-        path: { color: 'orange'},
+        path: { color: 'slategray'},
         type: { fontStyle: 'italic'}
     }), []);
 
     const dtStyles: DtStyleScheme = React.useMemo(() => ({
-        interfaceId: { color: 'royalblue'},
+        interfaceId: { color: 'steelblue'},
         propertyName: { color: 'crimson'},
         propertySchema: {fontStyle: 'italic' },
         twinId: { color: 'crimson' },
-        twinName: { color: 'slategray' },
-        modelId: { color: 'royalblue'}
+        twinName: { color: 'steelblue' },
+        modelId: { color: 'steelblue'}
     }), []);
 
     const onGenerateJQ = React.useCallback(() => {

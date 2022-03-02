@@ -403,7 +403,7 @@ function ModelsList({ nodeRows, onSelect, indentPixels, onMenuClick, styles }: M
                 <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedNode === node.key ? 'selected' : 'unselected'}`} style={style}>
                     {!!node.children.length && <MenuIcon />}
                     <div 
-                        className={`${select ? ' clickable selectable' : ''}`} 
+                        className={`${select ? ' clickable selectable' : ''} viewer-row-label`} 
                         onClick={select}>
                             {node.type.toLowerCase() === 'interface' && <div className='interface'>{node.type}: <span style={styles?.interfaceId}>{node.name ?? node.id}</span></div>}
                             {node.type.toLowerCase() === 'property' && <div>

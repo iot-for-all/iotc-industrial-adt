@@ -305,7 +305,7 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
                         style={tagNode?.type ? styles?.leafName || styles?.nodeName : styles?.nodeName}>
                             {(node as TagNode).name ?? node.id}
                     </div>
-                    <div className='margin-start-xsmall'>{type}</div>
+                    <div className='margin-start-xsmall viewer-row-label'>{type}</div>
                     {!!(node as TagNode).name && <div className='margin-start-xsmall'>{node.id}</div>}
                 </div>
             );
@@ -340,7 +340,7 @@ export const Details = React.memo(function Details({ type, struct, styles }: Det
           // (so an element with this id only exists when the tooltip is shown)
           id={tooltipId}
         >
-            <span className='struct'>{`(${type})`}</span>
+            <span className='struct-type'>{`(${type})`}</span>
         </TooltipHost>
     );
 });
