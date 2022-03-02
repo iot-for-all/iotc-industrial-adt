@@ -53,7 +53,11 @@ export const Mapping = React.memo(function Mapping() {
 
     const [ items, setItems ] = React.useState<MappingGridItem[]>([]); // rows for the grid
     const [ filter, setFilter ] = React.useState<string>();
+
+    // Jq state
     const [ showJqModal, setShowJqModal ] = useBoolean(false);
+    const [copyResult, setCopyResult] = React.useState<string>();
+    const [resultClass, setResultClass] = React.useState<string>();
 
     // if a file has been selected, opcuaFile will be updated with the File object.
     // Get the content of the file as JSON
@@ -204,6 +208,24 @@ export const Mapping = React.memo(function Mapping() {
         setShowJqModal.setTrue();
     }, [setShowJqModal]);
 
+    const onCopyJq = React.useCallback((jqText) => {
+        navigator.clipboard.writeText(jqText).then(function() {
+          /* clipboard successfully set */
+          setCopyResult('Copied!');
+          setResultClass('success');
+        }, function(e) {
+          /* clipboard write failed */
+          setCopyResult(`Copy failed ${e}`);
+          setResultClass('fail');
+        });
+      }, []);
+
+    const onDismissJqModal = React.useCallback(() => {
+        setShowJqModal.setFalse();
+        setCopyResult(undefined);
+          setResultClass(undefined);
+    }, []);
+
     const onSaveMapping = React.useCallback(() => {
         downloadFile(
             JSON.stringify(items),
@@ -306,7 +328,7 @@ export const Mapping = React.memo(function Mapping() {
                 </div>
             </div>
             <Footer disabled={!items?.length} onGenerateJQ={onGenerateJQ} onSaveMapping={onSaveMapping} />
-            <JqModal jq={items} isModalOpen={showJqModal} onDismiss={setShowJqModal.setFalse} />
+            <JqModal jq={items} isModalOpen={showJqModal} onDismiss={onDismissJqModal} onCopyJq={onCopyJq} copyResult={copyResult} resultClass={resultClass} />
         </div>
     </>);
 });

@@ -11,31 +11,20 @@ import { IconButton, IButtonStyles, PrimaryButton, DefaultButton } from '@fluent
 import { MappingGridItem } from './mappingGrid';
 import { downloadFile } from './core/controls/downloadFile';
 
-export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss }: { 
+export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss, onCopyJq, copyResult, resultClass }: { 
     jq: MappingGridItem[], 
     isModalOpen: boolean,
-    onDismiss: () => void 
+    onDismiss: () => void,
+    onCopyJq: (jq: string) => void;
+    copyResult?: string;
+    resultClass?: string;
 }) {
 
   // Use useId() to ensure that the IDs are unique on the page.
   // (It's also okay to use plain strings and manually ensure uniqueness.)
   const titleId = useId('title');
   const jqText = generateQuery(jq);
-  const [copyResult, setCopyResult] = React.useState<string>();
-  const [resultClass, setResultClass] = React.useState<string>();
-
-  const copyAppInfo = React.useCallback(() => {
-    navigator.clipboard.writeText(jqText).then(function() {
-      /* clipboard successfully set */
-      setCopyResult('Copied!');
-      setResultClass('success');
-    }, function(e) {
-      /* clipboard write failed */
-      setCopyResult(`Copy failed ${e}`);
-      setResultClass('fail');
-    });
-  }, []);
-
+  
   const onDownload = React.useCallback(() => {
     downloadFile(
         jqText,
@@ -79,7 +68,7 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
               <DefaultButton
                   text='Copy Jq'
                   className='margin-start-xsmall'
-                  onClick={copyAppInfo}
+                  onClick={() => onCopyJq(jqText)}
                   title='Copy Jq transformation' 
               />
             </div>
