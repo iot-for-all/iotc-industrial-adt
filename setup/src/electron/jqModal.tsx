@@ -17,17 +17,6 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
     isModalOpen: boolean,
     onDismiss: () => void 
 }) {
-  
-  // Normally the drag options would be in a constant, but here the toggle can modify keepInBounds
-  const dragOptions = React.useMemo(
-    (): IDragOptions => ({
-      moveMenuItemText: 'Move',
-      closeMenuItemText: 'Close',
-      menu: ContextualMenu,
-      keepInBounds: true
-    }),
-    [],
-  );
 
   // Use useId() to ensure that the IDs are unique on the page.
   // (It's also okay to use plain strings and manually ensure uniqueness.)
@@ -41,7 +30,6 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
         onDismiss={onDismiss}
         isBlocking={false}
         containerClassName={contentStyles.container}
-        dragOptions={dragOptions}
       >
         <div className={contentStyles.header}>
           <span id={titleId}>JQ Transformation</span>
