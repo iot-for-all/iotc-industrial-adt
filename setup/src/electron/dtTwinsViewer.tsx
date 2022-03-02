@@ -43,7 +43,14 @@ interface ProcessedInput {
 export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, styles }: TwinsViewerProps) {
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
-    const processedInput = useProcessJson(jsonContent);
+    let processedInput;
+    let error;
+    try {
+        processedInput = useProcessJson(jsonContent);
+    } catch (e) {
+        processedInput = undefined;
+        error = `Invalid input file (${e?.message})`;
+    }
     const inputRows = useGetRows(processedInput);
     
     // update the rows when a new file is selected (brings in new content)
@@ -68,6 +75,11 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         setNodeRows(newRows);
     }, [inputRows, nodeRows, processedInput?.modelTwinsMap]);
 
+    if (error) {
+        return (<div className='viewer'>
+            {error}
+        </div>);
+    }
     return <TwinsList nodeRows={nodeRows} onSelect={onSelect} onMenuClick={onMenuClick} styles={styles}/>;
 
 });

@@ -69,7 +69,14 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
-    const processedInput = useProcessJson(jsonContent);
+    let processedInput;
+    let error;
+    try {
+        processedInput = useProcessJson(jsonContent);
+    } catch (e) {
+        processedInput = undefined;
+        error = `Invalid input file (${e?.message})`;
+    }
     const inputRows = useGetRows(processedInput);
     
     // update the rows when a new file is selected (brings in new content)
@@ -100,6 +107,11 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
         setNodeRows(newRows);
     }, [nodeRows, processedInput?.nodeMap]);
 
+    if (error) {
+        return (<div className='viewer'>
+            {error}
+        </div>);
+    }
     return <OpcuaNodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
 
 });

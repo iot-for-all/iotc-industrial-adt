@@ -100,7 +100,14 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
-    const processedInput = useProcessJson(jsonContent);
+    let processedInput;
+    let error;
+    try {
+        processedInput = useProcessJson(jsonContent);
+    } catch (e) {
+        processedInput = undefined;
+        error = `Invalid input file (${e?.message})`;
+    }
     const inputRows = useGetRows(processedInput);
     
     // update the rows when a new file is selected (brings in new content)
@@ -131,6 +138,11 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
         setNodeRows(newRows);
     }, [nodeRows, processedInput?.nodeMap]);
 
+    if (error) {
+        return (<div className='viewer'>
+            {error}
+        </div>);
+    }
     return <ModelsList nodeRows={nodeRows} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
 
 });
