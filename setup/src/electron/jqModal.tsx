@@ -80,7 +80,7 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
             </div>
             <div className='copy-button'>
               <DefaultButton
-                  text='Copy Jq'
+                  text='Copy'
                   className='margin-start-xsmall'
                   onClick={() => onCopyJq(jqText)}
                   title='Copy Jq transformation' 
