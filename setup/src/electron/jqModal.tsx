@@ -6,6 +6,8 @@ import {
   FontWeights,
   Modal,
   IIconProps,
+  ContextualMenu,
+  IDragOptions,
 } from '@fluentui/react';
 import { IconButton, IButtonStyles, PrimaryButton, DefaultButton } from '@fluentui/react/lib/Button';
 import { MappingGridItem } from './mappingGrid';
@@ -24,6 +26,17 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
   // (It's also okay to use plain strings and manually ensure uniqueness.)
   const titleId = useId('title');
   const jqText = generateQuery(jq);
+
+  // Normally the drag options would be in a constant, but here the toggle can modify keepInBounds
+  const dragOptions = React.useMemo(
+    (): IDragOptions => ({
+      moveMenuItemText: 'Move',
+      closeMenuItemText: 'Close',
+      menu: ContextualMenu,
+      keepInBounds: true
+    }),
+    [],
+  );
   
   const onDownload = React.useCallback(() => {
     downloadFile(
@@ -41,6 +54,7 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
         onDismiss={onDismiss}
         isBlocking={false}
         containerClassName={contentStyles.container}
+        dragOptions={dragOptions}
       >
         <div className={contentStyles.header}>
           <span id={titleId}>JQ Transformation</span>
@@ -108,6 +122,7 @@ const contentStyles = mergeStyleSets({
       p: { margin: '14px 0' },
       'p:first-child': { marginTop: 0 },
       'p:last-child': { marginBottom: 0 },
+      'button': { cursor: 'pointer' }
     },
   },
 });
