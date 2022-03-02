@@ -285,11 +285,14 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
             : undefined;
         if (flatten && type) {
             return (
-                <div key={fullName} title={fullName} className='row icon-button clickable viewer-card margin-bottom-xsmall font-small' onClick={select}>
-                    <div className={`font-small selectable ${selectedNode === tagNode.key ? 'selected' : ''}`} style={styles?.leafName}>{(node as TagNode).name ?? node.id}</div>
+                <div key={fullName} title={fullName} className='row vertical-group clickable viewer-card margin-bottom-xsmall font-small' onClick={select}>
+                    <div className='horizontal-group justify-ends'>
+                        <div className={`font-small selectable ${selectedNode === tagNode.key ? 'selected' : ''}`} style={styles?.leafName}>{(node as TagNode).name ?? node.id}</div>
+                        <div>{type}</div>
+                    </div>
                     <div style={styles?.path}>path: {node.namespace.join('.')}</div>
-                    <div>{type}</div>
-                </div>)
+                </div>
+            );
         }
         if (!flatten && !node.hide) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };

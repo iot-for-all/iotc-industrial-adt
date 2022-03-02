@@ -60,6 +60,12 @@
     height: 1.5rem;
 }
 
+.viewer-card {
+    border-bottom: solid 1px #eee;
+    background-color: #faf9f8;
+    padding-bottom: 3px;
+}
+
 .jq-row {
     display: flex;
     flex-direction: column;
