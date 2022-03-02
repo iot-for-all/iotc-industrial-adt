@@ -10,6 +10,7 @@ import { OpcuaInputContainer } from './opcuaInputContainer';
 import { DtInputContainer } from './dtInputContainer';
 import { DtNode, DtStyleScheme } from './dtModels';
 import { JqModal } from './jqModal';
+import { downloadFile } from './core/controls/downloadFile';
 
 interface OpcuaItem {
     key: string;
@@ -203,6 +204,14 @@ export const Mapping = React.memo(function Mapping() {
         setShowJqModal.setTrue();
     }, [setShowJqModal]);
 
+    const onSaveMapping = React.useCallback(() => {
+        downloadFile(
+            JSON.stringify(items),
+            'application/json',
+            'opcua2dt-mapping.json'
+        );
+      }, [items]);
+
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -296,7 +305,7 @@ export const Mapping = React.memo(function Mapping() {
                     />}
                 </div>
             </div>
-            <Footer disabled={!items?.length} onGenerateJQ={onGenerateJQ} onSaveMapping={null} />
+            <Footer disabled={!items?.length} onGenerateJQ={onGenerateJQ} onSaveMapping={onSaveMapping} />
             <JqModal jq={items} isModalOpen={showJqModal} onDismiss={setShowJqModal.setFalse} />
         </div>
     </>);
