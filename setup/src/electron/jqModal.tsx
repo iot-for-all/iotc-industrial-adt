@@ -7,8 +7,9 @@ import {
   Modal,
   IIconProps,
 } from '@fluentui/react';
-import { IconButton, IButtonStyles, PrimaryButton } from '@fluentui/react/lib/Button';
+import { IconButton, IButtonStyles, PrimaryButton, DefaultButton } from '@fluentui/react/lib/Button';
 import { MappingGridItem } from './mappingGrid';
+import { downloadFile } from './core/controls/downloadFile';
 
 export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss }: { 
     jq: MappingGridItem[], 
@@ -35,6 +36,14 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
     });
   }, []);
 
+  const onDownload = React.useCallback(() => {
+    downloadFile(
+        jqText,
+        'text/plan',
+        'opcua2dt-mapping.jq'
+    );
+  }, [jqText]);
+
   return (
     <div>
       <Modal
@@ -58,8 +67,16 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss 
             <div>{jqText}</div>
           </div>
           <div className='horizontal-group copy-footer'>
-            <div className='copy-button'>
+            <div className='download-button'>
               <PrimaryButton
+                  text='Download'
+                  className='margin-start-xsmall'
+                  onClick={onDownload}
+                  title='Download Jq transformation' 
+              />
+            </div>
+            <div className='copy-button'>
+              <DefaultButton
                   text='Copy Jq'
                   className='margin-start-xsmall'
                   onClick={copyAppInfo}
