@@ -100,7 +100,9 @@ const theme = getTheme();
 const contentStyles = mergeStyleSets({
   container: {
     display: 'flex',
-    flexFlow: 'column nowrap'
+    flexFlow: 'column nowrap',
+    maxHeight: '80%',
+    overflowY: 'auto'
   },
   header: [
     theme.fonts.xLargePlus,
