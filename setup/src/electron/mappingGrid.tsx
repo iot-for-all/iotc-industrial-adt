@@ -10,11 +10,6 @@ import './mappingGrid.css';
 import { TooltipHost } from '@fluentui/react';
 
 const theme = getTheme();
-
-const exampleChildClass = mergeStyles({
-    display: 'block',
-    marginBottom: '10px',
-});
   
 const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
 
@@ -40,11 +35,12 @@ export interface MappingGridProps {
     setSelectedKey: (key: number|string) => void;
     onDismiss: (row: MappingGridItem) => void;
     deselect: boolean;
+    filter?: string;
+    setFilter?: (string) => void;
 }
 
 export const MappingGrid = React.memo(function MappingGrid( props : MappingGridProps ) {
-    const { setSelectedKey, allItems, onDismiss, deselect } = props;
-    const [ filter, setFilter ] = React.useState<string>();
+    const { setSelectedKey, allItems, onDismiss, deselect, filter, setFilter } = props;
     const [ selectionChanged, setSelectionChanged ] = useBoolean(false);
 
     const selection = React.useMemo(() => new Selection({ 
@@ -82,29 +78,21 @@ export const MappingGrid = React.memo(function MappingGrid( props : MappingGridP
     // const gridRef = React.useRef<IDetailsList>();
     
     return (
-        <div>
-            <TextField
-                className={exampleChildClass}
-                label="Filter:"
-                onChange={(_, value) => setFilter(value)}
-                styles={textFieldStyles}
+        <MarqueeSelection selection={selection}>
+            <DetailsList
+                // componentRef={gridRef}
+                items={items}
+                columns={columns}
+                setKey="set"
+                layoutMode={DetailsListLayoutMode.justified}
+                selection={selection}
+                selectionPreservedOnEmptyClick={true}
+                ariaLabelForSelectionColumn="Toggle selection"
+                ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+                checkButtonAriaLabel="select row"
+                onRenderRow={onRenderRow}
             />
-            <MarqueeSelection selection={selection}>
-                <DetailsList
-                    // componentRef={gridRef}
-                    items={items}
-                    columns={columns}
-                    setKey="set"
-                    layoutMode={DetailsListLayoutMode.justified}
-                    selection={selection}
-                    selectionPreservedOnEmptyClick={true}
-                    ariaLabelForSelectionColumn="Toggle selection"
-                    ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-                    checkButtonAriaLabel="select row"
-                    onRenderRow={onRenderRow}
-                />
-            </MarqueeSelection>
-        </div>
+        </MarqueeSelection>
     );
 });
   

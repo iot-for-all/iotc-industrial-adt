@@ -154,14 +154,14 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
     }, [processedInput]);
 }
 
-interface NodeListProps {
+interface TwinsListProps {
     nodeRows: Node[];
     onSelect?: (selectedNode: Node) => void;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
 }
 
-function TwinsList({ nodeRows, onSelect, onMenuClick, styles }: NodeListProps) {
+function TwinsList({ nodeRows, onSelect, onMenuClick, styles }: TwinsListProps) {
     const [ selectedNode, setSelectedNode ] = React.useState<string>();
     const content = nodeRows.map(node => {
         const icon = node.collapsed ? '+' : '-';

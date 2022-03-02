@@ -51,6 +51,7 @@ export const Mapping = React.memo(function Mapping() {
     const [ error, setError ] = React.useState<string>();  // did an error occur?
 
     const [ items, setItems ] = React.useState<MappingGridItem[]>([]); // rows for the grid
+    const [ filter, setFilter ] = React.useState<string>();
     const [ showJqModal, setShowJqModal ] = useBoolean(false);
 
     // if a file has been selected, opcuaFile will be updated with the File object.
@@ -210,71 +211,76 @@ export const Mapping = React.memo(function Mapping() {
         >
             {error}
         </MessageBar>}
-        <div className='container'>
-            <OpcuaInputContainer 
-                jsonFile={opcuaFile}
-                setJsonFile={setOpcuaFile}
-                jsonContent={opcuaJson}
-                onSelect={onSelectOpcuaInput}
-                styles={opcuaStyles}
-            />
-            <DtInputContainer 
-                twinJsonFile={dtTwinsFile}
-                setTwinJsonFile={setDtTwinsFile}
-                twinJsonContent={dtTwinsJson}
-                modelJsonFile={dtModelsFile}
-                setModelJsonFile={setDtModelsFile}
-                modelJsonContent={dtModelsJson}
-                onSelect={onSelectDTInput}
-                styles={dtStyles}
-            />
-            <div className='list grid-container'>
-                <div className='section-header'>Add/Update Mapping</div>
-                <div className='horizontal-group margin-bottom-xsmall'>
-                    <TooltipHost
-                        content={content}
-                        id={opcuaTooltipId}
-                    >
-                        <TextField
-                            name='opcuaNode'
-                            label='Opc UA Node'
-                            className='margin-end-xsmall'
-                            value={opcuaItem?.nodeName}
-                            readOnly
-                        /> 
-                    </TooltipHost>
-                    <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
-                    <TextField
-                        name='dtTwin'
-                        label='Digital Twin Id'
-                        className='margin-start-xsmall'
-                        value={dtItem?.twinId}
-                        title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
-                        readOnly
-                    />
-                    <TextField
-                        name='dtProperty'
-                        label='Property'
-                        className='margin-start-xsmall'
-                        value={dtItem?.propertyName}
-                        title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
-                        readOnly
-                    />
-                </div>
-                <PrimaryButton
-                    text={selectedKey ? 'Update' : 'Add'}
-                    onClick={onUpdateGrid}
-                    disabled={!opcuaItem || !dtItem?.propertyName || !dtItem?.twinId || !dtItem?.modelId}
+        <div className='mapping-container'>
+            <div className='horizontal-group'>
+                <OpcuaInputContainer 
+                    jsonFile={opcuaFile}
+                    setJsonFile={setOpcuaFile}
+                    jsonContent={opcuaJson}
+                    onSelect={onSelectOpcuaInput}
+                    styles={opcuaStyles}
                 />
-                {isUpdate && <MessageBar
-                    messageBarType={MessageBarType.info}
-                    isMultiline={false}
-                    onDismiss={setIsUpdate.setFalse}
-                    dismissButtonAriaLabel="Close"
-                    className='margin-bottom-xsmall'
-                >
-                    {`The selected row will be updated when saving...`}
-                </MessageBar>}
+                <DtInputContainer 
+                    twinJsonFile={dtTwinsFile}
+                    setTwinJsonFile={setDtTwinsFile}
+                    twinJsonContent={dtTwinsJson}
+                    modelJsonFile={dtModelsFile}
+                    setModelJsonFile={setDtModelsFile}
+                    modelJsonContent={dtModelsJson}
+                    onSelect={onSelectDTInput}
+                    styles={dtStyles}
+                />
+            </div>
+            <div className='mapping-wrapper group-wrapper'>
+                <div className='section-header group-header'>Add/Update Mapping</div>
+                <div className='horizontal-group margin-bottom-xsmall full-width justify-ends'>
+                    <div className='horizontal-group margin-end-xsmall'>
+                        <TooltipHost
+                            content={content}
+                            id={opcuaTooltipId}
+                        >
+                            <TextField
+                                name='opcuaNode'
+                                label='Opc UA Node'
+                                className='margin-end-xsmall'
+                                value={opcuaItem?.nodeName}
+                                readOnly
+                            /> 
+                        </TooltipHost>
+                        <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
+                        <TextField
+                            name='dtTwin'
+                            label='Digital Twin Id'
+                            className='margin-start-xsmall'
+                            value={dtItem?.twinId}
+                            title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
+                            readOnly
+                        />
+                        <TextField
+                            name='dtProperty'
+                            label='Property'
+                            className='margin-start-xsmall'
+                            value={dtItem?.propertyName}
+                            title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
+                            readOnly
+                        />
+                        <div className='anchor-bottom'>
+                            <PrimaryButton
+                                text={selectedKey ? 'Update' : 'Add'}
+                                className='margin-start-xsmall'
+                                onClick={onUpdateGrid}
+                                disabled={!opcuaItem || !dtItem?.propertyName || !dtItem?.twinId || !dtItem?.modelId}
+                            />
+                        </div>
+                    </div>
+                    <div className='horizontal-group place-end'>
+                        <TextField
+                            className='margin-start-xsmall'
+                            label="Filter:"
+                            onChange={(_, value) => setFilter(value)}
+                        />
+                    </div>
+                </div>
                 <div className='grid'>
                     {<MappingGrid 
                         allItems={items} 
@@ -283,8 +289,8 @@ export const Mapping = React.memo(function Mapping() {
                         deselect={deselect}
                     />}
                 </div>
-                <Footer disabled={!items?.length} onGenerateJQ={onGenerateJQ} onSaveMapping={null} />
             </div>
+            <Footer disabled={!items?.length} onGenerateJQ={onGenerateJQ} onSaveMapping={null} />
             <JqModal jq={items} isModalOpen={showJqModal} onDismiss={setShowJqModal.setFalse} />
         </div>
     </>);

@@ -1,71 +1,37 @@
 .file-viewer-container {
     display: flex;
     flex-direction: column;
-    width: 25%;
-    max-height: 800px;
+    width: 100%;
+    height: 500px;
+    max-height: 600px;
     position: relative;
-    margin-inline-end: 0.5rem;
     justify-content: stretch;
 }
 
-.twins-list {
+.opcua-wrapper {
+    width: 50%;
+    min-width: 200px;
     flex-grow: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    max-height: 35%;
 }
 
-.model-list {
-    flex-grow: 2;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    max-height: 65%;
-    padding-top: 0.5rem;
+.twins-wrapper {
+    min-width: 400px;
+    flex-grow: 1;
 }
 
-.horizontal-group {
-    display: flex;
-    flex-direction: row;
+.flatten-toggle {
+    min-width: 150px;
 }
 
-.align-center {
-    align-items: flex-start;
+.twins-viewer {
+    width: 50%;
 }
 
-.margin-top-xsmall {
-    margin-bottom: 0.5rem;
+.group-header {
+    border-bottom: solid 1px #eee;
 }
 
-.justify-ends {
-    justify-content: space-between;
-}
-
-.margin-bottom-xsmall {
-    margin-bottom: 0.5rem;
-}
-
-.margin-start-xsmall {
-    margin-inline-start: 0.5rem;
-}
-
-.margin-end-xsmall {
-    margin-inline-end: 0.5rem;
-}
-
-.opcua-viewer-container {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 2;
-    width: 100%;
-    padding: 0.5rem;
-    border: solid 1px #a19f9d;
-    box-sizing: border-box;
-    box-shadow: 0px 0px 5px rgb(0 0 0 / 0.2);
-}
-
-.dt-viewer-container {
+.viewer-container {
     display: flex;
     flex-direction: column;
     flex-grow: 2;
@@ -74,19 +40,17 @@
     padding: 0.5rem;
     border: solid 1px #a19f9d;
     box-sizing: border-box;
-    overflow: auto;
-    box-shadow: 0px 0px 5px rgb(0 0 0 / 0.2);
+    box-shadow: inset 0px 0px 5px rgb(0 0 0 / 0.2);
 }
 
-.viewer {
-    flex-grow: 1;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
+.selected {
+    background-color: lightyellow;
 }
 
-.icon-button {
-    border: solid 1px #a19f9d;
-    box-shadow: 1px 2px 5px rgb(0 0 0 / 0.2);
-    background-color: #faf9f8;
+.selectable:hover {
+    font-weight: bold;
+}
+
+.unselected {
+    background-color: inherit;
 }

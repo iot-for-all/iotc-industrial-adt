@@ -131,7 +131,7 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
         setNodeRows(newRows);
     }, [nodeRows, processedInput?.nodeMap]);
 
-    return <NodeList nodeRows={nodeRows} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
+    return <ModelsList nodeRows={nodeRows} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
 
 });
 
@@ -364,7 +364,7 @@ function updateChild(childNode: Node, parentNode: Node) {
     }
 }
 
-interface NodeListProps {
+interface ModelsListProps {
     nodeRows: Node[];
     onSelect?: (selectedNode: Node) => void;
     indentPixels: number;
@@ -372,7 +372,7 @@ interface NodeListProps {
     styles?: DtStyleScheme;
 }
 
-function NodeList({ nodeRows, onSelect, indentPixels, onMenuClick, styles }: NodeListProps) {
+function ModelsList({ nodeRows, onSelect, indentPixels, onMenuClick, styles }: ModelsListProps) {
     const [ selectedNode, setSelectedNode ] = React.useState<string>();
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, node.name ?? node.displayName ?? node.id].join('.');

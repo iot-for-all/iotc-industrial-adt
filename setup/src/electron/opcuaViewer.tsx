@@ -3,8 +3,6 @@ import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
 
-import './opcuaViewer.css';
-
 export interface Node {
     key: string;
     id: string;
@@ -102,7 +100,7 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
         setNodeRows(newRows);
     }, [nodeRows, processedInput?.nodeMap]);
 
-    return <NodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
+    return <OpcuaNodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
 
 });
 
@@ -244,7 +242,7 @@ function useGetRows(processedInput: ProcessedInput): (NSNode | TagNode)[] {
     }, [processedInput]);
 }
 
-interface NodeListProps {
+interface OpcuaNodeListProps {
     nodeRows: (NSNode | TagNode)[];
     flatten?: boolean;
     onSelect?: (selectedNode: TagNode) => void;
@@ -253,7 +251,7 @@ interface NodeListProps {
     styles?: OpcuaStyleScheme;
 }
 
-function NodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles }: NodeListProps) {
+function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles }: OpcuaNodeListProps) {
     const [ selectedNode, setSelectedNode ] = React.useState<string>();
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, (node as TagNode).name ?? node.id].join('.');

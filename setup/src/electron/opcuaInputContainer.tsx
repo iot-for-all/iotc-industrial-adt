@@ -27,31 +27,30 @@ export function OpcuaInputContainer(props) {
         }
     }, [setFlattened]);
 
-    return (<div className='file-viewer-container'>
-        <div className='horizontal-group align-center justify-ends'>
-            <div className='section-header'>OPC-UA Node Hierarchy</div>
-            <div className='header-item'>
+    return (
+        <div className='file-viewer-container group-wrapper opcua-wrapper margin-end-xsmall'>
+            <div className='section-header group-header'>OPC-UA Node Hierarchy</div>
+            <div className='flatten-toggle'>
                 <Toggle label="Flattened" inlineLabel onText="On" offText="Off" onChange={onChange} />
             </div>
-        </div>
-        <div className='horizontal-group margin-bottom-xsmall'>      
-            <FileUpload 
-                onChange={setJsonFile} 
-                iconOnly
-                iconProps={{ iconName: 'openFile'}}
-                className='icon-button margin-end-xsmall'
-            />
-            <div className='margin-start-xsmall font-small ellipsis-left' title={jsonFile?.path || 'No file selected'}>
-                {jsonFile?.path || 'No file selected'}
+            <div className='horizontal-group margin-bottom-xsmall'>      
+                <FileUpload 
+                    onChange={setJsonFile} 
+                    iconOnly
+                    iconProps={{ iconName: 'openFile'}}
+                    className='icon-button margin-end-xsmall'
+                />
+                <div className='margin-start-xsmall font-small ellipsis-left' title={jsonFile?.path || 'No file selected'}>
+                    {jsonFile?.path || 'No file selected'}
+                </div>
+            </div>
+            <div className='viewer-container'>
+                <SearchBox
+                    placeholder={'Search'}
+                    className='margin-bottom-xsmall'
+                />
+                <OpcuaViewer jsonContent={jsonContent} flatten={flattened} onSelect={onSelect} styles={styles}/>
             </div>
         </div>
-        <div className='opcua-viewer-container'>
-            <SearchBox
-                placeholder={'Search'}
-                className='margin-bottom-xsmall'
-            />
-            <OpcuaViewer jsonContent={jsonContent} flatten={flattened} onSelect={onSelect} styles={styles}/>
-        </div>
-        
-    </div>);
+    );
 }
