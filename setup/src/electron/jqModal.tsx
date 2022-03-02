@@ -67,7 +67,7 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
         </div>
         <div className={contentStyles.body}>
           <div className='jq-modal'>
-            <div>{jqText}</div>
+            <div><pre>{jqText}</pre></div>
           </div>
           <div className='horizontal-group copy-footer'>
             <div className='download-button'>
