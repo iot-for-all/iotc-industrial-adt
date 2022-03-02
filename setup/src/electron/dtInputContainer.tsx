@@ -49,7 +49,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     return (
         <div className='file-viewer-container group-wrapper twins-wrapper'>
             <div className='section-header group-header'>Digital Twins</div>
-            <div className='horizontal-group expand-height'>
+            <div className='horizontal-group expand no-scroll-parent'>
                 <div className='vertical-group twins-viewer margin-end-xsmall'>
                     <div className='section-header'>Twin Instances</div>
                     <div className='horizontal-group margin-bottom-xsmall'>      

@@ -212,7 +212,7 @@ export const Mapping = React.memo(function Mapping() {
             {error}
         </MessageBar>}
         <div className='mapping-container'>
-            <div className='horizontal-group'>
+            <div className='horizontal-group input-container'>
                 <OpcuaInputContainer 
                     jsonFile={opcuaFile}
                     setJsonFile={setOpcuaFile}
@@ -233,25 +233,27 @@ export const Mapping = React.memo(function Mapping() {
             </div>
             <div className='mapping-wrapper group-wrapper'>
                 <div className='section-header group-header'>Add/Update Mapping</div>
-                <div className='horizontal-group margin-bottom-xsmall full-width justify-ends'>
-                    <div className='horizontal-group margin-end-xsmall'>
-                        <TooltipHost
-                            content={content}
-                            id={opcuaTooltipId}
-                        >
-                            <TextField
-                                name='opcuaNode'
-                                label='Opc UA Node'
-                                className='margin-end-xsmall'
-                                value={opcuaItem?.nodeName}
-                                readOnly
-                            /> 
-                        </TooltipHost>
+                <div className='horizontal-group margin-bottom-xsmall full-width justify-ends no-scroll-parent'>
+                    <div className='horizontal-group margin-end-medium expand'>
+                        <div className='expand'>
+                            <TooltipHost
+                                content={content}
+                                id={opcuaTooltipId}
+                            >
+                                <TextField
+                                    name='opcuaNode'
+                                    label='Opc UA Node'
+                                    className='margin-end-xsmall'
+                                    value={opcuaItem?.nodeName}
+                                    readOnly
+                                /> 
+                            </TooltipHost>
+                        </div>
                         <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
                         <TextField
                             name='dtTwin'
                             label='Digital Twin Id'
-                            className='margin-start-xsmall'
+                            className='margin-start-xsmall expand'
                             value={dtItem?.twinId}
                             title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
                             readOnly
@@ -259,23 +261,24 @@ export const Mapping = React.memo(function Mapping() {
                         <TextField
                             name='dtProperty'
                             label='Property'
-                            className='margin-start-xsmall'
+                            className='margin-start-xsmall expand'
                             value={dtItem?.propertyName}
                             title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
                             readOnly
                         />
-                        <div className='anchor-bottom'>
+                        <div className='anchor-bottom expand'>
                             <PrimaryButton
                                 text={selectedKey ? 'Update' : 'Add'}
-                                className='margin-start-xsmall'
+                                className='margin-start-xsmall margin-end-'
                                 onClick={onUpdateGrid}
                                 disabled={!opcuaItem || !dtItem?.propertyName || !dtItem?.twinId || !dtItem?.modelId}
                             />
                         </div>
                     </div>
+                    <div className='separator'></div>
                     <div className='horizontal-group place-end'>
                         <TextField
-                            className='margin-start-xsmall'
+                            className='full-width'
                             label="Filter:"
                             onChange={(_, value) => setFilter(value)}
                         />
