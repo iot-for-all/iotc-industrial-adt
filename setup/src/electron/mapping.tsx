@@ -290,6 +290,7 @@ export const Mapping = React.memo(function Mapping() {
                         setSelectedKey={setSelectedKey}
                         onDismiss={onDismiss}
                         deselect={deselect}
+                        filter={filter}
                     />}
                 </div>
             </div>

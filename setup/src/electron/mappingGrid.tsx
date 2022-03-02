@@ -36,11 +36,10 @@ export interface MappingGridProps {
     onDismiss: (row: MappingGridItem) => void;
     deselect: boolean;
     filter?: string;
-    setFilter?: (string) => void;
 }
 
 export const MappingGrid = React.memo(function MappingGrid( props : MappingGridProps ) {
-    const { setSelectedKey, allItems, onDismiss, deselect, filter, setFilter } = props;
+    const { setSelectedKey, allItems, onDismiss, deselect, filter } = props;
     const [ selectionChanged, setSelectionChanged ] = useBoolean(false);
 
     const selection = React.useMemo(() => new Selection({ 
