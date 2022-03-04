@@ -5,18 +5,17 @@ import { FileUpload } from './core/controls/fileUpload';
 import { OpcuaViewer, OpcuaStyleScheme, TagNode } from './opcuaViewer';
 
 import './inputContainer.css';
-
 export interface OpcuaInputContainerProps {
     jsonFile: File;
     setJsonFile: () => void;
     jsonContent: object;
     onSelect: (selectedNode: TagNode) => void;
+    selectedItemKey: string;
     styles?: OpcuaStyleScheme;
-    clearSelect?: boolean;
 }
 
 export function OpcuaInputContainer(props) {
-    const { jsonFile, setJsonFile, jsonContent, onSelect, styles, clearSelect } = props;
+    const { jsonFile, setJsonFile, jsonContent, onSelect, selectedItemKey, styles } = props;
 
     const [ flattened, setFlattened ] = useBoolean(false);
 
@@ -50,7 +49,13 @@ export function OpcuaInputContainer(props) {
                     placeholder={'Search'}
                     className='margin-bottom-xsmall'
                 />
-                <OpcuaViewer jsonContent={jsonContent} flatten={flattened} onSelect={onSelect} styles={styles} clearSelect={clearSelect} />
+                <OpcuaViewer 
+                    jsonContent={jsonContent} 
+                    flatten={flattened} 
+                    onSelect={onSelect} 
+                    styles={styles} 
+                    selectedItemKey={selectedItemKey}
+                />
             </div>
         </div>
     );

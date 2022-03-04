@@ -214,8 +214,6 @@ export const Mapping = React.memo(function Mapping() {
         );
       }, [items]);
 
-    const clearSelect = !opcuaItem && !dtItem;
-
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -234,7 +232,7 @@ export const Mapping = React.memo(function Mapping() {
                     jsonContent={opcuaJson}
                     onSelect={onSelectOpcuaInput}
                     styles={opcuaStyles}
-                    clearSelect={clearSelect}
+                    selectedItemKey={opcuaItem?.key}
                 />
                 <DtInputContainer 
                     twinJsonFile={dtTwinsFile}

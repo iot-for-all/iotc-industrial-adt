@@ -2,6 +2,7 @@ import { TooltipHost } from '@fluentui/react';
 import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
+import { OpcuaItem } from './models';
 
 export interface Node {
     key: string;
@@ -61,12 +62,12 @@ export interface ViewerProps {
     noWrap?: boolean;
     styles?:  OpcuaStyleScheme;
     onSelect?: (selectedNode: TagNode) => void;
-    clearSelect?: boolean;
+    selectedItemKey: string;
 }
 
 const defaultIndent = 10;
 
-export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatten, indentWidth, onSelect, styles, clearSelect }: ViewerProps) {
+export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatten, indentWidth, onSelect, styles, selectedItemKey }: ViewerProps) {
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -113,7 +114,17 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
             {error}
         </div>);
     }
-    return <OpcuaNodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles} clearSelect={clearSelect} />;
+    return (
+        <OpcuaNodeList 
+            nodeRows={nodeRows} 
+            flatten={flatten} 
+            onSelect={onSelect} 
+            indentPixels={indentPixels} 
+            onMenuClick={onMenuClick} 
+            styles={styles} 
+            selectedItemKey={selectedItemKey} 
+        />
+    );
 
 });
 
@@ -262,11 +273,10 @@ interface OpcuaNodeListProps {
     indentPixels: number;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: OpcuaStyleScheme;
-    clearSelect?: boolean;
+    selectedItemKey: string;
 }
 
-function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles, clearSelect }: OpcuaNodeListProps) {
-    const [ selectedNode, setSelectedNode ] = React.useState<string>();
+function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles, selectedItemKey }: OpcuaNodeListProps) {
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, (node as TagNode).name ?? node.id].join('.');
         const tagNode: TagNode = (node as TagNode).type ? node as TagNode : undefined;
@@ -280,16 +290,13 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
         const MenuIcon = React.memo(() => <div className='menu-icon icon-button margin-end-xsmall clickable' onClick={onClick}>{icon}</div>);
         const select = tagNode 
-            ? () => {
-                setSelectedNode(selectedNode === tagNode.key ? undefined : tagNode.key);
-                onSelect(selectedNode === tagNode.key ? undefined : tagNode);
-            }
+            ? () => onSelect(selectedItemKey === tagNode.key ? undefined : tagNode)
             : undefined;
         if (flatten && type) {
             return (
                 <div key={fullName} title={fullName} className='row vertical-group clickable viewer-card margin-bottom-xsmall font-small' onClick={select}>
                     <div className='horizontal-group justify-ends'>
-                        <div className={`font-small selectable ${selectedNode === tagNode.key ? 'selected' : ''}`} style={styles?.leafName}>{(node as TagNode).name ?? node.id}</div>
+                        <div className={`font-small selectable ${selectedItemKey === tagNode.key ? 'selected' : ''}`} style={styles?.leafName}>{(node as TagNode).name ?? node.id}</div>
                         <div>{type}</div>
                     </div>
                     <div style={styles?.path}>path: {node.namespace.join('.')}</div>
@@ -299,7 +306,7 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
         if (!flatten && !node.hide) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
-                <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedNode === node.key ? 'selected' : ''}`} style={style}>
+                <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedItemKey === node.key ? 'selected' : ''}`} style={style}>
                     {!tagNode && <MenuIcon />}
                     <div 
                         className={`${select ? ' clickable selectable' : ''}`} 
@@ -313,12 +320,6 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
             );
         }
     });
-
-    React.useEffect(() => {
-        if (clearSelect) {
-            setSelectedNode(undefined);
-        }
-    }, [clearSelect]);
 
     return (<div className='viewer'>
         {content}
