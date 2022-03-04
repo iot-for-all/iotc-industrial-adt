@@ -1,8 +1,10 @@
 {
-  "name": "setup",
+  "name": "opcdt-mapper",
   "version": "0.1.0",
   "private": true,
   "main": ".webpack/main",
+  "author": "jahollie",
+  "description": "OPC-UA node to Azure Digital Twin mapper",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
