@@ -8,25 +8,9 @@ import { useBoolean, useId } from '@fluentui/react-hooks';
 import { OpcuaStyleScheme, TagNode } from './opcuaViewer';
 import { OpcuaInputContainer } from './opcuaInputContainer';
 import { DtInputContainer } from './dtInputContainer';
-import { DtNode, DtStyleScheme } from './dtModels';
+import { DtNode, DtStyleScheme, OpcuaItem, DtItem } from './models';
 import { JqModal } from './jqModal';
 import { downloadFile } from './core/controls/downloadFile';
-
-interface OpcuaItem {
-    key: string;
-    nodeId: string;
-    nodeName: string;
-    namespace: string[];
-}
-
-interface DtItem {
-    key: string;
-    twinId: string;
-    twinName: string;
-    modelId: string;
-    propertyName: string;
-    propertyId?: string;
-}
 
 export const Mapping = React.memo(function Mapping() {
     const [ opcuaFile, setOpcuaFile ] = React.useState<File>();  // json input file for opcua definitions

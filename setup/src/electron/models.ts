@@ -22,3 +22,19 @@ export interface DtNode {
     propertyName: string;
     propertyId: string;
 }
+
+export interface OpcuaItem {
+    key: string;
+    nodeId: string;
+    nodeName: string;
+    namespace: string[];
+}
+
+export interface DtItem {
+    key: string;
+    twinId: string;
+    twinName: string;
+    modelId: string;
+    propertyName: string;
+    propertyId?: string;
+}

@@ -1,7 +1,7 @@
 import { SearchBox } from '@fluentui/react';
 import React, { Dispatch, SetStateAction } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
-import { DtNode, DtStyleScheme } from './dtModels';
+import { DtNode, DtStyleScheme } from './models';
 import { DtModelViewer, Node as ModelNode } from './dtModelViewer';
 import { DtTwinsViewer, Node as TwinNode } from './dtTwinsViewer';
 

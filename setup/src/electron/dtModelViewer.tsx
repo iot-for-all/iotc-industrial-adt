@@ -2,7 +2,7 @@ import { TooltipHost } from '@fluentui/react';
 import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
-import { DtStyleScheme } from './dtModels';
+import { DtStyleScheme } from './models';
 
 import './dtViewer.css';
 
