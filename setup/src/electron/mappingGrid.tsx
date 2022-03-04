@@ -29,35 +29,36 @@ export interface MappingGridItem {
 
 export interface MappingGridProps {
     allItems: MappingGridItem[];
-    setSelectedKey: (key: number|string) => void;
+    onSelectRow: (key: number|string) => void;
     onDismiss: (row: MappingGridItem) => void;
     deselect: boolean;
     filter?: string;
 }
 
 export const MappingGrid = React.memo(function MappingGrid( props : MappingGridProps ) {
-    const { setSelectedKey, allItems, onDismiss, deselect, filter } = props;
+    const { onSelectRow, allItems, onDismiss, deselect, filter } = props;
     const [ selectionChanged, setSelectionChanged ] = useBoolean(false);
 
     const selection = React.useMemo(() => new Selection({ 
         selectionMode: SelectionMode.single,
-        onSelectionChanged: setSelectionChanged.setTrue
+        onSelectionChanged: setSelectionChanged.setTrue // don't have access to selection.getSelection here so set state flag
     }), [setSelectionChanged.setTrue]);
+
+    const selectedKey = selection.getSelection()[0]?.key;
 
     React.useEffect(() => {
         if (selectionChanged) {
-            setSelectedKey(selection.getSelection()[0]?.key)
-            setSelectionChanged.setFalse(); // set back to false so only updates the key on row click (prevents infinite state update loop)
+            onSelectRow(selectedKey)
+            setSelectionChanged.setFalse(); // reset it for the next time the onSelectionChanged event occurs
         }
-    }, [selection, selectionChanged, setSelectedKey, setSelectionChanged]);
+    }, [onSelectRow, selectedKey, selection, selectionChanged, setSelectionChanged]);
 
-    React.useEffect(() => {
+    React.useEffect(() => { 
         if (deselect) {
             // deselect the current row and turn off the deselect flag
             selection.toggleAllSelected();
         }
     }, [selection, deselect]);
-    
 
     const items = useFilteredItems(filter, allItems);
 

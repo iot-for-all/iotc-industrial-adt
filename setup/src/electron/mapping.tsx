@@ -89,7 +89,8 @@ export const Mapping = React.memo(function Mapping() {
         }
     }, [dtModelsFile]);
 
-    const onSelectGridRow = React.useCallback(newKey => {
+    // callback invoked by MappingGrid when the row selection changes
+    const onGridRowSelectionChange = React.useCallback(newKey => {
         if (newKey) {
             const item = items.find(item => item.key === newKey);
             if (item) {
@@ -98,16 +99,17 @@ export const Mapping = React.memo(function Mapping() {
                 const dt = createDtItemFromSelectedRow(item);
                 setDtItem(dt);
             }
-            setSelectedKey(newKey)
         } else {
             if (opcuaItem) {
                 setOpcuaItem(undefined);
             }
             if (dtItem) {
                 setDtItem(undefined);
-            }
+            }  
         }
-    }, [dtItem, items, opcuaItem]);
+        setSelectedKey(newKey)
+        setDeselectGrid.setFalse();
+    }, [dtItem, items, opcuaItem, setDeselectGrid]);
 
     const onSelectOpcuaInput = React.useCallback((tagNode: TagNode) => {
         const opcua: OpcuaItem = tagNode 
@@ -287,7 +289,7 @@ export const Mapping = React.memo(function Mapping() {
                 <div className='grid'>
                     {<MappingGrid 
                         allItems={items} 
-                        setSelectedKey={onSelectGridRow}
+                        onSelectRow={onGridRowSelectionChange}
                         onDismiss={onDismiss}
                         deselect={deselectGrid}
                         filter={filter}
