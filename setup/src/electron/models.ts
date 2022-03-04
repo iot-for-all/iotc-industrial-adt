@@ -13,16 +13,6 @@ export interface DtStyleScheme {
     twinName?: React.CSSProperties;
 }
 
-export interface DtNode {
-    twinKey: string;
-    twinId: string;
-    twinName: string;
-    modelId: string;
-    modelKey: string;
-    propertyName: string;
-    propertyId: string;
-}
-
 export interface OpcuaItem {
     key: string;
     nodeId: string;
@@ -32,8 +22,10 @@ export interface OpcuaItem {
 
 export interface DtItem {
     key: string;
+    twinKey: string;
     twinId: string;
     twinName: string;
+    modelKey: string;
     modelId: string;
     propertyName: string;
     propertyId?: string;

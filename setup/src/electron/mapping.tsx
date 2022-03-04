@@ -8,7 +8,7 @@ import { useBoolean, useId } from '@fluentui/react-hooks';
 import { OpcuaStyleScheme, TagNode } from './opcuaViewer';
 import { OpcuaInputContainer } from './opcuaInputContainer';
 import { DtInputContainer } from './dtInputContainer';
-import { DtNode, DtStyleScheme, OpcuaItem, DtItem } from './models';
+import { DtStyleScheme, OpcuaItem, DtItem } from './models';
 import { JqModal } from './jqModal';
 import { downloadFile } from './core/controls/downloadFile';
 
@@ -109,21 +109,6 @@ export const Mapping = React.memo(function Mapping() {
         }
     }, [dtItem, items, opcuaItem]);
 
-    // callback for click on JSON node
-    const onSelectDTInput = React.useCallback((dtNode: DtNode) => {
-        const dt: DtItem = dtNode 
-            ? {
-                key: `${dtNode.twinKey}-${dtNode.modelKey}`,
-                twinId: dtNode.twinId,
-                twinName: dtNode.twinName,
-                modelId: dtNode.modelId,
-                propertyName: dtNode.propertyName,
-                propertyId: dtNode.propertyId
-            }
-            : undefined;
-        setDtItem(dt);
-    }, []);
-
     const onSelectOpcuaInput = React.useCallback((tagNode: TagNode) => {
         const opcua: OpcuaItem = tagNode 
             ? {
@@ -214,13 +199,6 @@ export const Mapping = React.memo(function Mapping() {
         );
       }, [items]);
 
-    const [ selectedTwinKey, selectedModelKey ] = React.useMemo(() => {
-        const hyphenIdx = dtItem?.key.indexOf('-');
-        const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
-        const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
-        return [selectedTwinKey, selectedModelKey ];
-    }, [dtItem]);
-
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -248,9 +226,8 @@ export const Mapping = React.memo(function Mapping() {
                     modelJsonFile={dtModelsFile}
                     setModelJsonFile={setDtModelsFile}
                     modelJsonContent={dtModelsJson}
-                    onSelect={onSelectDTInput}
-                    selectedTwinKey={selectedTwinKey}
-                    selectedModelKey={selectedModelKey}
+                    onSelect={setDtItem}
+                    dtItem={dtItem}
                     styles={dtStyles}
                 />
             </div>
@@ -364,10 +341,15 @@ function createOpcuaItemFromSelectedRow(item: MappingGridItem): OpcuaItem {
 }
 
 function createDtItemFromSelectedRow(item: MappingGridItem): DtItem {
+    const hyphenIdx = item?.dtKey.indexOf('-');
+    const selectedTwinKey = hyphenIdx > 0 ? item.dtKey.substring(0, hyphenIdx) : undefined;
+    const selectedModelKey = hyphenIdx > 0 ? item.dtKey.substring(hyphenIdx + 1) : undefined;
     return {
         key: item.dtKey,
+        twinKey: selectedTwinKey,
         twinId: item.dtId,
         twinName: item.dtName,
+        modelKey: selectedModelKey,
         modelId: item.dtModelId,
         propertyName: item.dtPropertyName,
         propertyId: item.dtPropertyId

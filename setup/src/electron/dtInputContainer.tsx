@@ -1,7 +1,7 @@
 import { SearchBox } from '@fluentui/react';
 import React, { Dispatch, SetStateAction } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
-import { DtNode, DtStyleScheme } from './models';
+import { DtItem, DtStyleScheme } from './models';
 import { DtModelViewer, Node as ModelNode } from './dtModelViewer';
 import { DtTwinsViewer, Node as TwinNode } from './dtTwinsViewer';
 
@@ -14,39 +14,39 @@ export interface NodeViewerProps {
     setModelJsonFile: Dispatch<SetStateAction<File>>;
     twinJsonContent: object;
     modelJsonContent: object;
-    onSelect: (selectedNode: DtNode) => void;
-    selectedTwinKey: string;
-    selectedModelKey: string;
+    onSelect: (selectedNode: DtItem) => void;
+    dtItem: DtItem;
     styles?: DtStyleScheme;
 }
 
 export function DtInputContainer(props: NodeViewerProps) {
-    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, selectedTwinKey, selectedModelKey, styles } = props;
+    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles } = props;
 
-    const [ dtNode, setDtNode ] = React.useState<DtNode>();
+    const [ selectedTwinKey, selectedModelKey ] = React.useMemo(() => {
+        const hyphenIdx = dtItem?.key.indexOf('-');
+        const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
+        const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
+        return [selectedTwinKey, selectedModelKey ];
+    }, [dtItem]);
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
-        setDtNode({ ...dtNode, 
+        onSelect({ ...dtItem,
+            key: `${twinNode?.key}-${selectedModelKey}`,
             twinKey: twinNode?.key, 
             twinId: twinNode?.id, 
             twinName: twinNode?.name, 
             modelId: twinNode?.modelId
         });
-    }, [dtNode]);
+    }, [dtItem, onSelect, selectedModelKey]);
 
     const onModelSelect = React.useCallback((modelNode: ModelNode) => {
-        setDtNode({ ...dtNode, 
+        onSelect({ ...dtItem, 
+            key: `${selectedTwinKey}-${modelNode?.key}`,
             modelKey: modelNode?.key, 
             propertyName: modelNode?.name, 
             propertyId: modelNode?.id 
         });
-    }, [dtNode]);
-
-    // dtNode is updated only if one of the viewers changes their selection,
-    // so on dtNode change, call onSelect to let the parent know
-    React.useEffect(() => {
-        onSelect(dtNode);
-    }, [dtNode, onSelect])
+    }, [dtItem, onSelect, selectedTwinKey]);
 
     return (
         <div className='file-viewer-container group-wrapper twins-wrapper'>
@@ -77,7 +77,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                     <div className='section-header'>Models</div>
                     <div className='horizontal-group margin-bottom-xsmall'>      
                         <FileUpload 
-                            onChange={setModelJsonFile} 
+                            onChange={setModelJsonFile}
                             iconOnly
                             iconProps={{ iconName: 'openFile'}}
                             className='icon-button margin-end-xsmall'

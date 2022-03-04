@@ -1,17 +1,14 @@
 import * as React from 'react';
 import { DetailsList, DetailsRow, IDetailsRowStyles, DetailsListLayoutMode, Selection, SelectionMode, IDetailsRowProps  } from '@fluentui/react/lib/DetailsList';
 import { getTheme } from '@fluentui/react/lib/Styling';
-import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
-import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { useBoolean, useId } from '@fluentui/react-hooks';
 
 import './mappingGrid.css';
 import { TooltipHost } from '@fluentui/react';
 
 const theme = getTheme();
-  
-const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
+
 
 export interface MappingGridItem {
     key: number|string;
