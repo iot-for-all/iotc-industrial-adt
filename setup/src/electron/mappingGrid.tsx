@@ -50,7 +50,7 @@ export const MappingGrid = React.memo(function MappingGrid( props : MappingGridP
     React.useEffect(() => {
         if (selectionChanged) {
             setSelectedKey(selection.getSelection()[0]?.key)
-            setSelectionChanged.setFalse();
+            setSelectionChanged.setFalse(); // set back to false so only updates the key on row click (prevents infinite state update loop)
         }
     }, [selection, selectionChanged, setSelectedKey, setSelectionChanged]);
 
