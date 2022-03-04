@@ -11,7 +11,8 @@ export interface TwinsViewerProps {
     collapsed?: boolean |  number;
     noWrap?: boolean;
     styles?:  DtStyleScheme;
-    onSelect?: (selectedNode: Node) => void;
+    onSelect: (selectedNode: Node) => void;
+    selectedTwinKey: string;
 }
 
 export interface Node {
@@ -40,7 +41,7 @@ interface ProcessedInput {
     modelTwinsMap: Map<string, Node[]>;
 }
 
-export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, styles }: TwinsViewerProps) {
+export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles }: TwinsViewerProps) {
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
     let processedInput;
@@ -80,7 +81,15 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
             {error}
         </div>);
     }
-    return <TwinsList nodeRows={nodeRows} onSelect={onSelect} onMenuClick={onMenuClick} styles={styles}/>;
+    return (
+        <TwinsList 
+            nodeRows={nodeRows} 
+            onSelect={onSelect} 
+            selectedTwinKey={selectedTwinKey}
+            onMenuClick={onMenuClick} 
+            styles={styles}
+        />
+    );
 
 });
 
@@ -169,25 +178,22 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
 interface TwinsListProps {
     nodeRows: Node[];
     onSelect?: (selectedNode: Node) => void;
+    selectedTwinKey: string;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
 }
 
-function TwinsList({ nodeRows, onSelect, onMenuClick, styles }: TwinsListProps) {
-    const [ selectedNode, setSelectedNode ] = React.useState<string>();
+function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }: TwinsListProps) {
     const content = nodeRows.map(node => {
         const icon = node.collapsed ? '+' : '-';
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
         const MenuIcon = React.memo(() => <div className='menu-icon icon-button margin-end-xsmall clickable' onClick={onClick}>{icon}</div>);
         const select = !node.isModel
-            ? () => {
-                setSelectedNode(selectedNode === node.key ? undefined : node.key);
-                onSelect(selectedNode === node.key ? undefined : node);
-            }
+            ? () => onSelect(selectedTwinKey === node.key ? undefined : node)
             : undefined;
         if (!node.hide) {
             return (
-                <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedNode === node.key ? 'selected' : 'unselected'}`}>
+                <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`}>
                     {node.isModel && <MenuIcon />}
                     <div 
                         className={`viewer-row-label ${select ? ' clickable selectable' : ''}`} 

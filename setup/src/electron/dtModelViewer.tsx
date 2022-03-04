@@ -14,7 +14,8 @@ export interface DtModelViewerProps {
     collapsed?: boolean |  number;
     noWrap?: boolean;
     styles?:  DtStyleScheme;
-    onSelect?: (selectedNode: Node) => void;
+    onSelect: (selectedNode: Node) => void;
+    selectedModelKey: string;
 }
 
 export interface Node {
@@ -96,7 +97,7 @@ interface IdToKeyMap {
 
 const defaultIndent = 10;
 
-export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, indentWidth, onSelect, styles }: DtModelViewerProps) {
+export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, indentWidth, onSelect, selectedModelKey, styles }: DtModelViewerProps) {
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -143,8 +144,16 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
             {error}
         </div>);
     }
-    return <ModelsList nodeRows={nodeRows} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
-
+    return (
+        <ModelsList 
+            nodeRows={nodeRows} 
+            onSelect={onSelect} 
+            selectedModelKey={selectedModelKey}
+            indentPixels={indentPixels} 
+            onMenuClick={onMenuClick} 
+            styles={styles}
+        />
+    );
 });
 
 function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
@@ -378,29 +387,26 @@ function updateChild(childNode: Node, parentNode: Node) {
 
 interface ModelsListProps {
     nodeRows: Node[];
-    onSelect?: (selectedNode: Node) => void;
+    onSelect: (selectedNode: Node) => void;
+    selectedModelKey: string;
     indentPixels: number;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
 }
 
-function ModelsList({ nodeRows, onSelect, indentPixels, onMenuClick, styles }: ModelsListProps) {
-    const [ selectedNode, setSelectedNode ] = React.useState<string>();
+function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenuClick, styles }: ModelsListProps) {
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, node.name ?? node.displayName ?? node.id].join('.');
         const icon = node.collapsed ? '+' : '-';
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
         const MenuIcon = React.memo(() => <div className='menu-icon icon-button margin-end-xsmall clickable' onClick={onClick}>{icon}</div>);
         const select = node.type.toLowerCase() === 'property'
-            ? () => {
-                setSelectedNode(selectedNode === node.key ? undefined : node.key);
-                onSelect(selectedNode === node.key ? undefined : node);
-            }
+            ? () => onSelect(selectedModelKey === node.key ? undefined : node)
             : undefined;
         if (!node.hide) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
-                <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedNode === node.key ? 'selected' : 'unselected'}`} style={style}>
+                <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedModelKey === node.key ? 'selected' : 'unselected'}`} style={style}>
                     {!!node.children.length && <MenuIcon />}
                     <div 
                         className={`${select ? ' clickable selectable' : ''} viewer-row-label`} 

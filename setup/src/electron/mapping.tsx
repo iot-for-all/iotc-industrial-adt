@@ -214,6 +214,13 @@ export const Mapping = React.memo(function Mapping() {
         );
       }, [items]);
 
+    const [ selectedTwinKey, selectedModelKey ] = React.useMemo(() => {
+        const hyphenIdx = dtItem?.key.indexOf('-');
+        const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
+        const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
+        return [selectedTwinKey, selectedModelKey ];
+    }, [dtItem]);
+
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -242,6 +249,8 @@ export const Mapping = React.memo(function Mapping() {
                     setModelJsonFile={setDtModelsFile}
                     modelJsonContent={dtModelsJson}
                     onSelect={onSelectDTInput}
+                    selectedTwinKey={selectedTwinKey}
+                    selectedModelKey={selectedModelKey}
                     styles={dtStyles}
                 />
             </div>

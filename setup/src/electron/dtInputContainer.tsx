@@ -15,11 +15,13 @@ export interface NodeViewerProps {
     twinJsonContent: object;
     modelJsonContent: object;
     onSelect: (selectedNode: DtNode) => void;
+    selectedTwinKey: string;
+    selectedModelKey: string;
     styles?: DtStyleScheme;
 }
 
 export function DtInputContainer(props: NodeViewerProps) {
-    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, styles } = props;
+    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, selectedTwinKey, selectedModelKey, styles } = props;
 
     const [ dtNode, setDtNode ] = React.useState<DtNode>();
 
@@ -68,7 +70,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                             placeholder={'Search'}
                             className='margin-bottom-xsmall'
                         />
-                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} styles={styles}/>
+                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles}/>
                     </div>
                 </div>
                 <div className='vertical-group twins-viewer'>
@@ -89,7 +91,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                             placeholder={'Search'}
                             className='margin-bottom-xsmall'
                         />
-                        <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} styles={styles}/>
+                        <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles}/>
                     </div>
                 </div>
             </div>
