@@ -61,11 +61,12 @@ export interface ViewerProps {
     noWrap?: boolean;
     styles?:  OpcuaStyleScheme;
     onSelect?: (selectedNode: TagNode) => void;
+    clearSelect?: boolean;
 }
 
 const defaultIndent = 10;
 
-export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatten, indentWidth, onSelect, styles }: ViewerProps) {
+export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatten, indentWidth, onSelect, styles, clearSelect }: ViewerProps) {
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -112,7 +113,7 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
             {error}
         </div>);
     }
-    return <OpcuaNodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles}/>;
+    return <OpcuaNodeList nodeRows={nodeRows} flatten={flatten} onSelect={onSelect} indentPixels={indentPixels} onMenuClick={onMenuClick} styles={styles} clearSelect={clearSelect} />;
 
 });
 
@@ -261,9 +262,10 @@ interface OpcuaNodeListProps {
     indentPixels: number;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: OpcuaStyleScheme;
+    clearSelect?: boolean;
 }
 
-function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles }: OpcuaNodeListProps) {
+function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles, clearSelect }: OpcuaNodeListProps) {
     const [ selectedNode, setSelectedNode ] = React.useState<string>();
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, (node as TagNode).name ?? node.id].join('.');
@@ -311,6 +313,13 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
             );
         }
     });
+
+    React.useEffect(() => {
+        if (clearSelect) {
+            setSelectedNode(undefined);
+        }
+    }, [clearSelect]);
+
     return (<div className='viewer'>
         {content}
     </div>);

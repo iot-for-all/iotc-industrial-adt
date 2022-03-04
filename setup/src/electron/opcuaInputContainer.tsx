@@ -12,10 +12,11 @@ export interface OpcuaInputContainerProps {
     jsonContent: object;
     onSelect: (selectedNode: TagNode) => void;
     styles?: OpcuaStyleScheme;
+    clearSelect?: boolean;
 }
 
 export function OpcuaInputContainer(props) {
-    const { jsonFile, setJsonFile, jsonContent, onSelect, styles } = props;
+    const { jsonFile, setJsonFile, jsonContent, onSelect, styles, clearSelect } = props;
 
     const [ flattened, setFlattened ] = useBoolean(false);
 
@@ -49,7 +50,7 @@ export function OpcuaInputContainer(props) {
                     placeholder={'Search'}
                     className='margin-bottom-xsmall'
                 />
-                <OpcuaViewer jsonContent={jsonContent} flatten={flattened} onSelect={onSelect} styles={styles}/>
+                <OpcuaViewer jsonContent={jsonContent} flatten={flattened} onSelect={onSelect} styles={styles} clearSelect={clearSelect} />
             </div>
         </div>
     );

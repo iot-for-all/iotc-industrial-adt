@@ -40,15 +40,14 @@ export const Mapping = React.memo(function Mapping() {
 
     const [ selectedKey, setSelectedKey ] = React.useState<string|number>();  // tracks the selected row key in the grid (make sure item keys aren't changing)
 
-    // Item is an object containing the base properties need to map the selected entry.
+    // Item is an object containing the base properties needed to map the selected entry.
     // 'Selected entry' refers to the data transferred when clicking on the raw opcua or dt input in the viewer or
     // from selecting a grid row for update. The item contents are shown in the working row and stored in the grid
     // item when the working row is saved.
     const [ opcuaItem, setOpcuaItem] = React.useState<OpcuaItem>();
     const [ dtItem, setDtItem ] = React.useState<DtItem>();
 
-    const [ isUpdate, setIsUpdate ] = useBoolean(false);  // is a row selected (and its values put in the working row)?
-    const [ deselect, setDeselect ] = useBoolean(false);  // after update, does the grid row need to be unselected?
+    const [ deselectGrid, setDeselectGrid ] = useBoolean(false);  // after update, does the grid row need to be unselected?
     const [ error, setError ] = React.useState<string>();  // did an error occur?
 
     const [ items, setItems ] = React.useState<MappingGridItem[]>([]); // rows for the grid
@@ -106,17 +105,16 @@ export const Mapping = React.memo(function Mapping() {
         }
     }, [dtModelsFile]);
 
-    // row is selected in grid so find the row item and put its values in the input fields
-    React.useEffect(() => {
-        if (selectedKey) {
-            const item = items.find(item => item.key === selectedKey);
+    const onSelectGridRow = React.useCallback(newKey => {
+        if (newKey) {
+            const item = items.find(item => item.key === newKey);
             if (item) {
                 const opcua = createOpcuaItemFromSelectedRow(item);
                 setOpcuaItem(opcua);
                 const dt = createDtItemFromSelectedRow(item);
                 setDtItem(dt);
-                setIsUpdate.setTrue();
             }
+            setSelectedKey(newKey)
         } else {
             if (opcuaItem) {
                 setOpcuaItem(undefined);
@@ -124,10 +122,8 @@ export const Mapping = React.memo(function Mapping() {
             if (dtItem) {
                 setDtItem(undefined);
             }
-            setDeselect.setFalse();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedKey]);  // only run if a grid row is selected, not if an entry is clicked in the viewer
+    }, [dtItem, items, opcuaItem]);
 
     // callback for click on JSON node
     const onSelectDTInput = React.useCallback((dtNode: DtNode) => {
@@ -177,10 +173,10 @@ export const Mapping = React.memo(function Mapping() {
             setOpcuaItem(undefined);
             setDtItem(undefined);
             if (selectedKey) {
-                setDeselect.setTrue();
+                setDeselectGrid.setTrue();
             }
         }
-    }, [opcuaItem, dtItem, selectedKey, items, setDeselect]);
+    }, [opcuaItem, dtItem, selectedKey, items, setDeselectGrid]);
 
     const opcuaTooltipId = useId('opcuaEntry');
     const content: JSX.Element = (<>
@@ -224,7 +220,7 @@ export const Mapping = React.memo(function Mapping() {
         setShowJqModal.setFalse();
         setCopyResult(undefined);
           setResultClass(undefined);
-    }, []);
+    }, [setShowJqModal]);
 
     const onSaveMapping = React.useCallback(() => {
         downloadFile(
@@ -233,6 +229,8 @@ export const Mapping = React.memo(function Mapping() {
             'opcua2dt-mapping.json'
         );
       }, [items]);
+
+    const clearSelect = !opcuaItem && !dtItem;
 
     return (<>
         {error && <MessageBar
@@ -252,6 +250,7 @@ export const Mapping = React.memo(function Mapping() {
                     jsonContent={opcuaJson}
                     onSelect={onSelectOpcuaInput}
                     styles={opcuaStyles}
+                    clearSelect={clearSelect}
                 />
                 <DtInputContainer 
                     twinJsonFile={dtTwinsFile}
@@ -320,9 +319,9 @@ export const Mapping = React.memo(function Mapping() {
                 <div className='grid'>
                     {<MappingGrid 
                         allItems={items} 
-                        setSelectedKey={setSelectedKey}
+                        setSelectedKey={onSelectGridRow}
                         onDismiss={onDismiss}
-                        deselect={deselect}
+                        deselect={deselectGrid}
                         filter={filter}
                     />}
                 </div>
