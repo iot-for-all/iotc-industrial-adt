@@ -13,15 +13,13 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const transformFilename = `${app.getPath('userData')}/jqtransformation.txt`;
-
 let mainWindow: any;
 
 const createWindow = (): void => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 768,
-    width: 1024,
+    width: 1200,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
