@@ -141,6 +141,8 @@ const iconButtonStyles: Partial<IButtonStyles> = {
   },
 };
 
+// don't change indentation of the following code.
+// the indentation below is intentional for display using <pre> in UI.
 export function generateQuery(mappings: MappingGridItem[]) {
   let query = `import "iotc" as iotc;
 (.telemetry | iotc::find(.name=="name").value) as $name |empty,
@@ -148,13 +150,15 @@ export function generateQuery(mappings: MappingGridItem[]) {
 (.telemetry | iotc::find(.name=="value").value) as $value | empty,
 (`;
   mappings.forEach((mapping, index) => {
-    query += `${index === 0 ? "if" : "elif"} $id=="${mapping["opcuaNodeId"]}" then "${mapping["dtId"]}/${mapping.dtComponent ? mapping.dtComponent + '/' : ''}${mapping.dtPropertyName}" `;
-  });
-  query += `else $id end) as $id | empty,
-  {
-      twinRawId:$id,
-      value:$value
-  }
-  `;
+    query += `${index === 0 ? "if" : "elif"} $id=="${mapping["opcuaNodeId"]}" then "${mapping["dtId"]}/${mapping.dtComponent ? mapping.dtComponent + '/' : ''}${mapping.dtPropertyName}" 
+ `;
+});
+query += `else $id end
+) as $id | empty,
+{
+    twinRawId:$id,
+    value:$value
+}
+`;
   return query;
 }
