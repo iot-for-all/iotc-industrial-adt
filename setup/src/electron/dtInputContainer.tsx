@@ -23,7 +23,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles } = props;
 
     const [selectedTwinKey, selectedModelKey] = React.useMemo(() => {
-        const hyphenIdx = dtItem?.key.indexOf('-');
+        const hyphenIdx = dtItem?.key?.indexOf('-');
         const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
         const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
         return [selectedTwinKey, selectedModelKey];
@@ -63,6 +63,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                             iconOnly
                             iconProps={{ iconName: 'openFile' }}
                             className='icon-button margin-end-xsmall'
+                            tooltip='Upload Device Twin instances json'
                         />
                         <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
                             {twinJsonFile?.path || 'No file selected'}
@@ -84,16 +85,13 @@ export function DtInputContainer(props: NodeViewerProps) {
                             iconOnly
                             iconProps={{ iconName: 'openFile' }}
                             className='icon-button margin-end-xsmall'
+                            tooltip='Upload Device Twin models json'
                         />
                         <div className='margin-start-xsmall font-small ellipsis-left' title={modelJsonFile?.path || 'No file selected'}>
                             {modelJsonFile?.path || 'No file selected'}
                         </div>
                     </div>
                     <div className='viewer-container'>
-                        <SearchBox
-                            placeholder={'Search'}
-                            className='margin-bottom-xsmall'
-                        />
                         <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
                     </div>
                 </div>

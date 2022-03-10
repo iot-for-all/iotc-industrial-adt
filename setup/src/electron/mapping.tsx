@@ -126,7 +126,8 @@ export const Mapping = React.memo(function Mapping() {
     const onDismiss = React.useCallback((row: MappingGridItem) => setItems([...items.filter(item => item.key !== row.key)]),
         [items]);
 
-    // callback for confirming (button click) the entries in the node pair input fields
+    // callback for adding the contents of the opcua and dt items to the grid either as a new row
+    // or as an update to an existing (selected) row
     const onUpdateGrid = React.useCallback(() => {
         if (opcuaItem && dtItem) {
             if (selectedKey) {
@@ -256,10 +257,10 @@ export const Mapping = React.memo(function Mapping() {
                             name='dtTwin'
                             label='Digital Twin Id'
                             className='margin-start-xsmall expand'
-                            value={dtItem?.twinId}
+                            value={dtItem?.twinId || ''}
                             title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
                             onChange={(_, twinId) => {
-                                setDtItem({ ...dtItem, twinId });
+                                setDtItem({ ...dtItem, twinId, twinKey: `new:${twinId}` });
                             }}
                         />
                         <TextField

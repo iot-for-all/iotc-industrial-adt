@@ -5,6 +5,7 @@ import { FileUpload } from './core/controls/fileUpload';
 import { OpcuaViewer, OpcuaStyleScheme, TagNode } from './opcuaViewer';
 
 import './inputContainer.css';
+import { TooltipIconButton } from './core/controls/tooltipIconButton';
 export interface OpcuaInputContainerProps {
     jsonFile: File;
     setJsonFile: () => void;
@@ -18,6 +19,7 @@ export function OpcuaInputContainer(props) {
     const { jsonFile, setJsonFile, jsonContent, onSelect, selectedItemKey, styles } = props;
 
     const [ flattened, setFlattened ] = useBoolean(false);
+    const [ showSearch, setShowSearch ] = useBoolean(false);
 
     const onChange = React.useCallback((e: React.MouseEvent<HTMLElement>, checked: boolean) => {
         if (checked) {
@@ -27,11 +29,22 @@ export function OpcuaInputContainer(props) {
         }
     }, [setFlattened]);
 
+    const onSearch = React.useCallback(() => {
+        setShowSearch.toggle();
+    }, [setShowSearch]);
+
     return (
         <div className='file-viewer-container group-wrapper opcua-wrapper margin-end-xsmall'>
             <div className='section-header group-header'>OPC-UA Node Hierarchy</div>
-            <div className='flatten-toggle'>
+            <div className='flatten-toggle horizontal-group justify-ends'>
                 <Toggle label="Flattened" inlineLabel onText="On" offText="Off" onChange={onChange} />
+                <TooltipIconButton
+                    onClick={onSearch}
+                    iconProps={{ iconName: 'search'}}
+                    title='Search'
+                    tooltip='Search OPC-UA nodes'
+                    className='icon-button margin-start-xsmall'
+                />
             </div>
             <div className='horizontal-group margin-bottom-xsmall'>      
                 <FileUpload 
@@ -39,16 +52,17 @@ export function OpcuaInputContainer(props) {
                     iconOnly
                     iconProps={{ iconName: 'openFile'}}
                     className='icon-button margin-end-xsmall'
+                    tooltip='Upload OPC-UA nodes json'
                 />
                 <div className='margin-start-xsmall font-small ellipsis-left' title={jsonFile?.path || 'No file selected'}>
                     {jsonFile?.path || 'No file selected'}
                 </div>
             </div>
             <div className='viewer-container'>
-                <SearchBox
+                {showSearch && <SearchBox
                     placeholder={'Search'}
                     className='margin-bottom-xsmall'
-                />
+                />}
                 <OpcuaViewer 
                     jsonContent={jsonContent} 
                     flatten={flattened} 
