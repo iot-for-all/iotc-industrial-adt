@@ -22,29 +22,32 @@ export interface NodeViewerProps {
 export function DtInputContainer(props: NodeViewerProps) {
     const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles } = props;
 
-    const [ selectedTwinKey, selectedModelKey ] = React.useMemo(() => {
+    const [selectedTwinKey, selectedModelKey] = React.useMemo(() => {
         const hyphenIdx = dtItem?.key.indexOf('-');
         const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
         const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
-        return [selectedTwinKey, selectedModelKey ];
+        return [selectedTwinKey, selectedModelKey];
     }, [dtItem]);
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
-        onSelect({ ...dtItem,
+        onSelect({
+            ...dtItem,
             key: `${twinNode?.key}-${selectedModelKey}`,
-            twinKey: twinNode?.key, 
-            twinId: twinNode?.id, 
-            twinName: twinNode?.name, 
+            twinKey: twinNode?.key,
+            twinId: twinNode?.id,
+            twinName: twinNode?.name,
             modelId: twinNode?.modelId
         });
     }, [dtItem, onSelect, selectedModelKey]);
 
     const onModelSelect = React.useCallback((modelNode: ModelNode) => {
-        onSelect({ ...dtItem, 
+        onSelect({
+            ...dtItem,
             key: `${selectedTwinKey}-${modelNode?.key}`,
-            modelKey: modelNode?.key, 
-            propertyName: modelNode?.name, 
-            propertyId: modelNode?.id 
+            modelKey: modelNode?.key,
+            propertyName: modelNode?.name,
+            propertyId: modelNode?.id,
+            modelId: modelNode?.modelId
         });
     }, [dtItem, onSelect, selectedTwinKey]);
 
@@ -54,11 +57,11 @@ export function DtInputContainer(props: NodeViewerProps) {
             <div className='horizontal-group expand no-scroll-parent'>
                 <div className='vertical-group twins-viewer margin-end-xsmall'>
                     <div className='section-header'>Twin Instances</div>
-                    <div className='horizontal-group margin-bottom-xsmall'>      
-                        <FileUpload 
-                            onChange={setTwinJsonFile} 
+                    <div className='horizontal-group margin-bottom-xsmall'>
+                        <FileUpload
+                            onChange={setTwinJsonFile}
                             iconOnly
-                            iconProps={{ iconName: 'openFile'}}
+                            iconProps={{ iconName: 'openFile' }}
                             className='icon-button margin-end-xsmall'
                         />
                         <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
@@ -70,16 +73,16 @@ export function DtInputContainer(props: NodeViewerProps) {
                             placeholder={'Search'}
                             className='margin-bottom-xsmall'
                         />
-                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles}/>
+                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} />
                     </div>
                 </div>
                 <div className='vertical-group twins-viewer'>
                     <div className='section-header'>Models</div>
-                    <div className='horizontal-group margin-bottom-xsmall'>      
-                        <FileUpload 
+                    <div className='horizontal-group margin-bottom-xsmall'>
+                        <FileUpload
                             onChange={setModelJsonFile}
                             iconOnly
-                            iconProps={{ iconName: 'openFile'}}
+                            iconProps={{ iconName: 'openFile' }}
                             className='icon-button margin-end-xsmall'
                         />
                         <div className='margin-start-xsmall font-small ellipsis-left' title={modelJsonFile?.path || 'No file selected'}>
@@ -91,7 +94,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                             placeholder={'Search'}
                             className='margin-bottom-xsmall'
                         />
-                        <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles}/>
+                        <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
                     </div>
                 </div>
             </div>

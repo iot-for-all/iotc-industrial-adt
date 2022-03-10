@@ -13,32 +13,32 @@ import { JqModal } from './jqModal';
 import { downloadFile } from './core/controls/downloadFile';
 
 export const Mapping = React.memo(function Mapping() {
-    const [ opcuaFile, setOpcuaFile ] = React.useState<File>();  // json input file for opcua definitions
-    const [ opcuaJson, setOpcuaJson ] = React.useState<object>({});  // json content from the opcua input file
+    const [opcuaFile, setOpcuaFile] = React.useState<File>();  // json input file for opcua definitions
+    const [opcuaJson, setOpcuaJson] = React.useState<object>({});  // json content from the opcua input file
 
-    const [ dtTwinsFile, setDtTwinsFile ] = React.useState<File>();  // json input file for dt definitions
-    const [ dtTwinsJson, setDtTwinsJson ] = React.useState<object>({});   // json content from the dt input file
+    const [dtTwinsFile, setDtTwinsFile] = React.useState<File>();  // json input file for dt definitions
+    const [dtTwinsJson, setDtTwinsJson] = React.useState<object>({});   // json content from the dt input file
 
-    const [ dtModelsFile, setDtModelsFile ] = React.useState<File>();  // json input file for dt definitions
-    const [ dtModelsJson, setDtModelsJson ] = React.useState<object>({});   // json content from the dt input file
+    const [dtModelsFile, setDtModelsFile] = React.useState<File>();  // json input file for dt definitions
+    const [dtModelsJson, setDtModelsJson] = React.useState<object>({});   // json content from the dt input file
 
-    const [ selectedKey, setSelectedKey ] = React.useState<string|number>();  // tracks the selected row key in the grid (make sure item keys aren't changing)
+    const [selectedKey, setSelectedKey] = React.useState<string | number>();  // tracks the selected row key in the grid (make sure item keys aren't changing)
 
     // Item is an object containing the base properties needed to map the selected entry.
     // 'Selected entry' refers to the data transferred when clicking on the raw opcua or dt input in the viewer or
     // from selecting a grid row for update. The item contents are shown in the working row and stored in the grid
     // item when the working row is saved.
-    const [ opcuaItem, setOpcuaItem] = React.useState<OpcuaItem>();
-    const [ dtItem, setDtItem ] = React.useState<DtItem>();
+    const [opcuaItem, setOpcuaItem] = React.useState<OpcuaItem>();
+    const [dtItem, setDtItem] = React.useState<DtItem>();
 
-    const [ deselectGrid, setDeselectGrid ] = useBoolean(false);  // after update, does the grid row need to be unselected?
-    const [ error, setError ] = React.useState<string>();  // did an error occur?
+    const [deselectGrid, setDeselectGrid] = useBoolean(false);  // after update, does the grid row need to be unselected?
+    const [error, setError] = React.useState<string>();  // did an error occur?
 
-    const [ items, setItems ] = React.useState<MappingGridItem[]>([]); // rows for the grid
-    const [ filter, setFilter ] = React.useState<string>();
+    const [items, setItems] = React.useState<MappingGridItem[]>([]); // rows for the grid
+    const [filter, setFilter] = React.useState<string>();
 
     // Jq state
-    const [ showJqModal, setShowJqModal ] = useBoolean(false);
+    const [showJqModal, setShowJqModal] = useBoolean(false);
     const [copyResult, setCopyResult] = React.useState<string>();
     const [resultClass, setResultClass] = React.useState<string>();
 
@@ -105,14 +105,14 @@ export const Mapping = React.memo(function Mapping() {
             }
             if (dtItem) {
                 setDtItem(undefined);
-            }  
+            }
         }
         setSelectedKey(newKey)
         setDeselectGrid.setFalse();
     }, [dtItem, items, opcuaItem, setDeselectGrid]);
 
     const onSelectOpcuaInput = React.useCallback((tagNode: TagNode) => {
-        const opcua: OpcuaItem = tagNode 
+        const opcua: OpcuaItem = tagNode
             ? {
                 key: tagNode.key,
                 nodeId: tagNode.id,
@@ -151,24 +151,24 @@ export const Mapping = React.memo(function Mapping() {
 
     const opcuaTooltipId = useId('opcuaEntry');
     const content: JSX.Element = (<>
-            <div>Node id: {opcuaItem?.nodeId}</div>
-            <div>Path: {opcuaItem?.namespace.join('.')}</div>
-        </>);
+        <div>Node id: {opcuaItem?.nodeId}</div>
+        <div>Path: {opcuaItem?.namespace.join('.')}</div>
+    </>);
 
     // TODO move input list styles to config file
     const opcuaStyles: OpcuaStyleScheme = React.useMemo(() => ({
         leafName: { color: 'crimson' },
-        path: { color: 'slategray'},
-        type: { fontStyle: 'italic'}
+        path: { color: 'slategray' },
+        type: { fontStyle: 'italic' }
     }), []);
 
     const dtStyles: DtStyleScheme = React.useMemo(() => ({
-        interfaceId: { color: 'steelblue'},
-        propertyName: { color: 'crimson'},
-        propertySchema: {fontStyle: 'italic' },
+        interfaceId: { color: 'steelblue' },
+        propertyName: { color: 'crimson' },
+        propertySchema: { fontStyle: 'italic' },
         twinId: { color: 'crimson' },
         twinName: { color: 'steelblue' },
-        modelId: { color: 'steelblue'}
+        modelId: { color: 'steelblue' }
     }), []);
 
     const onGenerateJQ = React.useCallback(() => {
@@ -176,21 +176,21 @@ export const Mapping = React.memo(function Mapping() {
     }, [setShowJqModal]);
 
     const onCopyJq = React.useCallback((jqText) => {
-        navigator.clipboard.writeText(jqText).then(function() {
-          /* clipboard successfully set */
-          setCopyResult('Copied!');
-          setResultClass('success');
-        }, function(e) {
-          /* clipboard write failed */
-          setCopyResult(`Copy failed ${e}`);
-          setResultClass('fail');
+        navigator.clipboard.writeText(jqText).then(function () {
+            /* clipboard successfully set */
+            setCopyResult('Copied!');
+            setResultClass('success');
+        }, function (e) {
+            /* clipboard write failed */
+            setCopyResult(`Copy failed ${e}`);
+            setResultClass('fail');
         });
-      }, []);
+    }, []);
 
     const onDismissJqModal = React.useCallback(() => {
         setShowJqModal.setFalse();
         setCopyResult(undefined);
-          setResultClass(undefined);
+        setResultClass(undefined);
     }, [setShowJqModal]);
 
     const onSaveMapping = React.useCallback(() => {
@@ -199,7 +199,7 @@ export const Mapping = React.memo(function Mapping() {
             'application/json',
             'opcua2dt-mapping.json'
         );
-      }, [items]);
+    }, [items]);
 
     return (<>
         {error && <MessageBar
@@ -213,7 +213,7 @@ export const Mapping = React.memo(function Mapping() {
         </MessageBar>}
         <div className='mapping-container'>
             <div className='horizontal-group input-container'>
-                <OpcuaInputContainer 
+                <OpcuaInputContainer
                     jsonFile={opcuaFile}
                     setJsonFile={setOpcuaFile}
                     jsonContent={opcuaJson}
@@ -221,7 +221,7 @@ export const Mapping = React.memo(function Mapping() {
                     styles={opcuaStyles}
                     selectedItemKey={opcuaItem?.key}
                 />
-                <DtInputContainer 
+                <DtInputContainer
                     twinJsonFile={dtTwinsFile}
                     setTwinJsonFile={setDtTwinsFile}
                     twinJsonContent={dtTwinsJson}
@@ -248,7 +248,7 @@ export const Mapping = React.memo(function Mapping() {
                                     className='margin-end-xsmall'
                                     value={opcuaItem?.nodeName}
                                     readOnly
-                                /> 
+                                />
                             </TooltipHost>
                         </div>
                         <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
@@ -258,7 +258,9 @@ export const Mapping = React.memo(function Mapping() {
                             className='margin-start-xsmall expand'
                             value={dtItem?.twinId}
                             title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
-                            readOnly
+                            onChange={(_, twinId) => {
+                                setDtItem({ ...dtItem, twinId });
+                            }}
                         />
                         <TextField
                             name='dtProperty'
@@ -287,8 +289,8 @@ export const Mapping = React.memo(function Mapping() {
                     </div>
                 </div>
                 <div className='grid'>
-                    {<MappingGrid 
-                        allItems={items} 
+                    {<MappingGrid
+                        allItems={items}
                         onSelectRow={onGridRowSelectionChange}
                         onDismiss={onDismiss}
                         deselect={deselectGrid}
@@ -364,9 +366,9 @@ interface FooterProps {
     onSaveMapping: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const Footer = React.memo(function Footer({ disabled, onGenerateJQ, onSaveMapping } : FooterProps) {
+const Footer = React.memo(function Footer({ disabled, onGenerateJQ, onSaveMapping }: FooterProps) {
     return (<div className='horizontal-group footer'>
-      <PrimaryButton text='Generate JQ' disabled={disabled} onClick={onGenerateJQ} />
-      <DefaultButton text='Save Mapping' className='margin-start-xsmall' disabled={disabled} onClick={onSaveMapping} />
-    </div>);  
-  })
+        <PrimaryButton text='Generate JQ' disabled={disabled} onClick={onGenerateJQ} />
+        <DefaultButton text='Save Mapping' className='margin-start-xsmall' disabled={disabled} onClick={onSaveMapping} />
+    </div>);
+})

@@ -13,13 +13,13 @@ import { IconButton, IButtonStyles, PrimaryButton, DefaultButton } from '@fluent
 import { MappingGridItem } from './mappingGrid';
 import { downloadFile } from './core/controls/downloadFile';
 
-export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss, onCopyJq, copyResult, resultClass }: { 
-    jq: MappingGridItem[], 
-    isModalOpen: boolean,
-    onDismiss: () => void,
-    onCopyJq: (jq: string) => void;
-    copyResult?: string;
-    resultClass?: string;
+export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss, onCopyJq, copyResult, resultClass }: {
+  jq: MappingGridItem[],
+  isModalOpen: boolean,
+  onDismiss: () => void,
+  onCopyJq: (jq: string) => void;
+  copyResult?: string;
+  resultClass?: string;
 }) {
 
   // Use useId() to ensure that the IDs are unique on the page.
@@ -37,12 +37,12 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
     }),
     [],
   );
-  
+
   const onDownload = React.useCallback(() => {
     downloadFile(
-        jqText,
-        'text/plan',
-        'opcua2dt-mapping.jq'
+      jqText,
+      'text/plan',
+      'opcua2dt-mapping.jq'
     );
   }, [jqText]);
 
@@ -72,18 +72,18 @@ export const JqModal = React.memo(function JqModal({ jq, isModalOpen, onDismiss,
           <div className='horizontal-group copy-footer'>
             <div className='download-button'>
               <PrimaryButton
-                  text='Download'
-                  className='margin-start-xsmall'
-                  onClick={onDownload}
-                  title='Download Jq transformation' 
+                text='Download'
+                className='margin-start-xsmall'
+                onClick={onDownload}
+                title='Download Jq transformation'
               />
             </div>
             <div className='copy-button'>
               <DefaultButton
-                  text='Copy'
-                  className='margin-start-xsmall'
-                  onClick={() => onCopyJq(jqText)}
-                  title='Copy Jq transformation' 
+                text='Copy'
+                className='margin-start-xsmall'
+                onClick={() => onCopyJq(jqText)}
+                title='Copy Jq transformation'
               />
             </div>
             <div className={`margin-start-xsmall ${resultClass}`}>{copyResult}</div>
@@ -150,13 +150,13 @@ export function generateQuery(mappings: MappingGridItem[]) {
 (.telemetry | iotc::find(.name=="value").value) as $value | empty,
 (`;
   mappings.forEach((mapping, index) => {
-    query += `${index === 0 ? "if" : "elif"} $id=="${mapping["opcuaNodeId"]}" then "${mapping["dtId"]}/${mapping.dtComponent ? mapping.dtComponent + '/' : ''}${mapping.dtPropertyName}" 
+    query += `${index === 0 ? "if" : "elif"} $id=="${mapping["opcuaNodeId"]}" then {twinRawId:"${mapping["dtId"]}/${mapping.dtComponent ? mapping.dtComponent + '/' : ''}${mapping.dtPropertyName}",modelId:"${mapping['dtModelId']}"} 
  `;
-});
-query += `else $id end
-) as $id | empty,
+  });
+  query += `else { twinRawId:$id} end
+) as $twinInfo | empty,
+$twinInfo+
 {
-    twinRawId:$id,
     value:$value
 }
 `;
