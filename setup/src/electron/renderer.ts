@@ -1,3 +1,5 @@
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+
 /**
  * This file will automatically be loaded by webpack and run in the "renderer" context.
  * To learn more about the differences between the "main" and the "renderer" context in
@@ -25,6 +27,6 @@
  *  });
  * ```
  */
-
+initializeIcons();
 import './index.css';
 import './app';
