@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import './mapping.css';
-import { DefaultButton, MessageBar, MessageBarType, PrimaryButton, TextField, TooltipHost } from '@fluentui/react';
+import { DefaultButton, MessageBar, MessageBarType, PrimaryButton, SearchBox, TextField, TooltipHost } from '@fluentui/react';
 import { MappingGrid, MappingGridItem } from './mappingGrid';
 import { generateId } from './core/generateId';
 import { useBoolean, useId } from '@fluentui/react-hooks';
@@ -202,6 +202,10 @@ export const Mapping = React.memo(function Mapping() {
         );
     }, [items]);
 
+    const onAddNewTwin = React.useCallback((twinId: string) => {
+        // TODO: add a row to the viewer for this twin, including a key
+    }, []);
+
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -213,6 +217,12 @@ export const Mapping = React.memo(function Mapping() {
             {error}
         </MessageBar>}
         <div className='mapping-container'>
+            <div className='full-width horizontal-group place-end margin-bottom-xsmall'>
+                <SearchBox
+                    placeholder={'Search'}
+                    className='margin-bottom-xsmall search'
+                />
+            </div>
             <div className='horizontal-group input-container'>
                 <OpcuaInputContainer
                     jsonFile={opcuaFile}
@@ -232,6 +242,7 @@ export const Mapping = React.memo(function Mapping() {
                     onSelect={setDtItem}
                     dtItem={dtItem}
                     styles={dtStyles}
+                    onAddNewTwin={onAddNewTwin}
                 />
             </div>
             <div className='mapping-wrapper group-wrapper'>

@@ -14,6 +14,10 @@
     max-height: 100%;
 }
 
+.search {
+    border-color: #ddd;
+}
+
 .input-container {
     display: flex;
     flex-direction: column;
@@ -203,4 +207,8 @@
 .no-scroll-parent {
     max-height: 100%;
     overflow: hidden;
+}
+
+input::placeholder {
+    font-style: italic;
 }

@@ -13,6 +13,7 @@ export interface TwinsViewerProps {
     styles?:  DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
     selectedTwinKey: string;
+    addedTwins?: Node[];
 }
 
 export interface Node {
@@ -47,6 +48,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
     let processedInput;
     let error;
     try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         processedInput = useProcessJson(jsonContent);
     } catch (e) {
         processedInput = undefined;

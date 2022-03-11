@@ -23,6 +23,10 @@
     width: 50%;
 }
 
+.add-input {
+    width: 80%;
+}
+
 .group-header {
     border-bottom: solid 1px #eee;
 }
