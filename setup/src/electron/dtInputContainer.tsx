@@ -130,6 +130,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 value={newTwin}
                                 onChange={(_, twinId) => setNewTwin(twinId)}
                                 placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
+                                disabled={!dtItem?.modelId}
                             />
                             <IconButton 
                                 iconProps={{iconName: 'add'}}
