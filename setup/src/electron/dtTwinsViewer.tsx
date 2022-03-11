@@ -211,7 +211,7 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin): Node[] {
                 });
                 modelRowIdx = allRows.length - 1;
             }
-            allRows[modelRowIdx + 1] = twinRow;
+            allRows.splice(modelRowIdx + 1, 0, twinRow);
         }
         return allRows;
     }, [inputRows, customTwin]);
