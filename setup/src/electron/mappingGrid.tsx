@@ -109,7 +109,8 @@ function onRenderRow(props: IDetailsRowProps) {
 function useFilteredItems(text: string, items: MappingGridItem[]): MappingGridItem[] {
     const normalizeText = text?.toLowerCase();
     return React.useMemo(
-        () => normalizeText ? items.filter(i => i.opcuaNodeId.toLowerCase().indexOf(normalizeText) > -1 || i.dtId.toLowerCase().indexOf(normalizeText) > -1 || i.dtPropertyName.toLowerCase().indexOf(normalizeText) > -1) : items, 
+        () => normalizeText ? items.filter(i => i.opcuaNodeId.toLowerCase().indexOf(normalizeText) > -1 || i.dtId.toLowerCase().indexOf(normalizeText) > -1 
+            || i.dtPropertyName.toLowerCase().indexOf(normalizeText) > -1 || i.dtModelId.toLocaleLowerCase().indexOf(normalizeText)) : items, 
     [items, normalizeText]);
 }
 
