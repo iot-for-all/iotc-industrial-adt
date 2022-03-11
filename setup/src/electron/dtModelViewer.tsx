@@ -457,11 +457,11 @@ export const Details = React.memo(function Details({ node, styles }: DetailsProp
                     const style: React.CSSProperties = { paddingInlineStart: `${defaultIndent * detail.depth}px` };
                     const schema = detail.schema.toLowerCase() === 'array' ? `${detail.complexValues[0]} Array` : detail.schema;
                     
-                    return (<>
-                        <div style={style} key={`${generateId()}-${idx}`}>{detail.name} <span>({schema})</span></div>
+                    return (<div key={`${generateId()}-${idx}`}>
+                        <div style={style}>{detail.name} <span>({schema})</span></div>
                         {(schema.toLowerCase() === 'object') && getObjectSchemaJSX(detail)}
                         {['enum', 'map'].includes(schema.toLowerCase()) && getComplexSchemaJSX(detail.complexValues, schema)}
-                    </>);
+                    </div>);
                 })}
             </>);
             break;
