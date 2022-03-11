@@ -36,6 +36,11 @@ export function DtInputContainer(props: NodeViewerProps) {
     const [newTwin, setNewTwin] = React.useState<string>();
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
+        // don't allow twin selection from a different model if model is already selected
+        const currModelId = twinNode?.modelId;
+        if (currModelId && dtItem?.modelId && dtItem.modelId !== currModelId) {
+            return;
+        }
         onSelect({
             ...dtItem,
             key: `${twinNode?.key}-${selectedModelKey}`,
@@ -47,14 +52,23 @@ export function DtInputContainer(props: NodeViewerProps) {
     }, [dtItem, onSelect, selectedModelKey]);
 
     const onModelSelect = React.useCallback((modelNode: ModelNode) => {
-        onSelect({
+        // note: 'modelNode' will be undefined when the current model selection is clicked off
+        const currModelId = dtItem?.modelId;
+        const newItem = {
             ...dtItem,
             key: `${selectedTwinKey}-${modelNode?.key}`,
             modelKey: modelNode?.key,
             propertyName: modelNode?.name,
             propertyId: modelNode?.id,
             modelId: modelNode?.modelId
-        });
+        };
+        if (modelNode?.modelId !== currModelId) {
+            newItem.key = `undefined-${modelNode?.key}`,
+            newItem.twinKey = undefined;
+            newItem.twinId = undefined;
+            newItem.twinName = undefined;
+        }
+        onSelect(newItem);
     }, [dtItem, onSelect, selectedTwinKey]);
 
     const simpleIconStyles = {
@@ -133,7 +147,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
                                 disabled={!dtItem?.modelId}
                             />
-                            <IconButton 
+                            <IconButton
                                 iconProps={{iconName: 'add'}}
                                 title='Add entry'
                                 ariaLabel='add'
@@ -144,7 +158,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                             />
                             <IconButton
                                 iconProps={{iconName: 'cancel'}}
-                                title='Clear entry' 
+                                title='Clear entry'
                                 ariaLabel='cancel'
                                 disabled={!newTwin}
                                 className='simple-icon-button-small'

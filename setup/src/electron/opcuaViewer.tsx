@@ -2,7 +2,6 @@ import { TooltipHost } from '@fluentui/react';
 import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
-import { OpcuaItem } from './models';
 
 export interface Node {
     key: string;
@@ -74,6 +73,7 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
     let processedInput;
     let error;
     try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         processedInput = useProcessJson(jsonContent);
     } catch (e) {
         processedInput = undefined;
