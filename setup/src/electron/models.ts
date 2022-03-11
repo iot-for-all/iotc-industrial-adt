@@ -30,3 +30,8 @@ export interface DtItem {
     propertyName: string;
     propertyId?: string;
 }
+
+export interface CustomTwin {
+    twinId: string;
+    modelId: string;
+}

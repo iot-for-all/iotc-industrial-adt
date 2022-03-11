@@ -8,7 +8,7 @@ import { useBoolean, useId } from '@fluentui/react-hooks';
 import { OpcuaStyleScheme, TagNode } from './opcuaViewer';
 import { OpcuaInputContainer } from './opcuaInputContainer';
 import { DtInputContainer } from './dtInputContainer';
-import { DtStyleScheme, OpcuaItem, DtItem } from './models';
+import { DtStyleScheme, OpcuaItem, DtItem, CustomTwin } from './models';
 import { JqModal } from './jqModal';
 import { downloadFile } from './core/controls/downloadFile';
 
@@ -41,6 +41,8 @@ export const Mapping = React.memo(function Mapping() {
     const [showJqModal, setShowJqModal] = useBoolean(false);
     const [copyResult, setCopyResult] = React.useState<string>();
     const [resultClass, setResultClass] = React.useState<string>();
+
+    const [customTwin, setCustomTwin] = React.useState<CustomTwin>();
 
     // if a file has been selected, opcuaFile will be updated with the File object.
     // Get the content of the file as JSON
@@ -203,8 +205,8 @@ export const Mapping = React.memo(function Mapping() {
     }, [items]);
 
     const onAddNewTwin = React.useCallback((twinId: string) => {
-        // TODO: add a row to the viewer for this twin, including a key
-    }, []);
+        setCustomTwin({ twinId, modelId: dtItem.modelId});
+    }, [dtItem?.modelId]);
 
     return (<>
         {error && <MessageBar
@@ -243,6 +245,7 @@ export const Mapping = React.memo(function Mapping() {
                     dtItem={dtItem}
                     styles={dtStyles}
                     onAddNewTwin={onAddNewTwin}
+                    customTwin={customTwin}
                 />
             </div>
             <div className='mapping-wrapper group-wrapper'>

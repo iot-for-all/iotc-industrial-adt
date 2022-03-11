@@ -1,7 +1,7 @@
 import { IconButton, TextField } from '@fluentui/react';
 import React, { Dispatch, SetStateAction } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
-import { DtItem, DtStyleScheme } from './models';
+import { CustomTwin, DtItem, DtStyleScheme } from './models';
 import { DtModelViewer, Node as ModelNode } from './dtModelViewer';
 import { DtTwinsViewer, Node as TwinNode } from './dtTwinsViewer';
 
@@ -20,10 +20,11 @@ export interface NodeViewerProps {
     dtItem: DtItem;
     styles?: DtStyleScheme;
     onAddNewTwin: (twinId: string) => void;
+    customTwin: CustomTwin;
 }
 
 export function DtInputContainer(props: NodeViewerProps) {
-    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles, onAddNewTwin } = props;
+    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles, onAddNewTwin, customTwin } = props;
 
     const [selectedTwinKey, selectedModelKey] = React.useMemo(() => {
         const hyphenIdx = dtItem?.key?.indexOf('-');
@@ -151,7 +152,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 onClick={() => setNewTwin('')}
                             />
                         </form>}
-                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} />
+                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} customTwin={customTwin} />
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { generateId } from './core/generateId';
-import { DtStyleScheme } from './models';
+import { CustomTwin, DtStyleScheme } from './models';
 
 import './dtViewer.css';
 
@@ -13,7 +13,7 @@ export interface TwinsViewerProps {
     styles?:  DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
     selectedTwinKey: string;
-    addedTwins?: Node[];
+    customTwin: CustomTwin;
 }
 
 export interface Node {
@@ -42,7 +42,7 @@ interface ProcessedInput {
     modelTwinsMap: Map<string, Node[]>;
 }
 
-export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles }: TwinsViewerProps) {
+export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles, customTwin }: TwinsViewerProps) {
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
     let processedInput;
@@ -55,11 +55,14 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         error = `Invalid input file (${e?.message})`;
     }
     const inputRows = useGetRows(processedInput);
+
+    // add any custom twins after the JSON has been processed and memoized
+    const allRows = useGetCustomRows(inputRows, customTwin);
     
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
-        setNodeRows(inputRows);
-    }, [inputRows]);
+        setNodeRows(allRows);
+    }, [allRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
@@ -175,6 +178,43 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
         })
         return rows;
     }, [processedInput]);
+}
+
+function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin): Node[] {
+    return React.useMemo(() => {
+        const allRows: Node[] = [...inputRows];
+
+        if (customTwin) {
+            const { modelId, twinId } = customTwin;
+
+            // create the row for the twin
+            const twinRow = {
+                key: generateId(),
+                id: twinId,
+                modelId: modelId,
+                name: twinId,
+                isModel: false,
+                collapsed: false,
+            };
+
+            // if the model already exists, we'll add the twin immediately after it; otherwise, we'll 
+            // add a new model row followed by the twin
+            let modelRowIdx = allRows.findIndex(node => node.isModel && node.modelId === modelId);
+            if (modelRowIdx < 0) {
+                allRows.push({
+                    key: generateId(),
+                    id: modelId,
+                    modelId: modelId,
+                    name: modelId,
+                    isModel: true,
+                    collapsed: false
+                });
+                modelRowIdx = allRows.length - 1;
+            }
+            allRows[modelRowIdx + 1] = twinRow;
+        }
+        return allRows;
+    }, [inputRows, customTwin]);
 }
 
 interface TwinsListProps {
