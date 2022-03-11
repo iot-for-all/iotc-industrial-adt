@@ -176,6 +176,14 @@
     text-align: left;
 }
 
+.ellipsis-left-limited {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    text-align: left;
+}
+
 .align-center {
     align-items: flex-start;
 }

@@ -65,9 +65,9 @@ export const MappingGrid = React.memo(function MappingGrid( props : MappingGridP
     const columns = React.useMemo(() => [
         { key: 'opcua', name: 'OpcUA', fieldName: 'opcua', minWidth: 100, maxWidth: 200, isResizable: true, onRender: (item: MappingGridItem) => <MappedItemDetail name={`${item.opcuaNodeId} | ${item.opcuaName}`} detail={item} />},
         { key: 'arrow', name: '', fieldName: 'arrow', minWidth: 20, maxWidth: 20, isResizable: false, onRender: _ => '->' },
-        { key: 'dttwin', name: 'Twin Id', fieldName: 'twin', minWidth: 100, maxWidth: 200, isResizable: true, onRender: (item: MappingGridItem) => <MappedItemDetail name={item.dtId} detail={item} />},
         { key: 'dtmodel', name: 'Twin Model', fieldName: 'model', minWidth: 100, maxWidth: 200, isResizable: true, onRender: (item: MappingGridItem) => <MappedItemDetail name={item.dtModelId} detail={item} />},
         { key: 'dtprop', name: 'Property', fieldName: 'prop', minWidth: 100, maxWidth: 200, isResizable: true, onRender: (item: MappingGridItem) => <MappedItemDetail name={item.dtPropertyName} detail={item} />},
+        { key: 'dttwin', name: 'Twin Id', fieldName: 'twin', minWidth: 100, maxWidth: 200, isResizable: true, onRender: (item: MappingGridItem) => <MappedItemDetail name={item.dtId} detail={item} />},
         { key: 'delete', name: '', fieldName: 'delete', minWidth: 20, maxWidth: 20, isResizable: false, 
             onRender: (item: MappingGridItem) => <button onClick={() => onDismiss(item)} className='dismiss-button margin-end-xsmall'>x</button> }
     ], [onDismiss]);    

@@ -104,6 +104,7 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
     let processedInput;
     let error;
     try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         processedInput = useProcessJson(jsonContent);
     } catch (e) {
         processedInput = undefined;

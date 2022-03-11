@@ -265,14 +265,12 @@ export const Mapping = React.memo(function Mapping() {
                         </div>
                         <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
                         <TextField
-                            name='dtTwin'
-                            label='Digital Twin Id'
-                            className='margin-start-xsmall expand'
-                            value={dtItem?.twinId || ''}
-                            title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
-                            onChange={(_, twinId) => {
-                                setDtItem({ ...dtItem, twinId, twinKey: `new:${twinId}` });
-                            }}
+                            name='dtModel'
+                            label='Model'
+                            className='expand ellipsis-left-limited margin-end-xsmall'
+                            value={dtItem?.modelId}
+                            title={dtItem?.modelId}
+                            readOnly
                         />
                         <TextField
                             name='dtProperty'
@@ -281,6 +279,16 @@ export const Mapping = React.memo(function Mapping() {
                             value={dtItem?.propertyName}
                             title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
                             readOnly
+                        />
+                        <TextField
+                            name='dtTwin'
+                            label='Digital Twin Id'
+                            className='margin-start-xsmall expand'
+                            value={dtItem?.twinId || ''}
+                            title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
+                            onChange={(_, twinId) => {
+                                setDtItem({ ...dtItem, twinId, twinKey: `new:${twinId}` });
+                            }}
                         />
                         <div className='anchor-bottom expand'>
                             <PrimaryButton
