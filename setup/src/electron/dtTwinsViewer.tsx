@@ -12,6 +12,7 @@ export interface TwinsViewerProps {
     noWrap?: boolean;
     styles?:  DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
+    selectedModelId: string;
     selectedTwinKey: string;
     customTwin: CustomTwin;
 }
@@ -42,7 +43,7 @@ interface ProcessedInput {
     modelTwinsMap: Map<string, Node[]>;
 }
 
-export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles, customTwin }: TwinsViewerProps) {
+export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedModelId, selectedTwinKey, styles, customTwin }: TwinsViewerProps) {
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
     let processedInput;
@@ -58,17 +59,24 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
 
     // add any custom twins after the JSON has been processed and memoized
     const allRows = useGetCustomRows(inputRows, customTwin);
-    
+
+    const filteredRows = React.useMemo(() => {
+        if (selectedModelId) {
+            return allRows.filter(row => row.modelId === selectedModelId);
+        }
+        return allRows;
+    }, [allRows, selectedModelId]);
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
-        setNodeRows(allRows);
-    }, [allRows]);
+        setNodeRows(filteredRows);
+    }, [filteredRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
         // since their references are used in the node.children array
-        const newRows = [...nodeRows]; 
-        
+        const newRows = [...nodeRows];
+
         // update the menu setting for the clicked row
         const node = inputRows.find(node => node.key === nodeKey);
         node.collapsed = collapse;
@@ -87,11 +95,11 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         </div>);
     }
     return (
-        <TwinsList 
-            nodeRows={nodeRows} 
-            onSelect={onSelect} 
+        <TwinsList
+            nodeRows={nodeRows}
+            onSelect={onSelect}
             selectedTwinKey={selectedTwinKey}
-            onMenuClick={onMenuClick} 
+            onMenuClick={onMenuClick}
             styles={styles}
         />
     );
@@ -100,27 +108,27 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
 
 function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
     return React.useMemo(() => {
-        if (!jsonContent) { 
-            return undefined; 
+        if (!jsonContent) {
+            return undefined;
         }
 
         // we expect the input to be an object with 'value' property that holds an array of interface objects
-        const rawArray: Twin[] = !Array.isArray(jsonContent) 
+        const rawArray: Twin[] = !Array.isArray(jsonContent)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ? (jsonContent as { value: Twin[]}).value  
+            ? (jsonContent as { value: Twin[]}).value
                 ?? ((jsonContent as Twin)['@$dtId'] && [ (jsonContent as Twin) ])
                 ?? null
             : jsonContent as Twin[];
-        
+
         if (!rawArray || !Array.isArray(rawArray)) {
             return undefined;
         }
         // create a rootArray containing only Interface objects
         const rawTwinArray: Twin[] = rawArray.filter(rawObj => rawObj['$dtId']);
-        
+
         const models = new Set<string>();
         const modelTwinsMap = new Map<string, Node[]>();
-        
+
         // we'll assume there's a depth limit built into DTDL so we won't go
         // to deep and blow the stack. All top-level models should be interfaces.
         for (const rawNode of rawTwinArray) {
@@ -150,7 +158,7 @@ function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
                 }
             });
         }
-        
+
         return { models, modelTwinsMap };
     }, [jsonContent]);
 }
@@ -161,7 +169,7 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
         if (!processedInput) {
             return rows;
         }
-        const { models, modelTwinsMap } = processedInput; 
+        const { models, modelTwinsMap } = processedInput;
         const collapsed = models.size > 1;
 
         models.forEach(model => {
@@ -197,7 +205,7 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin): Node[] {
                 collapsed: false,
             };
 
-            // if the model already exists, we'll add the twin immediately after it; otherwise, we'll 
+            // if the model already exists, we'll add the twin immediately after it; otherwise, we'll
             // add a new model row followed by the twin
             let modelRowIdx = allRows.findIndex(node => node.isModel && node.modelId === modelId);
             if (modelRowIdx < 0) {
@@ -237,8 +245,8 @@ function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }:
             return (
                 <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`}>
                     {node.isModel && <MenuIcon />}
-                    <div 
-                        className={`viewer-row-label ${select ? ' clickable selectable' : ''}`} 
+                    <div
+                        className={`viewer-row-label ${select ? ' clickable selectable' : ''}`}
                         onClick={select}>
                             {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
                             {!node.isModel && <div>

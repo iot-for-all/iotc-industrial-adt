@@ -166,7 +166,13 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 onClick={() => setNewTwin('')}
                             />
                         </form>}
-                        <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} customTwin={customTwin} />
+                        <DtTwinsViewer
+                            jsonContent={twinJsonContent}
+                            onSelect={onTwinSelect}
+                            selectedModelId={dtItem?.modelId}
+                            selectedTwinKey={selectedTwinKey}
+                            styles={styles}
+                            customTwin={customTwin} />
                     </div>
                 </div>
             </div>
