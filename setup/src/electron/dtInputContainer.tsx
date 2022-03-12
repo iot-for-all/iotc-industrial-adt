@@ -8,6 +8,7 @@ import { DtTwinsViewer, Node as TwinNode } from './dtTwinsViewer';
 import './inputContainer.css';
 import { useBoolean } from '@fluentui/react-hooks';
 import { TooltipIconButton } from './core/controls/tooltipIconButton';
+import { ErrorBoundary } from './core/controls/errorBoundary';
 
 export interface NodeViewerProps {
     twinJsonFile: File;
@@ -85,10 +86,19 @@ export function DtInputContainer(props: NodeViewerProps) {
         }
     };
 
+    const addDisabled = !newTwin || !dtItem?.modelId || invalidName;
     const onAdd = React.useCallback(() => {
         onAddNewTwin(newTwin);
         setNewTwin('');
     }, [newTwin, onAddNewTwin]);
+
+    const onSubmit = React.useCallback((e: React.SyntheticEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!addDisabled) {
+            onAdd();
+        }
+    }, [addDisabled, onAdd]);
 
     const onTwinNameError = React.useCallback((value) => {
         if ((value as string)?.match('.*[\\s].*')) {
@@ -100,94 +110,95 @@ export function DtInputContainer(props: NodeViewerProps) {
     }, [setInvalidName]);
 
     return (
-        <div className='file-viewer-container group-wrapper twins-wrapper'>
-            <div className='section-header group-header'>Digital Twins</div>
-            <div className='horizontal-group expand no-scroll-parent'>
-            <div className='vertical-group twins-viewer  margin-end-xsmall'>
-                    <div className='section-header'>Models</div>
-                    <div className='horizontal-group margin-bottom-xsmall'>
-                        <FileUpload
-                            onChange={setModelJsonFile}
-                            iconOnly
-                            iconProps={{ iconName: 'openFile' }}
-                            className='icon-button margin-end-xsmall'
-                            tooltip='Upload Device Twin models json'
-                        />
-                        <div className='margin-start-xsmall font-small ellipsis-left' title={modelJsonFile?.path || 'No file selected'}>
-                            {modelJsonFile?.path || 'No file selected'}
+        <ErrorBoundary>
+            <div className='file-viewer-container group-wrapper twins-wrapper'>
+                <div className='section-header group-header'>Digital Twins</div>
+                <div className='horizontal-group expand no-scroll-parent'>
+                <div className='vertical-group twins-viewer  margin-end-xsmall'>
+                        <div className='section-header'>Models</div>
+                        <div className='horizontal-group margin-bottom-xsmall'>
+                            <FileUpload
+                                onChange={setModelJsonFile}
+                                iconOnly
+                                iconProps={{ iconName: 'openFile' }}
+                                className='icon-button margin-end-xsmall'
+                                tooltip='Upload Device Twin models json'
+                            />
+                            <div className='margin-start-xsmall font-small ellipsis-left' title={modelJsonFile?.path || 'No file selected'}>
+                                {modelJsonFile?.path || 'No file selected'}
+                            </div>
+                        </div>
+                        <div className='viewer-container'>
+                            <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
                         </div>
                     </div>
-                    <div className='viewer-container'>
-                        <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
-                    </div>
-                </div>
-                <div className='vertical-group twins-viewer'>
-                    <div className='flatten-toggle horizontal-group justify-ends'>
-                        <div className='section-header'>Twin Instances</div>
-                        <div className='vertical-group'>
-                            <TooltipIconButton
-                                onClick={setShowAdd.toggle}
-                                iconProps={{ iconName: 'add'}}
-                                title='Add twin'
-                                tooltip='Show/hide add input field'
-                                className='add'
-                            />
+                    <div className='vertical-group twins-viewer'>
+                        <div className='flatten-toggle horizontal-group justify-ends'>
+                            <div className='section-header'>Twin Instances</div>
+                            <div className='vertical-group'>
+                                <TooltipIconButton
+                                    onClick={setShowAdd.toggle}
+                                    iconProps={{ iconName: 'add'}}
+                                    title='Add twin'
+                                    tooltip='Show/hide add input field'
+                                    className='add'
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className='horizontal-group margin-bottom-xsmall'>
-                        <FileUpload
-                            onChange={setTwinJsonFile}
-                            iconOnly
-                            iconProps={{ iconName: 'openFile' }}
-                            className='icon-button margin-end-xsmall'
-                            tooltip='Upload Device Twin instances json'
-                        />
-                        <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
-                            {twinJsonFile?.path || 'No file selected'}
+                        <div className='horizontal-group margin-bottom-xsmall'>
+                            <FileUpload
+                                onChange={setTwinJsonFile}
+                                iconOnly
+                                iconProps={{ iconName: 'openFile' }}
+                                className='icon-button margin-end-xsmall'
+                                tooltip='Upload Device Twin instances json'
+                            />
+                            <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
+                                {twinJsonFile?.path || 'No file selected'}
+                            </div>
                         </div>
-                    </div>
-                    <div className='viewer-container'>
-                        {showAdd && <form className='horizontal-group'>
-                            <TextField
-                                name='newTwin'
-                                label=''
-                                title={!dtItem?.modelId ? 'Choose model first, then enter new twin name' : 'Enter name of new twin'}
-                                className='margin-bottom-xsmall add-input margin-end-xsmall'
-                                value={newTwin}
-                                onChange={(_, twinId) => setNewTwin(twinId)}
-                                placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
-                                disabled={!dtItem?.modelId}
-                                onGetErrorMessage={onTwinNameError}
-                            />
-                            <IconButton
-                                iconProps={{iconName: 'add'}}
-                                title='Add entry'
-                                ariaLabel='add'
-                                disabled={!newTwin || !dtItem?.modelId || invalidName}
-                                className='simple-icon-button-small margin-end-xsmall'
-                                styles={simpleIconStyles}
-                                onClick={onAdd}
-                            />
-                            <IconButton
-                                iconProps={{iconName: 'cancel'}}
-                                title='Clear entry'
-                                ariaLabel='cancel'
-                                disabled={!newTwin}
-                                className='simple-icon-button-small'
-                                styles={simpleIconStyles}
-                                onClick={() => setNewTwin('')}
-                            />
-                        </form>}
-                        <DtTwinsViewer
-                            jsonContent={twinJsonContent}
-                            onSelect={onTwinSelect}
-                            selectedModelId={dtItem?.modelId}
-                            selectedTwinKey={selectedTwinKey}
-                            styles={styles}
-                            customTwin={customTwin} />
+                        <div className='viewer-container'>
+                            {showAdd && <form className='horizontal-group' onSubmit={onSubmit}>
+                                <TextField
+                                    name='newTwin'
+                                    label=''
+                                    title={!dtItem?.modelId ? 'Choose model first, then enter new twin name' : 'Enter name of new twin'}
+                                    className='margin-bottom-xsmall add-input margin-end-xsmall'
+                                    value={newTwin}
+                                    onChange={(_, twinId) => setNewTwin(twinId)}
+                                    placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
+                                    disabled={!dtItem?.modelId}
+                                    onGetErrorMessage={onTwinNameError}
+                                />
+                                <IconButton
+                                    iconProps={{iconName: 'add'}}
+                                    title='Add entry'
+                                    ariaLabel='add'
+                                    disabled={addDisabled}
+                                    className='simple-icon-button-small margin-end-xsmall'
+                                    styles={simpleIconStyles}
+                                    onClick={onAdd}
+                                />
+                                <IconButton
+                                    iconProps={{iconName: 'cancel'}}
+                                    title='Clear entry'
+                                    ariaLabel='cancel'
+                                    disabled={!newTwin}
+                                    className='simple-icon-button-small'
+                                    styles={simpleIconStyles}
+                                    onClick={() => setNewTwin('')}
+                                />
+                            </form>}
+                            <DtTwinsViewer
+                                jsonContent={twinJsonContent}
+                                onSelect={onTwinSelect}
+                                selectedModelId={dtItem?.modelId}
+                                selectedTwinKey={selectedTwinKey}
+                                styles={styles}
+                                customTwin={customTwin} />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        </ErrorBoundary>);
 }

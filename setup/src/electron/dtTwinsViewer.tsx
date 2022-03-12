@@ -47,6 +47,8 @@ interface ProcessedInput {
     modelTwinsMap: Map<string, Node[]>;
 }
 
+const newTwinPrefix = 'newtwins-';
+
 export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedModelId, selectedTwinKey, styles, customTwin }: TwinsViewerProps) {
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -86,7 +88,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         node.collapsed = collapse;
 
         // if clicked menu is on a model, collapse/expand twins, separator and new twins.
-        // if the clicked menu is on the separator, only collapse/expand the separator and its twins.
+        // if the clicked menu is on the separator, only collapse/expand the separator's twins.
         if (node.isModel) {
             const twins = processedInput.modelTwinsMap.get(node.modelId);
             for (const twin of twins) {
@@ -96,6 +98,10 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
 
         const separator = node.isSeparator ? node : allRows.find(row => row.isSeparator && row.modelId === node.modelId);
         if (separator) {
+            if (node !== separator) {
+                separator.collapsed = collapse;
+                separator.hide = collapse;
+            }
             const twins = processedInput.modelTwinsMap.get(separator.id);
             for (const twin of twins) {
                 twin.hide = collapse;
@@ -188,6 +194,7 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
         const { models, modelTwinsMap } = processedInput;
         const collapsed = models.size > 1;
 
+        // create a model row followed by rows for each existing twin of that model
         models.forEach(model => {
             rows.push({
                 key: generateId(),
@@ -210,6 +217,10 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
 
         if (customTwin?.modelId && customTwin.twinId) {
             const { modelId, twinId } = customTwin;
+
+            // modelTwinsMap has a key that is a modelId and a value that is an array of existing twins for that modelId.
+            // new twins should not be in this array. they will be stored in the array for the map key that is equal to
+            // the key that is the model id prefixed with 'newtwins-'.
             const { models, modelTwinsMap } = processedInput;
 
             // if the model already exists, we'll add the twin immediately after it; otherwise, we'll
@@ -248,7 +259,7 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
             if (!separatorNode) {
                 separatorNode = {
                     key: generateId(),
-                    id: `newtwins-${modelId}`,
+                    id: `${newTwinPrefix}${modelId}`,
                     modelId: modelId,
                     name: 'separator',
                     isModel: false,
@@ -269,7 +280,8 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
             }
 
             // create the row for the twin
-            const twinRow: Node = {
+            const newTwins: Node[] = modelTwinsMap.get(separatorNode.id);
+            newTwins.push({
                 key: generateId(),
                 id: twinId,
                 modelId: modelId,
@@ -277,9 +289,10 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
                 isModel: false,
                 collapsed: separatorNode.collapsed,
                 isNew: true
-            };
-            allRows.splice(modelRowIdx, 0, twinRow);
-            modelTwinsMap.get(separatorNode.id).push(twinRow);
+            });
+            // Add in all twins to rows
+            allRows.splice(modelRowIdx, 0, ...newTwins);
+
         }
         return allRows;
     }, [inputRows, customTwin, processedInput]);
@@ -295,6 +308,7 @@ interface TwinsListProps {
 
 function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }: TwinsListProps) {
     const tooltipId = useId('newTwin');
+    const baseClass = 'row font-small margin-bottom-xsmall';
     const content = nodeRows.map(node => {
         const icon = node.collapsed ? '+' : '-';
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
@@ -305,17 +319,19 @@ function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }:
         const content: JSX.Element = (<div key={`${generateId()}`}>
             The twin ids under this menu do NOT exist and will be created when mapped OPC-UA telemetry is sent.
         </div>);
+        const modelClass = node.isModel || node.isSeparator ? 'model' : '';
+        const separatorClass = node.isSeparator ? 'new-twin-separator' : '';
+        const selectedClass = selectedTwinKey === node.key ? 'selected' : 'unselected';
         if (!node.hide) {
             return (
-                <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel || node.isSeparator ? 'model' : ''} ${node.isNew ? 'new-twin' : ''} \
-                    ${node.isSeparator ? 'new-twin-separator' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`} >
+                <div key={node.key} className={`${baseClass} ${modelClass} ${separatorClass} ${selectedClass}`} >
                     {(node.isModel || node.isSeparator) && <MenuIcon />}
                     <div
                         className={`viewer-row-label ${select ? ' clickable selectable' : ''}`}
                         onClick={select}>
                             {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
                             {!(node.isModel || node.isSeparator) && <div>
-                                <div>TwinId: <span style={styles?.twinId}>{node.id}</span></div>
+                                <div>{node.isNew ? 'Future ' : ''}Twin: <span style={styles?.twinId}>{node.id}</span></div>
                                 <div style={styles?.twinName}>{node.name}</div>
                             </div>}
                             {node.isSeparator &&
