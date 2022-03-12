@@ -34,6 +34,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     }, [dtItem]);
     const [showAdd, setShowAdd] = useBoolean(false);
     const [newTwin, setNewTwin] = React.useState<string>();
+    const [invalidName, setInvalidName] = useBoolean(false);
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
         // note: 'twinNode' will become undefined when the current twin selection is clicked off
@@ -88,6 +89,15 @@ export function DtInputContainer(props: NodeViewerProps) {
         onAddNewTwin(newTwin);
         setNewTwin('');
     }, [newTwin, onAddNewTwin]);
+
+    const onTwinNameError = React.useCallback((value) => {
+        if ((value as string)?.match('.*[\\s].*')) {
+            setInvalidName.setTrue();
+            return 'Name cannot contain spaces';
+        }
+        setInvalidName.setFalse();
+        return '';
+    }, [setInvalidName]);
 
     return (
         <div className='file-viewer-container group-wrapper twins-wrapper'>
@@ -147,12 +157,13 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 onChange={(_, twinId) => setNewTwin(twinId)}
                                 placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
                                 disabled={!dtItem?.modelId}
+                                onGetErrorMessage={onTwinNameError}
                             />
                             <IconButton
                                 iconProps={{iconName: 'add'}}
                                 title='Add entry'
                                 ariaLabel='add'
-                                disabled={!newTwin || !dtItem?.modelId}
+                                disabled={!newTwin || !dtItem?.modelId || invalidName}
                                 className='simple-icon-button-small margin-end-xsmall'
                                 styles={simpleIconStyles}
                                 onClick={onAdd}

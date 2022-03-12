@@ -96,7 +96,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
 
         const separator = node.isSeparator ? node : allRows.find(row => row.isSeparator && row.modelId === node.modelId);
         if (separator) {
-            const twins = processedInput.modelTwinsMap.get(separator.key);
+            const twins = processedInput.modelTwinsMap.get(separator.id);
             for (const twin of twins) {
                 twin.hide = collapse;
             }
@@ -261,11 +261,11 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
             }
 
             // add a group for collapse/expand menu clicks on separator
-            if (!models.has(separatorNode.key)) {
-                models.add(separatorNode.key);
+            if (!models.has(separatorNode.id)) {
+                models.add(separatorNode.id);
             }
-            if (!modelTwinsMap.has(separatorNode.key)) {
-                modelTwinsMap.set(separatorNode.key, []);
+            if (!modelTwinsMap.has(separatorNode.id)) {
+                modelTwinsMap.set(separatorNode.id, []);
             }
 
             // create the row for the twin
@@ -279,7 +279,7 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
                 isNew: true
             };
             allRows.splice(modelRowIdx, 0, twinRow);
-            modelTwinsMap.get(separatorNode.key).push(twinRow);
+            modelTwinsMap.get(separatorNode.id).push(twinRow);
         }
         return allRows;
     }, [inputRows, customTwin, processedInput]);
