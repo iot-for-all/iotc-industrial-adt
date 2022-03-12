@@ -111,7 +111,7 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
         error = `Invalid input file (${e?.message})`;
     }
     const inputRows = useGetRows(processedInput);
-    
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
         setNodeRows(inputRows);
@@ -120,8 +120,8 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
         // since their references are used in the node.children array
-        const newRows = [...nodeRows]; 
-        
+        const newRows = [...nodeRows];
+
         // update the menu setting for the clicked row
         const node = processedInput.nodeMap[nodeKey];
         node.collapsed = collapse;
@@ -146,12 +146,12 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
         </div>);
     }
     return (
-        <ModelsList 
-            nodeRows={nodeRows} 
-            onSelect={onSelect} 
+        <ModelsList
+            nodeRows={nodeRows}
+            onSelect={onSelect}
             selectedModelKey={selectedModelKey}
-            indentPixels={indentPixels} 
-            onMenuClick={onMenuClick} 
+            indentPixels={indentPixels}
+            onMenuClick={onMenuClick}
             styles={styles}
         />
     );
@@ -159,22 +159,22 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
 
 function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
     return React.useMemo(() => {
-        if (!jsonContent) { 
-            return undefined; 
+        if (!jsonContent) {
+            return undefined;
         }
 
         // we expect the input to be an object with 'value' property that holds an array of interface objects
-        const rawArray: (Model | Interface)[] = !Array.isArray(jsonContent) 
+        const rawArray: (Model | Interface)[] = !Array.isArray(jsonContent)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ? (jsonContent as { value: Model[]}).value  
+            ? (jsonContent as { value: Model[]}).value
                 ?? ((jsonContent as Interface)['@type'] === 'Interface' && [ (jsonContent as Interface) ])
                 ?? null
             : jsonContent as (Model | Interface)[];
-        
+
         if (!rawArray || !Array.isArray(rawArray)) {
             return undefined;
         }
-        
+
         const nodeMap: InputData = {};
         const rootNodes: string[] = [];
         const idToKeyMap: IdToKeyMap = {};  // for linking related and component interfaces
@@ -209,7 +209,7 @@ function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
                 rawNode.contents.forEach(childNode => processObject(childNode, nodeMap, idToKeyMap, node, collapsed));
             }
         }
-        
+
         return { nodeMap, rootNodes, idToKeyMap };
     }, [jsonContent]);
 }
@@ -302,7 +302,7 @@ function getComplexValues(schema: any, schemaName: string): string[] {
             return schema.enumValues.map((val) => `${val.name}: ${val.enumValue}`);
         case 'map':
             return [
-                `${schema.mapKey.name} (${getSchemaName(schema.mapKey.schema)})`, 
+                `${schema.mapKey.name} (${getSchemaName(schema.mapKey.schema)})`,
                 `${schema.mapValue.name} (${getSchemaName(schema.mapValue.schema)})`
             ];
     }
@@ -314,7 +314,7 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
         if (!processedInput) {
             return rows;
         }
-        const { nodeMap, rootNodes, idToKeyMap } = processedInput;  
+        const { nodeMap, rootNodes, idToKeyMap } = processedInput;
 
         // replace component and relationship nodes with their interfaces
         const nestedInterfaces = [];
@@ -332,18 +332,18 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
                     nestedInterfaces.push(compInterfaceNode.key);
 
                     // replace the node contents w/ the top-level interface node
-                    // Note: these properties of the component node are retained:  
+                    // Note: these properties of the component node are retained:
                     //       type, name, displayName, namespace, depth, hide, modelId
                     childNode.id = compInterfaceNode.id;
                     childNode.schema = undefined;
                     childNode.children = compInterfaceNode.children;
                     childNode.collapsed = childNode.hide;
-                    childNode.displayName = (typeof childNode.displayName === 'string') 
-                        ? childNode.displayName 
+                    childNode.displayName = (typeof childNode.displayName === 'string')
+                        ? childNode.displayName
                         : (childNode.displayName as { en: string })?.en
                             ? (childNode.displayName as { en: string }).en
-                            : (typeof compInterfaceNode.displayName === 'string') 
-                                ? compInterfaceNode.displayName 
+                            : (typeof compInterfaceNode.displayName === 'string')
+                                ? compInterfaceNode.displayName
                                 : (compInterfaceNode.displayName as { 'en': string })?.en;
 
                     // update the depth, namespace and hide props of any children of the component
@@ -409,13 +409,13 @@ function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenu
             return (
                 <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedModelKey === node.key ? 'selected' : 'unselected'}`} style={style}>
                     {!!node.children.length && <MenuIcon />}
-                    <div 
-                        className={`${select ? ' clickable selectable' : ''} viewer-row-label`} 
+                    <div
+                        className={`${select ? ' clickable selectable' : ''} viewer-row-label`}
                         onClick={select}>
                             {node.type.toLowerCase() === 'interface' && <div className='interface'>{node.type}: <span style={styles?.interfaceId}>{node.name ?? node.id}</span></div>}
                             {node.type.toLowerCase() === 'property' && <div>
                                 <div>{node.type}: <span style={styles?.propertyName}>{node.name ?? node.id}</span></div>
-                                {['object', 'map', 'enum'].includes(node.schema.toLowerCase()) 
+                                {['object', 'map', 'enum'].includes(node.schema.toLowerCase())
                                     ? <Details node={node} styles={styles}/>
                                     : <span>(<span  style={styles?.propertySchema}>
                                         {node.schema.toLowerCase() === 'array' ? `${node.complexValues[0]} ` : ''}{node.schema}</span>)
@@ -457,7 +457,7 @@ export const Details = React.memo(function Details({ node, styles }: DetailsProp
                 {node.object.map((detail, idx) => {
                     const style: React.CSSProperties = { paddingInlineStart: `${defaultIndent * detail.depth}px` };
                     const schema = detail.schema.toLowerCase() === 'array' ? `${detail.complexValues[0]} Array` : detail.schema;
-                    
+
                     return (<div key={`${generateId()}-${idx}`}>
                         <div style={style}>{detail.name} <span>({schema})</span></div>
                         {(schema.toLowerCase() === 'object') && getObjectSchemaJSX(detail)}
@@ -471,7 +471,7 @@ export const Details = React.memo(function Details({ node, styles }: DetailsProp
             content = getComplexSchemaJSX(node.complexValues, schema);
             break;
     }
-  
+
     return (
         <TooltipHost
           content={content}
@@ -489,7 +489,7 @@ function getObjectSchemaJSX(object: ComplexProperties): JSX.Element {
         {object.properties.map((detail, idx) => {
             const style: React.CSSProperties = { paddingInlineStart: `${defaultIndent * detail.depth}px` };
             const schema = detail.schema.toLowerCase() === 'array' ? `${detail.complexValues[0]} Array` : detail.schema;
-            
+
             return (<>
                 <div style={style} key={idx}>{detail.name} <span>({schema})</span></div>
                 {(schema.toLowerCase() === 'object') && getObjectSchemaJSX(detail)}

@@ -36,6 +36,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     const [newTwin, setNewTwin] = React.useState<string>();
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
+        // note: 'twinNode' will become undefined when the current twin selection is clicked off
         // don't allow twin selection from a different model if model is already selected
         const currModelId = twinNode?.modelId;
         if (currModelId && dtItem?.modelId && dtItem.modelId !== currModelId) {
@@ -52,7 +53,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     }, [dtItem, onSelect, selectedModelKey]);
 
     const onModelSelect = React.useCallback((modelNode: ModelNode) => {
-        // note: 'modelNode' will be undefined when the current model selection is clicked off
+        // note: 'modelNode' will become undefined when the current model selection is clicked off
         const currModelId = dtItem?.modelId;
         const newItem = {
             ...dtItem,

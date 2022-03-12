@@ -3,6 +3,8 @@ import { generateId } from './core/generateId';
 import { CustomTwin, DtStyleScheme } from './models';
 
 import './dtViewer.css';
+import { TooltipHost } from '@fluentui/react';
+import { useId } from '@fluentui/react-hooks';
 
 export interface TwinsViewerProps {
     jsonContent: object | Array<object>;
@@ -25,6 +27,8 @@ export interface Node {
     isModel: boolean;
     collapsed?: boolean;
     hide?: boolean; // for descendents, set to true if an ancestor has collapsed === true; used in render to determine whether to show the row
+    isNew?: boolean;
+    isSeparator?: boolean;
 }
 
 // List Twins shapes
@@ -58,7 +62,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
     const inputRows = useGetRows(processedInput);
 
     // add any custom twins after the JSON has been processed and memoized
-    const allRows = useGetCustomRows(inputRows, customTwin);
+    const allRows = useGetCustomRows(inputRows, customTwin, processedInput);
 
     const filteredRows = React.useMemo(() => {
         if (selectedModelId) {
@@ -78,16 +82,28 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         const newRows = [...nodeRows];
 
         // update the menu setting for the clicked row
-        const node = inputRows.find(node => node.key === nodeKey);
+        const node = allRows.find(node => node.key === nodeKey);
         node.collapsed = collapse;
 
-        // toggle the hide prop of the descendents until either you find a descendent menu that is 'collapsed' or reach all descendents
-        const twins = processedInput.modelTwinsMap.get(node.modelId);
-        for (const twin of twins) {
-            twin.hide = collapse;
+        // if clicked menu is on a model, collapse/expand twins, separator and new twins.
+        // if the clicked menu is on the separator, only collapse/expand the separator and its twins.
+        if (node.isModel) {
+            const twins = processedInput.modelTwinsMap.get(node.modelId);
+            for (const twin of twins) {
+                twin.hide = collapse;
+            }
         }
+
+        const separator = node.isSeparator ? node : allRows.find(row => row.isSeparator && row.modelId === node.modelId);
+        if (separator) {
+            const twins = processedInput.modelTwinsMap.get(separator.key);
+            for (const twin of twins) {
+                twin.hide = collapse;
+            }
+        }
+
         setNodeRows(newRows);
-    }, [inputRows, nodeRows, processedInput?.modelTwinsMap]);
+    }, [allRows, nodeRows, processedInput?.modelTwinsMap]);
 
     if (error) {
         return (<div className='viewer'>
@@ -188,22 +204,13 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
     }, [processedInput]);
 }
 
-function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin): Node[] {
+function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedInput: ProcessedInput): Node[] {
     return React.useMemo(() => {
         const allRows: Node[] = [...inputRows];
 
-        if (customTwin) {
+        if (customTwin?.modelId && customTwin.twinId) {
             const { modelId, twinId } = customTwin;
-
-            // create the row for the twin
-            const twinRow = {
-                key: generateId(),
-                id: twinId,
-                modelId: modelId,
-                name: twinId,
-                isModel: false,
-                collapsed: false,
-            };
+            const { models, modelTwinsMap } = processedInput;
 
             // if the model already exists, we'll add the twin immediately after it; otherwise, we'll
             // add a new model row followed by the twin
@@ -219,10 +226,63 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin): Node[] {
                 });
                 modelRowIdx = allRows.length - 1;
             }
-            allRows.splice(modelRowIdx + 1, 0, twinRow);
+
+            // update the model-twin map for collapse/expand menu clicks
+            if (!models.has(modelId)) {
+                models.add(modelId);
+            }
+            if (!modelTwinsMap.has(modelId)) {
+                modelTwinsMap.set(modelId, []);
+            }
+
+            // find last twin under the current model
+            let separatorNode: Node;
+            while (allRows[++modelRowIdx]?.modelId === modelId) {
+                if (allRows[modelRowIdx].isSeparator) {
+                    separatorNode = allRows[modelRowIdx];
+                }
+            }
+
+            // if there aren't any new twins yet, add a separator between existing twins
+            // for the model and the new twin
+            if (!separatorNode) {
+                separatorNode = {
+                    key: generateId(),
+                    id: `newtwins-${modelId}`,
+                    modelId: modelId,
+                    name: 'separator',
+                    isModel: false,
+                    collapsed: false,
+                    isNew: true,
+                    isSeparator: true
+                };
+                allRows[modelRowIdx] = separatorNode;
+                modelRowIdx++;
+            }
+
+            // add a group for collapse/expand menu clicks on separator
+            if (!models.has(separatorNode.key)) {
+                models.add(separatorNode.key);
+            }
+            if (!modelTwinsMap.has(separatorNode.key)) {
+                modelTwinsMap.set(separatorNode.key, []);
+            }
+
+            // create the row for the twin
+            const twinRow: Node = {
+                key: generateId(),
+                id: twinId,
+                modelId: modelId,
+                name: twinId,
+                isModel: false,
+                collapsed: separatorNode.collapsed,
+                isNew: true
+            };
+            allRows.splice(modelRowIdx, 0, twinRow);
+            modelTwinsMap.get(separatorNode.key).push(twinRow);
         }
         return allRows;
-    }, [inputRows, customTwin]);
+    }, [inputRows, customTwin, processedInput]);
 }
 
 interface TwinsListProps {
@@ -234,25 +294,39 @@ interface TwinsListProps {
 }
 
 function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }: TwinsListProps) {
+    const tooltipId = useId('newTwin');
     const content = nodeRows.map(node => {
         const icon = node.collapsed ? '+' : '-';
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
         const MenuIcon = React.memo(() => <div className='menu-icon icon-button margin-end-xsmall clickable' onClick={onClick}>{icon}</div>);
-        const select = !node.isModel
+        const select = !(node.isModel || node.isSeparator)
             ? () => onSelect(selectedTwinKey === node.key ? undefined : node)
             : undefined;
+        const content: JSX.Element = (<div key={`${generateId()}`}>
+            The twin ids under this menu do NOT exist and will be created when mapped OPC-UA telemetry is sent.
+        </div>);
         if (!node.hide) {
             return (
-                <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`}>
-                    {node.isModel && <MenuIcon />}
+                <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel || node.isSeparator ? 'model' : ''} ${node.isNew ? 'new-twin' : ''} \
+                    ${node.isSeparator ? 'new-twin-separator' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`} >
+                    {(node.isModel || node.isSeparator) && <MenuIcon />}
                     <div
                         className={`viewer-row-label ${select ? ' clickable selectable' : ''}`}
                         onClick={select}>
                             {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
-                            {!node.isModel && <div>
+                            {!(node.isModel || node.isSeparator) && <div>
                                 <div>TwinId: <span style={styles?.twinId}>{node.id}</span></div>
                                 <div style={styles?.twinName}>{node.name}</div>
                             </div>}
+                            {node.isSeparator &&
+                                <TooltipHost
+                                content={content}
+                                // This id is used on the tooltip itself, not the host
+                                // (so an element with this id only exists when the tooltip is shown)
+                                id={tooltipId}
+                                >
+                                    <div>Future Twins for <span style={styles?.modelId}>{node.modelId}</span></div>
+                            </TooltipHost>}
                     </div>
                 </div>
             );
