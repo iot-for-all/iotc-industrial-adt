@@ -169,6 +169,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                     placeholder={!dtItem?.modelId ? 'Choose from Models first' : 'Enter name of new twin'}
                                     disabled={!dtItem?.modelId}
                                     onGetErrorMessage={onTwinNameError}
+                                    autoFocus
                                 />
                                 <IconButton
                                     iconProps={{iconName: 'add'}}
