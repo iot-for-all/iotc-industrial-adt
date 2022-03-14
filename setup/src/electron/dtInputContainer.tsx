@@ -138,8 +138,8 @@ export function DtInputContainer(props: NodeViewerProps) {
                             <div className='vertical-group'>
                                 <TooltipIconButton
                                     onClick={setShowAdd.toggle}
-                                    iconProps={{ iconName: 'add'}}
-                                    title='Add twin'
+                                    iconProps={{ iconName: `${!showAdd ? 'add' : 'remove'}` }}
+                                    title='Show/hide add twin'
                                     tooltip='Show/hide add input field'
                                     className='add'
                                 />
