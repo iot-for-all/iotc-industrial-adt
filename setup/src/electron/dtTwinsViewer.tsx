@@ -267,7 +267,7 @@ function useGetCustomRows(inputRows: Node[], customTwin: CustomTwin, processedIn
                     isNew: true,
                     isSeparator: true
                 };
-                allRows[modelRowIdx] = separatorNode;
+                allRows.splice(modelRowIdx, 0, separatorNode);
                 modelRowIdx++;
             }
 
