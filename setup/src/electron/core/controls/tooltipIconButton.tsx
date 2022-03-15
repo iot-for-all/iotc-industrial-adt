@@ -12,6 +12,7 @@ export interface IButtonProps {
   disabled?: boolean;
   checked?: boolean;
   className?: string;
+  img?: JSX.Element;
 }
 
 const calloutProps = { gapSpace: 0 };
@@ -24,7 +25,7 @@ export const TooltipIconButton = React.memo(function TooltipIconButton(props: IB
   // (It's also okay to use a plain string and manually ensure uniqueness.
   const tooltipId = useId('tooltip');
 
-  const { iconProps, tooltip, disabled, checked, className, onClick, title } = props;
+  const { iconProps, tooltip, disabled, checked, className, onClick, title, img } = props;
 
   return (
     <div>
@@ -36,15 +37,17 @@ export const TooltipIconButton = React.memo(function TooltipIconButton(props: IB
         calloutProps={calloutProps}
         styles={hostStyles}
       >
-        <IconButton 
-          iconProps={iconProps} 
-          title={title} 
+        <IconButton
+          iconProps={iconProps}
+          title={title}
           ariaLabel={title}
-          disabled={disabled} 
-          checked={checked} 
-          className={className} 
+          disabled={disabled}
+          checked={checked}
+          className={className}
           onClick={onClick}
-        />
+        >
+            {img}
+        </IconButton>
       </TooltipHost>
     </div>
   );

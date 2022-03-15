@@ -1,4 +1,4 @@
-import { IconButton, TextField } from '@fluentui/react';
+import { IconButton, SearchBox, TextField } from '@fluentui/react';
 import React, { Dispatch, SetStateAction } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
 import { CustomTwin, DtItem, DtStyleScheme } from './models';
@@ -9,6 +9,7 @@ import './inputContainer.css';
 import { useBoolean } from '@fluentui/react-hooks';
 import { TooltipIconButton } from './core/controls/tooltipIconButton';
 import { ErrorBoundary } from './core/controls/errorBoundary';
+import { HideSearch } from './hideSearchSvg';
 
 export interface NodeViewerProps {
     twinJsonFile: File;
@@ -36,6 +37,12 @@ export function DtInputContainer(props: NodeViewerProps) {
     const [showAdd, setShowAdd] = useBoolean(false);
     const [newTwin, setNewTwin] = React.useState<string>();
     const [invalidName, setInvalidName] = useBoolean(false);
+
+    // search
+    const [showModelSearch, setShowModelSearch] = useBoolean(false);
+    const [modelSearchFilter, setModelSearchFilter] = React.useState<string>();
+    const [showTwinSearch, setShowTwinSearch] = useBoolean(false);
+    const [twinSearchFilter, setTwinSearchFilter] = React.useState<string>();
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
         // note: 'twinNode' will become undefined when the current twin selection is clicked off
@@ -109,13 +116,28 @@ export function DtInputContainer(props: NodeViewerProps) {
         return '';
     }, [setInvalidName]);
 
+    const modelSearchTitle = `${!showModelSearch ? 'Show' : 'Hide'} search field`;
+    const twinSearchTitle = `${!showTwinSearch ? 'Show' : 'Hide'} search field`;
+
     return (
         <ErrorBoundary>
             <div className='file-viewer-container group-wrapper twins-wrapper'>
                 <div className='section-header group-header'>Digital Twins</div>
                 <div className='horizontal-group expand no-scroll-parent'>
-                <div className='vertical-group twins-viewer  margin-end-xsmall'>
-                        <div className='section-header'>Models</div>
+                    <div className='vertical-group twins-viewer margin-end-xsmall'>
+                        <div className='flatten-toggle horizontal-group justify-ends'>
+                            <div className='section-header'>Models</div>
+                            <div className='vertical-group search-toggle margin-end-xsmall'>
+                                <TooltipIconButton
+                                    onClick={setShowModelSearch.toggle}
+                                    iconProps={{ iconName: `${!showModelSearch ? 'search' : undefined}` }}
+                                    title={modelSearchTitle}
+                                    tooltip={modelSearchTitle}
+                                    className='search-toggle'
+                                    img={showModelSearch ? <HideSearch /> : undefined}
+                                />
+                            </div>
+                        </div>
                         <div className='horizontal-group margin-bottom-xsmall'>
                             <FileUpload
                                 onChange={setModelJsonFile}
@@ -129,20 +151,37 @@ export function DtInputContainer(props: NodeViewerProps) {
                             </div>
                         </div>
                         <div className='viewer-container'>
+                            {showModelSearch && <SearchBox
+                                placeholder={'Search'}
+                                className='margin-bottom-xsmall search'
+                                onChange={(_, value) => setModelSearchFilter(value)}
+                            />}
                             <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
                         </div>
                     </div>
                     <div className='vertical-group twins-viewer'>
                         <div className='flatten-toggle horizontal-group justify-ends'>
                             <div className='section-header'>Twin Instances</div>
-                            <div className='vertical-group'>
-                                <TooltipIconButton
-                                    onClick={setShowAdd.toggle}
-                                    iconProps={{ iconName: `${!showAdd ? 'add' : 'remove'}` }}
-                                    title='Show/hide add twin'
-                                    tooltip='Show/hide add input field'
-                                    className='add'
-                                />
+                            <div className='horizontal-group place-end'>
+                                <div className='vertical-group'>
+                                    <TooltipIconButton
+                                        onClick={setShowAdd.toggle}
+                                        iconProps={{ iconName: `${!showAdd ? 'add' : 'remove'}` }}
+                                        title='Show/hide add twin'
+                                        tooltip='Show/hide add input field'
+                                        className='add'
+                                    />
+                                </div>
+                                <div className='vertical-group search-toggle margin-end-xsmall'>
+                                    <TooltipIconButton
+                                        onClick={setShowTwinSearch.toggle}
+                                        iconProps={{ iconName: `${!showTwinSearch ? 'search' : undefined}` }}
+                                        title={twinSearchTitle}
+                                        tooltip={twinSearchTitle}
+                                        className='search-toggle'
+                                        img={showTwinSearch ? <HideSearch /> : undefined}
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div className='horizontal-group margin-bottom-xsmall'>
@@ -190,6 +229,11 @@ export function DtInputContainer(props: NodeViewerProps) {
                                     onClick={() => setNewTwin('')}
                                 />
                             </form>}
+                            {showTwinSearch && <SearchBox
+                                placeholder={'Search'}
+                                className='margin-bottom-xsmall search'
+                                onChange={(_, value) => setTwinSearchFilter(value)}
+                            />}
                             <DtTwinsViewer
                                 jsonContent={twinJsonContent}
                                 onSelect={onTwinSelect}

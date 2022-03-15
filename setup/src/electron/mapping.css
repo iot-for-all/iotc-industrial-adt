@@ -18,6 +18,10 @@
     border-color: #ddd;
 }
 
+.search-toggle {
+    fill: rgb(0, 120, 212);
+}
+
 .input-container {
     display: flex;
     flex-direction: column;

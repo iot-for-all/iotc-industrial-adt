@@ -62,11 +62,14 @@ export interface ViewerProps {
     styles?:  OpcuaStyleScheme;
     onSelect?: (selectedNode: TagNode) => void;
     selectedItemKey: string;
+    searchFilter?: string;
 }
 
 const defaultIndent = 10;
 
-export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatten, indentWidth, onSelect, styles, selectedItemKey }: ViewerProps) {
+export const OpcuaViewer = React.memo(function OpcuaViewer(props: ViewerProps) {
+
+    const { jsonContent, flatten, indentWidth, onSelect, styles, selectedItemKey, searchFilter } = props;
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -80,17 +83,21 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
         error = `Invalid input file (${e?.message})`;
     }
     const inputRows = useGetRows(processedInput);
-    
+    const searchRows = React.useMemo(() => searchFilter
+        ? inputRows.filter(row => row.id?.includes(searchFilter) || row.namespace?.includes(searchFilter) || (row as TagNode).name?.includes(searchFilter))
+        : inputRows,
+        [inputRows, searchFilter]);
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
-        setNodeRows(inputRows);
-    }, [inputRows]);
+        setNodeRows(searchRows);
+    }, [searchRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
         // since their references are used in the node.children array
-        const newRows = [...nodeRows]; 
-        
+        const newRows = [...nodeRows];
+
         // update the menu setting for the clicked row
         const node = processedInput.nodeMap[nodeKey];
         node.collapsed = collapse;
@@ -115,14 +122,15 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
         </div>);
     }
     return (
-        <OpcuaNodeList 
-            nodeRows={nodeRows} 
-            flatten={flatten} 
-            onSelect={onSelect} 
-            indentPixels={indentPixels} 
-            onMenuClick={onMenuClick} 
-            styles={styles} 
-            selectedItemKey={selectedItemKey} 
+        <OpcuaNodeList
+            nodeRows={nodeRows}
+            flatten={flatten}
+            onSelect={onSelect}
+            indentPixels={indentPixels}
+            onMenuClick={onMenuClick}
+            styles={styles}
+            selectedItemKey={selectedItemKey}
+            filtered={!!searchFilter}
         />
     );
 
@@ -130,18 +138,18 @@ export const OpcuaViewer = React.memo(function OpcuaViewer({ jsonContent, flatte
 
 function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
     return React.useMemo(() => {
-        if (!jsonContent) { 
-            return undefined; 
+        if (!jsonContent) {
+            return undefined;
         }
-        const rootObject: object = Array.isArray(jsonContent) 
+        const rootObject: object = Array.isArray(jsonContent)
             ? jsonContent[0] ? jsonContent[0] : null
             : jsonContent;
-        
+
         // we should have a single key in the root object
         if (!rootObject || Object.keys(rootObject).length !== 1) {
             return undefined;
         }
-        
+
         const rootKey = Object.keys(rootObject)[0];
         const nodeMap: InputData = {};
         const node: NSNode = {
@@ -163,7 +171,7 @@ function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
             currNode.children.forEach(child => child.hide = false);
             currNode.collapsed = false;
         }
-        
+
         return { nodeMap, rootKey: node.key };
     }, [jsonContent]);
 }
@@ -178,14 +186,14 @@ function processObject(rawObj: object, nodeMap: InputData, node: NSNode, collaps
     collapsed = collapsed || childCount > 1;
     node.collapsed = collapsed;
 
-    
+
     // process the keys in this object
     [...Object.keys(rawObj)].forEach(rawChildKey => {
 
         // base case: if key is 'tags', the value is an array of leaves so add them to the
         // incoming node's children
         if (rawChildKey.toLowerCase() === 'tags') {
-            node.children.push( 
+            node.children.push(
                 ...rawObj['tags'].map(tag => {
 
                     // if tag is complex type, store its complex format to show on dropdown
@@ -208,7 +216,7 @@ function processObject(rawObj: object, nodeMap: InputData, node: NSNode, collaps
                     return tagNode;
                 })
             );
-            
+
         } else {
             // otherwise, process the next level namespace object
             const nsnode: NSNode = {
@@ -246,7 +254,7 @@ function useGetRows(processedInput: ProcessedInput): (NSNode | TagNode)[] {
         if (!processedInput) {
             return rows;
         }
-        const { nodeMap, rootKey } = processedInput;  
+        const { nodeMap, rootKey } = processedInput;
 
         const stack: (NSNode | TagNode)[] = [ nodeMap[rootKey] ];
         while (stack.length) {
@@ -274,22 +282,25 @@ interface OpcuaNodeListProps {
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: OpcuaStyleScheme;
     selectedItemKey: string;
+    filtered: boolean;
 }
 
-function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles, selectedItemKey }: OpcuaNodeListProps) {
+function OpcuaNodeList(props: OpcuaNodeListProps) {
+    const { nodeRows, flatten, onSelect, indentPixels, onMenuClick, styles, selectedItemKey, filtered } = props;
     const content = nodeRows.map(node => {
+        // let match = false;
         const fullName = [...node.namespace, (node as TagNode).name ?? node.id].join('.');
         const tagNode: TagNode = (node as TagNode).type ? node as TagNode : undefined;
-        
-        const type = tagNode?.type 
-            ? tagNode.type === 'complex' 
+
+        const type = tagNode?.type
+            ? tagNode.type === 'complex'
                 ? <Details type={tagNode.type} struct={tagNode.struct} styles={styles}/>
                 : <span>(<span  style={styles?.type}>{tagNode.type}</span>)</span>
             : '';
         const icon = node.collapsed ? '+' : '-';
         const onClick = (event) => onMenuClick(event, node.key, !node.collapsed);
         const MenuIcon = React.memo(() => <div className='menu-icon icon-button margin-end-xsmall clickable' onClick={onClick}>{icon}</div>);
-        const select = tagNode 
+        const select = tagNode
             ? () => onSelect(selectedItemKey === tagNode.key ? undefined : tagNode)
             : undefined;
         if (flatten && type) {
@@ -303,13 +314,13 @@ function OpcuaNodeList({ nodeRows, flatten, onSelect, indentPixels, onMenuClick,
                 </div>
             );
         }
-        if (!flatten && !node.hide) {
+        if (!flatten && (!node.hide || filtered)) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
                 <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedItemKey === node.key ? 'selected' : ''}`} style={style}>
                     {!tagNode && <MenuIcon />}
-                    <div 
-                        className={`${select ? ' clickable selectable' : ''}`} 
+                    <div
+                        className={`${select ? ' clickable selectable' : ''}`}
                         onClick={select}
                         style={tagNode?.type ? styles?.leafName || styles?.nodeName : styles?.nodeName}>
                             {(node as TagNode).name ?? node.id}
@@ -342,7 +353,7 @@ export const Details = React.memo(function Details({ type, struct, styles }: Det
             return <div style={style} key={idx}>{detail.name} <span>(<span  style={styles?.type}>{type}</span>)</span></div>
         })}
     </>);
-  
+
     return (
         <TooltipHost
           content={content}
