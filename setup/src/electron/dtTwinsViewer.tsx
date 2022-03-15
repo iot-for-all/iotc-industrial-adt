@@ -17,6 +17,7 @@ export interface TwinsViewerProps {
     selectedModelId: string;
     selectedTwinKey: string;
     customTwin: CustomTwin;
+    searchFilter?: string;
 }
 
 export interface Node {
@@ -49,7 +50,9 @@ interface ProcessedInput {
 
 const newTwinPrefix = 'newtwins-';
 
-export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedModelId, selectedTwinKey, styles, customTwin }: TwinsViewerProps) {
+export const DtTwinsViewer = React.memo(function DtTwinsViewer(props: TwinsViewerProps) {
+
+    const { jsonContent, onSelect, selectedModelId, selectedTwinKey, styles, customTwin, searchFilter } = props;
 
     const [ nodeRows, setNodeRows ] = React.useState([]);
     let processedInput;
@@ -73,10 +76,15 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         return allRows;
     }, [allRows, selectedModelId]);
 
+    const searchRows = React.useMemo(() => searchFilter
+        ? filteredRows.filter(row => row.id?.includes(searchFilter) || row.name?.includes(searchFilter) || row.modelId?.includes(searchFilter))
+        : filteredRows,
+        [filteredRows, searchFilter]);
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
-        setNodeRows(filteredRows);
-    }, [filteredRows]);
+        setNodeRows(searchRows);
+    }, [searchRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
@@ -123,6 +131,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
             selectedTwinKey={selectedTwinKey}
             onMenuClick={onMenuClick}
             styles={styles}
+            filtered={!!searchFilter}
         />
     );
 
@@ -304,9 +313,10 @@ interface TwinsListProps {
     selectedTwinKey: string;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
+    filtered: boolean;
 }
 
-function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }: TwinsListProps) {
+function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles, filtered }: TwinsListProps) {
     const tooltipId = useId('newTwin');
     const baseClass = 'row font-small margin-bottom-xsmall';
     const content = nodeRows.map(node => {
@@ -322,7 +332,7 @@ function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }:
         const modelClass = node.isModel || node.isSeparator ? 'model' : '';
         const separatorClass = node.isSeparator ? 'new-twin-separator' : '';
         const selectedClass = selectedTwinKey === node.key ? 'selected' : 'unselected';
-        if (!node.hide) {
+        if (!node.hide || filtered) {
             return (
                 <div key={node.key} className={`${baseClass} ${modelClass} ${separatorClass} ${selectedClass}`} >
                     {(node.isModel || node.isSeparator) && <MenuIcon />}

@@ -16,6 +16,7 @@ export interface DtModelViewerProps {
     styles?:  DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
     selectedModelKey: string;
+    searchFilter?: string;
 }
 
 export interface Node {
@@ -97,7 +98,9 @@ interface IdToKeyMap {
 
 const defaultIndent = 10;
 
-export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, indentWidth, onSelect, selectedModelKey, styles }: DtModelViewerProps) {
+export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelViewerProps) {
+
+    const { jsonContent, indentWidth, onSelect, selectedModelKey, styles, searchFilter } = props;
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [ nodeRows, setNodeRows ] = React.useState([]);
@@ -112,10 +115,27 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
     }
     const inputRows = useGetRows(processedInput);
 
+    const searchRows = React.useMemo(() => searchFilter
+        ? inputRows.filter(row => {
+            let keep = row.id?.includes(searchFilter) || row.namespace?.includes(searchFilter) || row.name?.includes(searchFilter)
+            || row.type?.includes(searchFilter) || row.modelId?.includes(searchFilter);
+            if (!keep) {
+                if (typeof row.displayName === 'string') {
+                    keep = row.displayName.includes(searchFilter);
+                } else if (typeof row.displayName === 'object') {
+                    keep = (row.displayName['en'] as string)?.includes(searchFilter);
+                }
+            }
+            return keep;
+
+        })
+        : inputRows,
+        [inputRows, searchFilter]);
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
-        setNodeRows(inputRows);
-    }, [inputRows]);
+        setNodeRows(searchRows);
+    }, [searchRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
@@ -153,6 +173,7 @@ export const DtModelViewer = React.memo(function DtModelViewer({ jsonContent, in
             indentPixels={indentPixels}
             onMenuClick={onMenuClick}
             styles={styles}
+            filtered={!!searchFilter}
         />
     );
 });
@@ -393,9 +414,10 @@ interface ModelsListProps {
     indentPixels: number;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
+    filtered: boolean;
 }
 
-function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenuClick, styles }: ModelsListProps) {
+function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenuClick, styles, filtered }: ModelsListProps) {
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, node.name ?? node.displayName ?? node.id].join('.');
         const icon = node.collapsed ? '+' : '-';
@@ -404,7 +426,7 @@ function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenu
         const select = node.type.toLowerCase() === 'property'
             ? () => onSelect(selectedModelKey === node.key ? undefined : node)
             : undefined;
-        if (!node.hide) {
+        if (!node.hide || filtered) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
                 <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedModelKey === node.key ? 'selected' : 'unselected'}`} style={style}>

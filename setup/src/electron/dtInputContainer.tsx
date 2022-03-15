@@ -156,7 +156,13 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 className='margin-bottom-xsmall search'
                                 onChange={(_, value) => setModelSearchFilter(value)}
                             />}
-                            <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
+                            <DtModelViewer
+                                jsonContent={modelJsonContent}
+                                onSelect={onModelSelect}
+                                selectedModelKey={selectedModelKey}
+                                styles={styles}
+                                searchFilter={modelSearchFilter}
+                            />
                         </div>
                     </div>
                     <div className='vertical-group twins-viewer'>
@@ -240,7 +246,9 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 selectedModelId={dtItem?.modelId}
                                 selectedTwinKey={selectedTwinKey}
                                 styles={styles}
-                                customTwin={customTwin} />
+                                customTwin={customTwin}
+                                searchFilter = {twinSearchFilter}
+                            />
                         </div>
                     </div>
                 </div>
