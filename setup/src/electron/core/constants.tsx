@@ -36,4 +36,15 @@ export const AUTH_MESSAGES = {
 
 export const CACHE_LOCATION = "./data/cache.json";
 
-export const REDIRECT_URL = 'msal83417053-8ce3-413c-8698-7830a8954fbf';
+export const REDIRECT_URL = 'msal3e9a455b-b362-4872-a159-7b769ad497fe';
+
+export const TOKEN_AUDIENCES = {
+    Arm: 'https://management.azure.com/user_impersonation',
+    ADT: 'https://digitaltwins.azure.net/Read.Write'
+}
+
+export const API_VERSIONS = {
+    DigitalTwinsControl: '2020-12-01',
+    DigitalTwinsData: '2020-10-31',
+    ResourceManager: '2021-04-01'
+}

@@ -1,4 +1,4 @@
-import { Callout, DefaultButton, Icon, IPersonaSharedProps, Persona, PersonaSize, PrimaryButton } from '@fluentui/react';
+import { Callout, DefaultButton, Icon, IPersonaSharedProps, Persona, PersonaSize, PrimaryButton, Spinner, SpinnerSize } from '@fluentui/react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Mapping } from './mapping';
@@ -35,46 +35,50 @@ const UserCard = React.memo<{ user: AccountInfo & { image?: string }, target: st
       <DefaultButton text='Logout' onClick={logout} />
     </div>
   </Callout>)
-  return null;
 });
 
 const App = React.memo(function App() {
   const [user, setUser] = React.useState<AccountInfo>();
   const [userCardVisible, { toggle }] = useBoolean(false);
   const userIconId = useId();
+
   React.useEffect(() => {
     const fn = async () => {
-      setUser(await window.electron.signInSilent());
+      let data = await window.electron.signInSilent();
+      if (!data) {
+        data = await window.electron.signIn();
+      }
+      setUser(data);
     };
-    fn();
-  }, []);
-  return (
-    <div>
-      <div className='masthead'>
-        <h3 className='padding-horizontal flex1'>OPCUA to DT Mapping Tool</h3>
-        <div className='right-align-flex'>
-          {user ?
+    if (!user) {
+      fn();
+    }
+  }, [setUser, user]);
+
+  if (user) {
+    return (
+      <div>
+        <div className='masthead'>
+          <h3 className='padding-horizontal flex1'>OPCUA to DT Mapping Tool</h3>
+          <div className='right-align-flex'>
             <div className='link' onClick={toggle}>
               <span className='margin-right-sm'>{user.name || user.username}</span>
               <div id={userIconId} className='round-border inline-block'>
                 <Icon iconName='Contact' className='icon-30' />
                 {userCardVisible && <UserCard target={userIconId} user={user} logout={async () => {
                   const data = await window.electron.signOut();
-                  console.log(data);
                   setUser(data);
                 }} />}
-              </div></div> :
-            <div className='round-border link' onClick={async () => {
-              const data = await window.electron.signIn();
-              console.log(data);
-              setUser(data);
-            }}>
-              <Icon iconName='AddFriend' className='icon-30' />
-            </div>}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <Mapping />
-    </div>);
+        <Mapping />
+      </div>);
+  }
+  return <div className='flex-center full-height justify-center'>
+    <Spinner size={SpinnerSize.large} />
+  </div>
 });
 
 function render() {

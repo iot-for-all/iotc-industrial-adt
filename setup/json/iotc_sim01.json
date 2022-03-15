@@ -6,142 +6,48 @@
                     "Widget_Maker_1": {
                         "tags": [
                             {
-                                "nodeId": "ns=2;i=3",
-                                "name": "coolant_temp",
-                                "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=2;i=4",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=2;i=5",
-                                "name": "spindle_rpm",
-                                "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=2;i=6",
-                                "name": "widget_count",
+                                "nodeId": "ns=2;i=8",
+                                "name": "error_count",
                                 "type": "Int16"
                             },
                             {
                                 "nodeId": "ns=2;i=7",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "name": "coolant_temp",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=6",
+                                "name": "spindle_rpm",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=5",
+                                "name": "widget_count",
+                                "type": "Int16"
                             }
                         ]
                     },
                     "Widget_Maker_2": {
                         "tags": [
                             {
-                                "nodeId": "ns=2;i=8",
-                                "name": "coolant_temp",
-                                "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=2;i=9",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=2;i=10",
-                                "name": "spindle_rpm",
-                                "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=2;i=11",
-                                "name": "widget_count",
+                                "nodeId": "ns=2;i=13",
+                                "name": "error_count",
                                 "type": "Int16"
                             },
                             {
                                 "nodeId": "ns=2;i=12",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "name": "coolant_temp",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=11",
+                                "name": "spindle_rpm",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=10",
+                                "name": "widget_count",
+                                "type": "Int16"
                             }
                         ]
                     }
@@ -150,142 +56,48 @@
                     "Widget_Maker_1": {
                         "tags": [
                             {
-                                "nodeId": "ns=3;i=3",
+                                "nodeId": "ns=2;i=19",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=18",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=3;i=4",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=3;i=5",
+                                "nodeId": "ns=2;i=17",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=3;i=6",
+                                "nodeId": "ns=2;i=16",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=3;i=7",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     },
                     "Widget_Maker_2": {
                         "tags": [
                             {
-                                "nodeId": "ns=3;i=8",
+                                "nodeId": "ns=2;i=24",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=23",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=3;i=9",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=3;i=10",
+                                "nodeId": "ns=2;i=22",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=3;i=11",
+                                "nodeId": "ns=2;i=21",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=3;i=12",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     }
@@ -296,142 +108,48 @@
                     "Widget_Maker_1": {
                         "tags": [
                             {
-                                "nodeId": "ns=4;i=3",
+                                "nodeId": "ns=2;i=31",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=30",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=4;i=4",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=4;i=5",
+                                "nodeId": "ns=2;i=29",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=4;i=6",
+                                "nodeId": "ns=2;i=28",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=4;i=7",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     },
                     "Widget_Maker_2": {
                         "tags": [
                             {
-                                "nodeId": "ns=4;i=8",
+                                "nodeId": "ns=2;i=36",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=35",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=4;i=9",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=4;i=10",
+                                "nodeId": "ns=2;i=34",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=4;i=11",
+                                "nodeId": "ns=2;i=33",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=4;i=12",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     }
@@ -440,142 +158,48 @@
                     "Widget_Maker_1": {
                         "tags": [
                             {
-                                "nodeId": "ns=5;i=3",
+                                "nodeId": "ns=2;i=42",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=41",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=5;i=4",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=5;i=5",
+                                "nodeId": "ns=2;i=40",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=5;i=6",
+                                "nodeId": "ns=2;i=39",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=5;i=7",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     },
                     "Widget_Maker_2": {
                         "tags": [
                             {
-                                "nodeId": "ns=5;i=8",
+                                "nodeId": "ns=2;i=47",
+                                "name": "error_count",
+                                "type": "Int16"
+                            },
+                            {
+                                "nodeId": "ns=2;i=46",
                                 "name": "coolant_temp",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=5;i=9",
-                                "name": "cartridge-level",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "red",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "green",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "blue",
-                                        "type": "Float"
-                                    }
-                                ]
-                            },
-                            {
-                                "nodeId": "ns=5;i=10",
+                                "nodeId": "ns=2;i=45",
                                 "name": "spindle_rpm",
                                 "type": "Int16"
                             },
                             {
-                                "nodeId": "ns=5;i=11",
+                                "nodeId": "ns=2;i=44",
                                 "name": "widget_count",
                                 "type": "Int16"
-                            },
-                            {
-                                "nodeId": "ns=5;i=12",
-                                "name": "vibration_3d",
-                                "type": "complex",
-                                "properties": [
-                                    {
-                                        "name": "x",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "y",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "z",
-                                        "type": "Float"
-                                    },
-                                    {
-                                        "name": "nested",
-                                        "type": "complex",
-                                        "properties": [
-                                            {
-                                                "name": "a",
-                                                "type": "Float"
-                                            },
-                                            {
-                                                "name": "b",
-                                                "type": "Float"
-                                            }
-                                        ]
-                                    }
-                                ]
                             }
                         ]
                     }

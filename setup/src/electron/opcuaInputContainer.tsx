@@ -30,7 +30,7 @@ export function OpcuaInputContainer(props) {
     return (
         <div className='file-viewer-container group-wrapper opcua-wrapper margin-end-xsmall'>
             <div className='section-header group-header'>OPC-UA Node Hierarchy</div>
-            <div className='flatten-toggle'>
+            <div className='option-toggle'>
                 <Toggle label="Flattened" inlineLabel onText="On" offText="Off" onChange={onChange} />
             </div>
             <div className='horizontal-group margin-bottom-xsmall'>      

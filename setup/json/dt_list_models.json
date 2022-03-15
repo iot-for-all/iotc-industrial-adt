@@ -1,144 +1,142 @@
-{
-    "value": [
-        {
-            "@id": "dtmi:com:microsoft:iot:central:opc_ua:factory;1",
-            "@type": "Interface",
-            "displayName": "OPC Factory",
-            "@context": "dtmi:dtdl:context;2",
-            "contents": [
-                {
-                    "@type": "Property",
-                    "name": "opcendpoint",
-                    "displayName": {
-                        "en": "Factory OPC Server endpoint"
-                    },
-                    "schema": "string"
+[
+    {
+        "@id": "dtmi:com:microsoft:iot:central:opc_ua:factory;1",
+        "@type": "Interface",
+        "displayName": "OPC Factory",
+        "@context": "dtmi:dtdl:context;2",
+        "contents": [
+            {
+                "@type": "Property",
+                "name": "opcendpoint",
+                "displayName": {
+                    "en": "Factory OPC Server endpoint"
                 },
-                {
-                    "@type": "Property",
-                    "name": "location",
-                    "displayName": {
-                        "en": "Factory Location"
-                    },
-                    "schema": {
-                        "@type": "Object",
-                        "fields": [
-                            {
-                                "name": "lat",
-                                "schema": "double"
-                            },
-                            {
-                                "name": "lon",
-                                "schema": "double"
-                            },
-                            {
-                                "name": "alt",
-                                "schema": "double"
-                            }
-                        ]
-                    }
+                "schema": "string"
+            },
+            {
+                "@type": "Property",
+                "name": "location",
+                "displayName": {
+                    "en": "Factory Location"
                 },
-                {
-                    "@type": "Relationship",
-                    "displayName": {
-                        "en": "Has buildings"
-                    },
-                    "name": "contains",
-                    "target": "dtmi:com:microsoft:iot:central:opc_ua:building;1"
+                "schema": {
+                    "@type": "Object",
+                    "fields": [
+                        {
+                            "name": "lat",
+                            "schema": "double"
+                        },
+                        {
+                            "name": "lon",
+                            "schema": "double"
+                        },
+                        {
+                            "name": "alt",
+                            "schema": "double"
+                        }
+                    ]
                 }
-            ]
-        },
-        {
-            "@id": "dtmi:com:microsoft:iot:central:opc_ua:building;1",
-            "@type": "Interface",
-            "displayName": "OPC Factory - Building",
-            "@context": "dtmi:dtdl:context;2",
-            "contents": [
-                {
-                    "@type": "Relationship",
-                    "displayName": {
-                        "en": "Has floors"
-                    },
-                    "name": "contains",
-                    "target": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
-                }
-            ]
-        },
-        {
-            "@id": "dtmi:com:microsoft:iot:central:opc_ua:floor;1",
-            "@type": "Interface",
-            "displayName": "OPC Factory - Floor",
-            "@context": "dtmi:dtdl:context;2",
-            "contents": [
-                {
-                    "@type": "Property",
-                    "name": "rooms",
-                    "displayName": {
-                        "en": "# Rooms"
-                    },
-                    "schema": "integer"
+            },
+            {
+                "@type": "Relationship",
+                "displayName": {
+                    "en": "Has buildings"
                 },
-                {
-                    "@type": "Relationship",
-                    "displayName": {
-                        "en": "Has assets"
-                    },
-                    "name": "contains",
-                    "target": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1"
-                }
-            ]
-        },
-        {
-            "@id": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1",
-            "@type": "Interface",
-            "displayName": "OPC Factory - Widget Maker",
-            "@context": "dtmi:dtdl:context;2",
-            "contents": [
-                {
-                    "@type": "Property",
-                    "name": "widget_count",
-                    "displayName": {
-                        "en": "Widget Count"
-                    },
-                    "schema": "integer",
-                    "writable": true
+                "name": "contains",
+                "target": "dtmi:com:microsoft:iot:central:opc_ua:building;1"
+            }
+        ]
+    },
+    {
+        "@id": "dtmi:com:microsoft:iot:central:opc_ua:building;1",
+        "@type": "Interface",
+        "displayName": "OPC Factory - Building",
+        "@context": "dtmi:dtdl:context;2",
+        "contents": [
+            {
+                "@type": "Relationship",
+                "displayName": {
+                    "en": "Has floors"
                 },
-                {
-                    "@type": "Property",
-                    "name": "spindle_rpm",
-                    "displayName": {
-                        "en": "Spindle RPM"
-                    },
-                    "schema": "float",
-                    "writable": true
+                "name": "contains",
+                "target": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+            }
+        ]
+    },
+    {
+        "@id": "dtmi:com:microsoft:iot:central:opc_ua:floor;1",
+        "@type": "Interface",
+        "displayName": "OPC Factory - Floor",
+        "@context": "dtmi:dtdl:context;2",
+        "contents": [
+            {
+                "@type": "Property",
+                "name": "rooms",
+                "displayName": {
+                    "en": "# Rooms"
                 },
-                {
-                    "@type": "Property",
-                    "name": "coolant_temp",
-                    "displayName": {
-                        "en": "Coolant Temperature"
-                    },
-                    "schema": "float",
-                    "writable": true
+                "schema": "integer"
+            },
+            {
+                "@type": "Relationship",
+                "displayName": {
+                    "en": "Has assets"
                 },
-                {
-                    "@type": "Property",
-                    "name": "error_count",
-                    "displayName": {
-                        "en": "Error count"
-                    },
-                    "schema": "integer",
-                    "writable": true
+                "name": "contains",
+                "target": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1"
+            }
+        ]
+    },
+    {
+        "@id": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1",
+        "@type": "Interface",
+        "displayName": "OPC Factory - Widget Maker",
+        "@context": "dtmi:dtdl:context;2",
+        "contents": [
+            {
+                "@type": "Property",
+                "name": "widget_count",
+                "displayName": {
+                    "en": "Widget Count"
                 },
-                {
-                    "@type": "Property",
-                    "name": "humidity",
-                    "displayName": {
-                        "en": "Tape humidity"
-                    },
-                    "schema": "float"
-                }
-            ]
-        }
-    ]
-}
+                "schema": "integer",
+                "writable": true
+            },
+            {
+                "@type": "Property",
+                "name": "spindle_rpm",
+                "displayName": {
+                    "en": "Spindle RPM"
+                },
+                "schema": "float",
+                "writable": true
+            },
+            {
+                "@type": "Property",
+                "name": "coolant_temp",
+                "displayName": {
+                    "en": "Coolant Temperature"
+                },
+                "schema": "float",
+                "writable": true
+            },
+            {
+                "@type": "Property",
+                "name": "error_count",
+                "displayName": {
+                    "en": "Error count"
+                },
+                "schema": "integer",
+                "writable": true
+            },
+            {
+                "@type": "Property",
+                "name": "humidity",
+                "displayName": {
+                    "en": "Tape humidity"
+                },
+                "schema": "float"
+            }
+        ]
+    }
+]

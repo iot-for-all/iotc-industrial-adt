@@ -24,7 +24,9 @@ const cachePlugin = {
 
 const MSAL_CONFIG: Configuration = {
     auth: {
-        clientId: "83417053-8ce3-413c-8698-7830a8954fbf"
+        clientId: "3e9a455b-b362-4872-a159-7b769ad497fe",
+        authority: "https://login.microsoftonline.com/4ac2d501-d648-4bd0-8486-653a65f90fc7"
+
     },
     cache: {
         cachePlugin
@@ -35,7 +37,8 @@ const msalInstance = new PublicClientApplication(MSAL_CONFIG);
 let account: AccountInfo;
 const basicAuthParameters = {
     scopes: ['user.read'],
-    redirectUri: `${REDIRECT_URL}://auth`
+    redirectUri: `${REDIRECT_URL}://auth`,
+    extraScopesToConsent: ['https://management.azure.com/user_impersonation']
 }
 
 async function getAccount(): Promise<AccountInfo> {
@@ -62,8 +65,7 @@ async function getAccount(): Promise<AccountInfo> {
 
 async function listenForAuthCode(navigateUrl: string, authWindow: BrowserWindow) {
     return new Promise<string>((res, rej) => {
-        authWindow.loadURL(navigateUrl);
-        protocol.registerFileProtocol(REDIRECT_URL, (req, callback) => {
+        const registered = protocol.registerFileProtocol(REDIRECT_URL, (req, callback) => {
             const requestUrl = new URL(req.url);
             // parsing redirect query string to get auth code
             const authCode = requestUrl.searchParams.get('code');
@@ -76,6 +78,8 @@ async function listenForAuthCode(navigateUrl: string, authWindow: BrowserWindow)
             }
             callback(path.normalize(`${__dirname}/${requestUrl.pathname}`));
         });
+        authWindow.webContents.openDevTools();
+        authWindow.loadURL(navigateUrl);
     });
 }
 
@@ -116,16 +120,41 @@ async function handleResponse(response: AuthenticationResult) {
     return account;
 }
 
+export async function getToken(resource: string) {
+    try {
+        const authResult = await msalInstance.acquireTokenSilent({
+            scopes: [resource],
+            account
+        });
+        return authResult.accessToken;
+    }
+    catch (e) {
+
+        const authResult = await getTokenInteractive(new BrowserWindow({
+            height: 600,
+            width: 400,
+        }), {
+            ...basicAuthParameters,
+            scopes: ['https://management.azure.com/user_impersonation']
+        });
+        return handleResponse(authResult);
+    }
+}
+
 export async function login(authWindow: BrowserWindow) {
-    const authResult = await getTokenInteractive(authWindow);
-    return handleResponse(authResult);
+    try {
+        const authResult = await getTokenInteractive(authWindow);
+        return handleResponse(authResult);
+    }
+    catch (e) {
+        console.log(e);
+    }
 }
 
 export async function loginSilent(): Promise<AccountInfo> {
     if (!account) {
         account = await getAccount();
     }
-
     return account;
 }
 

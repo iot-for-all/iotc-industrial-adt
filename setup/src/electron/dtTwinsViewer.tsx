@@ -1,16 +1,16 @@
 import React from 'react';
 import { generateId } from './core/generateId';
-import { DtStyleScheme } from './models';
+import { DtStyleScheme, Twin } from './models';
 
 import './dtViewer.css';
 
 export interface TwinsViewerProps {
-    jsonContent: object | Array<object>;
+    jsonContent: Twin[];
     theme?: 'light' | 'dark';
     className?: string;
-    collapsed?: boolean |  number;
+    collapsed?: boolean | number;
     noWrap?: boolean;
-    styles?:  DtStyleScheme;
+    styles?: DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
     selectedTwinKey: string;
 }
@@ -25,17 +25,6 @@ export interface Node {
     hide?: boolean; // for descendents, set to true if an ancestor has collapsed === true; used in render to determine whether to show the row
 }
 
-// List Twins shapes
-interface Twin {
-    '$dtId': string;
-    '$metadata': TwinMetaData;
-    'name': string;
-}
-
-interface TwinMetaData {
-    '$model': string;
-}
-
 interface ProcessedInput {
     models: Set<string>;
     modelTwinsMap: Map<string, Node[]>;
@@ -43,7 +32,7 @@ interface ProcessedInput {
 
 export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles }: TwinsViewerProps) {
 
-    const [ nodeRows, setNodeRows ] = React.useState([]);
+    const [nodeRows, setNodeRows] = React.useState([]);
     let processedInput;
     let error;
     try {
@@ -53,7 +42,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         error = `Invalid input file (${e?.message})`;
     }
     const inputRows = useGetRows(processedInput);
-    
+
     // update the rows when a new file is selected (brings in new content)
     React.useEffect(() => {
         setNodeRows(inputRows);
@@ -62,8 +51,8 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
         // since their references are used in the node.children array
-        const newRows = [...nodeRows]; 
-        
+        const newRows = [...nodeRows];
+
         // update the menu setting for the clicked row
         const node = inputRows.find(node => node.key === nodeKey);
         node.collapsed = collapse;
@@ -82,40 +71,29 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, on
         </div>);
     }
     return (
-        <TwinsList 
-            nodeRows={nodeRows} 
-            onSelect={onSelect} 
+        <TwinsList
+            nodeRows={nodeRows}
+            onSelect={onSelect}
             selectedTwinKey={selectedTwinKey}
-            onMenuClick={onMenuClick} 
+            onMenuClick={onMenuClick}
             styles={styles}
         />
     );
 
 });
 
-function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
+function useProcessJson(jsonContent: Twin[]): ProcessedInput {
     return React.useMemo(() => {
-        if (!jsonContent) { 
-            return undefined; 
-        }
-
-        // we expect the input to be an object with 'value' property that holds an array of interface objects
-        const rawArray: Twin[] = !Array.isArray(jsonContent) 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ? (jsonContent as { value: Twin[]}).value  
-                ?? ((jsonContent as Twin)['@$dtId'] && [ (jsonContent as Twin) ])
-                ?? null
-            : jsonContent as Twin[];
-        
-        if (!rawArray || !Array.isArray(rawArray)) {
+        if (!jsonContent) {
             return undefined;
         }
+
         // create a rootArray containing only Interface objects
-        const rawTwinArray: Twin[] = rawArray.filter(rawObj => rawObj['$dtId']);
-        
+        const rawTwinArray: Twin[] = jsonContent.filter(rawObj => rawObj['$dtId']);
+
         const models = new Set<string>();
         const modelTwinsMap = new Map<string, Node[]>();
-        
+
         // we'll assume there's a depth limit built into DTDL so we won't go
         // to deep and blow the stack. All top-level models should be interfaces.
         for (const rawNode of rawTwinArray) {
@@ -145,7 +123,7 @@ function useProcessJson(jsonContent: object | Array<object>): ProcessedInput {
                 }
             });
         }
-        
+
         return { models, modelTwinsMap };
     }, [jsonContent]);
 }
@@ -156,7 +134,7 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
         if (!processedInput) {
             return rows;
         }
-        const { models, modelTwinsMap } = processedInput; 
+        const { models, modelTwinsMap } = processedInput;
         const collapsed = models.size > 1;
 
         models.forEach(model => {
@@ -195,14 +173,14 @@ function TwinsList({ nodeRows, onSelect, selectedTwinKey, onMenuClick, styles }:
             return (
                 <div key={node.key} className={`row font-small margin-bottom-xsmall ${node.isModel ? 'model' : ''} ${selectedTwinKey === node.key ? 'selected' : 'unselected'}`}>
                     {node.isModel && <MenuIcon />}
-                    <div 
-                        className={`viewer-row-label ${select ? ' clickable selectable' : ''}`} 
+                    <div
+                        className={`viewer-row-label ${select ? ' clickable selectable' : ''}`}
                         onClick={select}>
-                            {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
-                            {!node.isModel && <div>
-                                <div>TwinId: <span style={styles?.twinId}>{node.id}</span></div>
-                                <div style={styles?.twinName}>{node.name}</div>
-                            </div>}
+                        {node.isModel && <div>Model: <span style={styles?.modelId}>{node.id}</span></div>}
+                        {!node.isModel && <div>
+                            <div>TwinId: <span style={styles?.twinId}>{node.id}</span></div>
+                            <div style={styles?.twinName}>{node.name}</div>
+                        </div>}
                     </div>
                 </div>
             );

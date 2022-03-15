@@ -41,7 +41,7 @@
         [
           "@electron-forge/plugin-webpack",
           {
-            "devContentSecurityPolicy": "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:; font-src 'self' 'unsafe-inline' https://static2.sharepointonline.com https://spoppe-b.azureedge.net; style-src 'self' 'unsafe-inline'",
+            "devContentSecurityPolicy": "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;",
             "mainConfig": "./webpack.main.config.js",
             "renderer": {
               "config": "./webpack.renderer.config.js",
@@ -109,6 +109,7 @@
     "immer": "^9.0.12",
     "monaco-editor": "^0.31.1",
     "monaco-languages-jq": "^1.0.0",
+    "node-fetch": "^3.2.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-json-pretty": "^2.2.0",
