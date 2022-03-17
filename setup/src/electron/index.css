@@ -10,4 +10,6 @@ body {
 }
 html,#app{
 height: 100%;
+  padding: 2rem;
+  padding-top: 1rem;
 }

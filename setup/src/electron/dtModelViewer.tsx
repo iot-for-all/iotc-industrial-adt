@@ -7,7 +7,7 @@ import { DtStyleScheme } from './models';
 import './dtViewer.css';
 
 export interface DtModelViewerProps {
-    jsonContent: Interface[];
+    models: Interface[];
     theme?: 'light' | 'dark';
     className?: string;
     indentWidth?: number;
@@ -100,7 +100,7 @@ const defaultIndent = 10;
 
 export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelViewerProps) {
 
-    const { jsonContent, indentWidth, onSelect, selectedModelKey, styles, searchFilter } = props;
+    const { models, indentWidth, onSelect, selectedModelKey, styles, searchFilter } = props;
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [nodeRows, setNodeRows] = React.useState([]);
@@ -108,7 +108,7 @@ export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelVie
     let error;
     try {
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        processedInput = useProcessJson(jsonContent);
+        processedInput = useProcessJson(models);
     } catch (e) {
         processedInput = undefined;
         error = `Invalid input file (${e?.message})`;
@@ -131,6 +131,11 @@ export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelVie
         })
         : inputRows,
         [inputRows, searchFilter]);
+
+    // update the rows when a new file is selected (brings in new content)
+    React.useEffect(() => {
+        setNodeRows(searchRows);
+    }, [searchRows]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
@@ -168,6 +173,7 @@ export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelVie
             indentPixels={indentPixels}
             onMenuClick={onMenuClick}
             styles={styles}
+            filtered={!!searchFilter}
         />
     );
 });
@@ -177,6 +183,7 @@ function useProcessJson(models: Interface[]): ProcessedInput {
         if (!models) {
             return undefined;
         }
+
 
         const nodeMap: InputData = {};
         const rootNodes: string[] = [];
@@ -334,7 +341,7 @@ function useGetRows(processedInput: ProcessedInput): Node[] {
                     nestedInterfaces.push(compInterfaceNode.key);
 
                     // replace the node contents w/ the top-level interface node
-                    // Note: these properties of the component node are retained:  
+                    // Note: these properties of the component node are retained:
                     //       type, name, displayName, namespace, depth, hide, modelId
                     childNode.id = compInterfaceNode.id;
                     childNode.schema = undefined;
@@ -395,9 +402,10 @@ interface ModelsListProps {
     indentPixels: number;
     onMenuClick: (e: MouseEvent, nodeKey: string, collapse: boolean) => void;
     styles?: DtStyleScheme;
+    filtered: boolean;
 }
 
-function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenuClick, styles }: ModelsListProps) {
+function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenuClick, styles, filtered }: ModelsListProps) {
     const content = nodeRows.map(node => {
         const fullName = [...node.namespace, node.name ?? node.displayName ?? node.id].join('.');
         const icon = node.collapsed ? '+' : '-';
@@ -406,7 +414,7 @@ function ModelsList({ nodeRows, onSelect, selectedModelKey, indentPixels, onMenu
         const select = node.type.toLowerCase() === 'property'
             ? () => onSelect(selectedModelKey === node.key ? undefined : node)
             : undefined;
-        if (!node.hide) {
+        if (!node.hide || filtered) {
             const style: React.CSSProperties = { paddingInlineStart: `${indentPixels * node.depth}px` };
             return (
                 <div key={fullName} title={fullName} className={`row font-small margin-bottom-xsmall ${selectedModelKey === node.key ? 'selected' : 'unselected'}`} style={style}>
@@ -460,11 +468,11 @@ export const Details = React.memo(function Details({ node, styles }: DetailsProp
                     const style: React.CSSProperties = { paddingInlineStart: `${defaultIndent * detail.depth}px` };
                     const schema = detail.schema.toLowerCase() === 'array' ? `${detail.complexValues[0]} Array` : detail.schema;
 
-                    return (<React.Fragment key={`${generateId()}-${idx}`}>
-                        <div style={style} >{detail.name} <span>({schema})</span></div>
+                    return (<div key={`${generateId()}-${idx}`}>
+                        <div style={style}>{detail.name} <span>({schema})</span></div>
                         {(schema.toLowerCase() === 'object') && getObjectSchemaJSX(detail)}
                         {['enum', 'map'].includes(schema.toLowerCase()) && getComplexSchemaJSX(detail.complexValues, schema)}
-                    </React.Fragment>);
+                    </div>);
                 })}
             </>);
             break;

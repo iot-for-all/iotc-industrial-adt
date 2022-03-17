@@ -2,3 +2,9 @@
     padding-top: 0.25rem;
     border-top: solid 1px #dbdad9;
 }
+
+.new-twin-separator {
+    border-bottom: solid 1px #dbdad9;
+    padding-bottom: 0.25rem;
+    background-color:#f9f9f9;
+}

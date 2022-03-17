@@ -6,12 +6,12 @@
 }
 
 .opcua-wrapper {
-    min-width: 200px;
+    min-width: 300px;
     flex-grow: 1;
 }
 
 .twins-wrapper {
-    min-width: 400px;
+    min-width: 600px;
     flex-grow: 2;
 }
 
@@ -21,6 +21,10 @@
 
 .twins-viewer {
     width: 50%;
+}
+
+.add-input {
+    width: 80%;
 }
 
 .group-header {

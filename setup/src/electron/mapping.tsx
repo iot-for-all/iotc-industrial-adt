@@ -8,9 +8,11 @@ import { useBoolean, useId } from '@fluentui/react-hooks';
 import { OpcuaStyleScheme, TagNode } from './opcuaViewer';
 import { OpcuaInputContainer } from './opcuaInputContainer';
 import { DtInputContainer } from './dtInputContainer';
-import { DtStyleScheme, OpcuaItem, DtItem, Interface, Twin } from './models';
+import { DtStyleScheme, OpcuaItem, DtItem, CustomTwin } from './models';
 import { JqModal } from './jqModal';
 import { downloadFile } from './core/controls/downloadFile';
+import { Twin } from './dtTwinsViewer';
+import { Interface } from './dtModelViewer';
 
 export const Mapping = React.memo(function Mapping() {
     const [opcuaFile, setOpcuaFile] = React.useState<File>();  // json input file for opcua definitions
@@ -41,6 +43,8 @@ export const Mapping = React.memo(function Mapping() {
     const [showJqModal, setShowJqModal] = useBoolean(false);
     const [copyResult, setCopyResult] = React.useState<string>();
     const [resultClass, setResultClass] = React.useState<string>();
+
+    const [customTwin, setCustomTwin] = React.useState<CustomTwin>();
 
     // if a file has been selected, opcuaFile will be updated with the File object.
     // Get the content of the file as JSON
@@ -126,7 +130,8 @@ export const Mapping = React.memo(function Mapping() {
     const onDismiss = React.useCallback((row: MappingGridItem) => setItems([...items.filter(item => item.key !== row.key)]),
         [items]);
 
-    // callback for confirming (button click) the entries in the node pair input fields
+    // callback for adding the contents of the opcua and dt items to the grid either as a new row
+    // or as an update to an existing (selected) row
     const onUpdateGrid = React.useCallback(() => {
         if (opcuaItem && dtItem) {
             if (selectedKey) {
@@ -201,6 +206,10 @@ export const Mapping = React.memo(function Mapping() {
         );
     }, [items]);
 
+    const onAddNewTwin = React.useCallback((twinId: string) => {
+        setCustomTwin({ twinId, modelId: dtItem.modelId });
+    }, [dtItem?.modelId]);
+
     return (<>
         {error && <MessageBar
             messageBarType={MessageBarType.error}
@@ -233,6 +242,8 @@ export const Mapping = React.memo(function Mapping() {
                     onSelect={setDtItem}
                     dtItem={dtItem}
                     styles={dtStyles}
+                    onAddNewTwin={onAddNewTwin}
+                    customTwin={customTwin}
                 />
             </div>
             <div className='mapping-wrapper group-wrapper'>
@@ -255,11 +266,11 @@ export const Mapping = React.memo(function Mapping() {
                         </div>
                         <span className='anchor-bottom'><span className='margin-bottom-xsmall arrow'>{'->'}</span></span>
                         <TextField
-                            name='dtTwin'
-                            label='Digital Twin Id'
-                            className='margin-start-xsmall expand'
-                            value={dtItem?.twinId}
-                            title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
+                            name='dtModel'
+                            label='Model'
+                            className='expand ellipsis-left-limited margin-end-xsmall'
+                            value={dtItem?.modelId}
+                            title={dtItem?.modelId}
                             readOnly
                         />
                         <TextField
@@ -269,6 +280,16 @@ export const Mapping = React.memo(function Mapping() {
                             value={dtItem?.propertyName}
                             title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
                             readOnly
+                        />
+                        <TextField
+                            name='dtTwin'
+                            label='Digital Twin Id'
+                            className='margin-start-xsmall expand'
+                            value={dtItem?.twinId || ''}
+                            title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
+                            onChange={(_, twinId) => {
+                                setDtItem({ ...dtItem, twinId, twinKey: `new:${twinId}` });
+                            }}
                         />
                         <div className='anchor-bottom expand'>
                             <PrimaryButton
