@@ -1,9 +1,9 @@
 import { Dropdown, IDropdownOption, IDropdownProps, SearchBox, Spinner, SpinnerSize, Stack, Toggle } from '@fluentui/react';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
-import { DtItem, DtStyleScheme, Interface, Node as ModelNode, Twin } from './models';
-import { DtModelViewer } from './dtModelViewer';
-import { DtTwinsViewer, Node as TwinNode } from './dtTwinsViewer';
+import { CustomTwin, DtItem, DtStyleScheme } from './models';
+import { DtModelViewer, Node as ModelNode, Interface } from './dtModelViewer';
+import { DtTwinsViewer, Node as TwinNode, Twin } from './dtTwinsViewer';
 
 import './inputContainer.css';
 import { useBoolean } from '@fluentui/react-hooks';
@@ -21,10 +21,11 @@ export interface NodeViewerProps {
     onSelect: (selectedNode: DtItem) => void;
     dtItem: DtItem;
     styles?: DtStyleScheme;
+    customTwin: CustomTwin;
 }
 
 export function DtInputContainer(props: NodeViewerProps) {
-    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, setTwinJsonContent, twinJsonContent, modelJsonContent, setModelJsonContent, onSelect, dtItem, styles } = props;
+    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, setTwinJsonContent, twinJsonContent, modelJsonContent, setModelJsonContent, onSelect, dtItem, styles, customTwin } = props;
     const [adtItems, setAdtItems] = useState<IDropdownOption[]>([]);
     const [loadingInstances, { setTrue: startLoadInstances, setFalse: stopLoadInstances }] = useBoolean(false);
     const [useFiles, { toggle: toggleFiles }] = useBoolean(false);
@@ -155,7 +156,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 placeholder={'Search'}
                                 className='margin-bottom-xsmall'
                             />
-                            <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} />
+                            <DtTwinsViewer jsonContent={twinJsonContent} onSelect={onTwinSelect} selectedTwinKey={selectedTwinKey} styles={styles} selectedModelId={dtItem?.modelId} customTwin={customTwin} />
                         </>}
                     </div>
                 </div>
@@ -182,7 +183,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 placeholder={'Search'}
                                 className='margin-bottom-xsmall'
                             />
-                            <DtModelViewer models={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
+                            <DtModelViewer jsonContent={modelJsonContent} onSelect={onModelSelect} selectedModelKey={selectedModelKey} styles={styles} />
                         </>}
                     </div>
                 </div>

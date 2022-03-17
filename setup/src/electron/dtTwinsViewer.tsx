@@ -1,6 +1,6 @@
 import React from 'react';
 import { generateId } from './core/generateId';
-import { DtStyleScheme, Twin } from './models';
+import { DtStyleScheme, CustomTwin } from './models';
 
 import './dtViewer.css';
 
@@ -12,7 +12,10 @@ export interface TwinsViewerProps {
     noWrap?: boolean;
     styles?: DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
+    selectedModelId: string;
     selectedTwinKey: string;
+    customTwin: CustomTwin;
+    searchFilter?: string;
 }
 
 export interface Node {
@@ -23,12 +26,27 @@ export interface Node {
     isModel: boolean;
     collapsed?: boolean;
     hide?: boolean; // for descendents, set to true if an ancestor has collapsed === true; used in render to determine whether to show the row
+    isNew?: boolean;
+    isSeparator?: boolean;
+}
+
+// List Twins shapes
+export interface Twin {
+    '$dtId': string;
+    '$metadata': TwinMetaData;
+    'name': string;
+}
+
+interface TwinMetaData {
+    '$model': string;
 }
 
 interface ProcessedInput {
     models: Set<string>;
     modelTwinsMap: Map<string, Node[]>;
 }
+
+const newTwinPrefix = 'newtwins-';
 
 export const DtTwinsViewer = React.memo(function DtTwinsViewer({ jsonContent, onSelect, selectedTwinKey, styles }: TwinsViewerProps) {
 

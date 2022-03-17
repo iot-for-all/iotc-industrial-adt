@@ -2,12 +2,12 @@ import { TooltipHost } from '@fluentui/react';
 import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
-import { ComplexObjectSchema, DtStyleScheme, IdToKeyMap, InputData, Interface, ProcessedInput, PropertySchema, Node, ComplexProperties } from './models';
+import { DtStyleScheme } from './models';
 
 import './dtViewer.css';
 
 export interface DtModelViewerProps {
-    models: Interface[];
+    jsonContent: Interface[];
     theme?: 'light' | 'dark';
     className?: string;
     indentWidth?: number;
@@ -16,28 +16,121 @@ export interface DtModelViewerProps {
     styles?: DtStyleScheme;
     onSelect: (selectedNode: Node) => void;
     selectedModelKey: string;
+    searchFilter?: string;
+}
+
+export interface Node {
+    key: string;
+    id: string;
+    type: 'Property' | 'Interface' | 'Relationship' | 'Component';
+    name: string;
+    displayName?: string;
+    modelId: string;
+
+    // for complex schemas, use of the following
+    //  - 'array' + complexValues: [arrayType]
+    //  - 'enum' + complexValues: [enum name/value, ...]
+    //  - 'map' + complexValues: [key name/schema, key value/schema]
+    //  - 'object' + object containing keys (and nested complex objects)
+    schema: string;
+    complexValues?: string[];
+    object?: ComplexProperties[];
+    target?: string;
+    children?: Node[];
+    namespace: string[];
+    depth: number;
+    collapsed?: boolean;  // for parents, indicates whether to collapse all ancestors
+    hide?: boolean; // for descendents, set to true if an ancestor has collapsed === true; used in render to determine whether to show the row
+}
+
+export interface InputData {
+    [namespace: string]: Node;
+}
+
+// for nested object types
+interface ComplexProperties {
+    name: string,
+    schema: string,
+    depth: number;
+    properties?: ComplexProperties[];
+    complexValues?: string[];
+}
+
+// DT Model input shapes
+interface Model {
+    model: Interface;
+}
+
+export interface Interface {
+    '@type': 'Interface',
+    '@id': string,
+    displayName?: string,
+    contents: HasType[];
+}
+
+interface HasType {
+    '@type': 'Property' | 'Interface' | 'Relationship' | 'Component';
+}
+
+// an interface Property has both a @type and a schema.
+// a property of a complex object only has an @type (and fields)
+interface PropertySchema {
+    schema: string | ComplexObjectSchema;
+    '@type'?: string;
+}
+
+interface ComplexObjectSchema {
+    '@type': string;
+    fields: object[]
+}
+
+// end DT Input shapes
+
+interface ProcessedInput {
+    nodeMap: InputData;
+    rootNodes: string[];
+    idToKeyMap: IdToKeyMap;
+}
+
+interface IdToKeyMap {
+    [id: string]: string;
 }
 
 const defaultIndent = 10;
 
-export const DtModelViewer = React.memo(function DtModelViewer({ models, indentWidth, onSelect, selectedModelKey, styles }: DtModelViewerProps) {
+export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelViewerProps) {
+
+    const { jsonContent, indentWidth, onSelect, selectedModelKey, styles, searchFilter } = props;
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [nodeRows, setNodeRows] = React.useState([]);
     let processedInput;
     let error;
     try {
-        processedInput = useProcessJson(models);
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        processedInput = useProcessJson(jsonContent);
     } catch (e) {
         processedInput = undefined;
         error = `Invalid input file (${e?.message})`;
     }
     const inputRows = useGetRows(processedInput);
 
-    // update the rows when a new file is selected (brings in new content)
-    React.useEffect(() => {
-        setNodeRows(inputRows);
-    }, [inputRows]);
+    const searchRows = React.useMemo(() => searchFilter
+        ? inputRows.filter(row => {
+            let keep = row.id?.includes(searchFilter) || row.namespace?.includes(searchFilter) || row.name?.includes(searchFilter)
+                || row.type?.includes(searchFilter) || row.modelId?.includes(searchFilter);
+            if (!keep) {
+                if (typeof row.displayName === 'string') {
+                    keep = row.displayName.includes(searchFilter);
+                } else if (typeof row.displayName === 'object') {
+                    keep = (row.displayName['en'] as string)?.includes(searchFilter);
+                }
+            }
+            return keep;
+
+        })
+        : inputRows,
+        [inputRows, searchFilter]);
 
     const onMenuClick = React.useCallback((e: MouseEvent, nodeKey: string, collapse: boolean) => {
         // create a new array object but return existing node objects
