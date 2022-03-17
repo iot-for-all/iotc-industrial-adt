@@ -1,4 +1,4 @@
-import { IconButton, SearchBox, TextField } from '@fluentui/react';
+import { Dropdown, IconButton, IDropdownOption, SearchBox, Spinner, SpinnerSize, Stack, TextField, Toggle } from '@fluentui/react';
 import React, { Dispatch, SetStateAction } from 'react';
 import { FileUpload } from './core/controls/fileUpload';
 import { CustomTwin, DtItem, DtStyleScheme } from './models';
@@ -10,6 +10,7 @@ import { useBoolean } from '@fluentui/react-hooks';
 import { TooltipIconButton } from './core/controls/tooltipIconButton';
 import { ErrorBoundary } from './core/controls/errorBoundary';
 import { HideSearch } from './hideSearchSvg';
+import { API_VERSIONS, TOKEN_AUDIENCES } from './core/constants';
 
 export interface NodeViewerProps {
     twinJsonFile: File;
@@ -28,14 +29,14 @@ export interface NodeViewerProps {
 }
 
 export function DtInputContainer(props: NodeViewerProps) {
-    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, twinJsonContent, modelJsonContent, onSelect, dtItem, styles, onAddNewTwin, customTwin } = props;
+    const { twinJsonFile, setTwinJsonFile, modelJsonFile, setModelJsonFile, setModelJsonContent, setTwinJsonContent, twinJsonContent, modelJsonContent, onSelect, dtItem, styles, onAddNewTwin, customTwin } = props;
 
-    const [selectedTwinKey, selectedModelKey] = React.useMemo(() => {
-        const hyphenIdx = dtItem?.key?.indexOf('-');
-        const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
-        const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
-        return [selectedTwinKey, selectedModelKey];
-    }, [dtItem]);
+    // loadings
+    const [loadingInstances, { setTrue: startLoadInstances, setFalse: stopLoadInstances }] = useBoolean(false);
+    const [useFiles, { toggle: toggleFiles }] = useBoolean(false);
+    const [adtItems, setAdtItems] = React.useState<IDropdownOption[]>([]);
+    const [modelsLoading, { setTrue: startLoadModels, setFalse: stopLoadModels }] = useBoolean(false);
+    const [twinsLoading, { setTrue: startLoadTwins, setFalse: stopLoadTwins }] = useBoolean(false);
     const [showAdd, setShowAdd] = useBoolean(false);
     const [newTwin, setNewTwin] = React.useState<string>();
     const [invalidName, setInvalidName] = useBoolean(false);
@@ -45,6 +46,13 @@ export function DtInputContainer(props: NodeViewerProps) {
     const [modelSearchFilter, setModelSearchFilter] = React.useState<string>();
     const [showTwinSearch, setShowTwinSearch] = useBoolean(false);
     const [twinSearchFilter, setTwinSearchFilter] = React.useState<string>();
+
+    const [selectedTwinKey, selectedModelKey] = React.useMemo(() => {
+        const hyphenIdx = dtItem?.key?.indexOf('-');
+        const selectedTwinKey = hyphenIdx > 0 ? dtItem.key.substring(0, hyphenIdx) : undefined;
+        const selectedModelKey = hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
+        return [selectedTwinKey, selectedModelKey];
+    }, [dtItem]);
 
     const onTwinSelect = React.useCallback((twinNode: TwinNode) => {
         // note: 'twinNode' will become undefined when the current twin selection is clicked off
@@ -76,12 +84,48 @@ export function DtInputContainer(props: NodeViewerProps) {
         };
         if (modelNode?.modelId !== currModelId) {
             newItem.key = `undefined-${modelNode?.key}`,
-            newItem.twinKey = undefined;
+                newItem.twinKey = undefined;
             newItem.twinId = undefined;
             newItem.twinName = undefined;
         }
         onSelect(newItem);
     }, [dtItem, onSelect, selectedTwinKey]);
+
+    const onInstancesLoading = React.useCallback((props) => {
+        return <Stack horizontal verticalAlign='center' horizontalAlign='space-between'>
+            <span>Select Azure Digital Twins instance</span>
+            <Spinner size={SpinnerSize.small} style={{ visibility: loadingInstances ? 'visible' : 'hidden' }} />
+        </Stack>;
+    }, [loadingInstances]);
+
+    const onInstanceSelected = React.useCallback(async (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) => {
+        startLoadModels();
+        startLoadTwins();
+        const armParams: RequestInit = {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${await window.electron.getToken(TOKEN_AUDIENCES.Arm)}`
+            }
+        };
+        const instanceResp = await fetch(`https://management.azure.com${item.key}?api-version=${API_VERSIONS.DigitalTwinsControl}`, armParams);
+        const adtHostname = (await instanceResp.json()).properties.hostName;
+        const getModels = async () => {
+            return await window.electron.getModels(adtHostname);
+        }
+        const getTwins = async () => {
+            return await window.electron.getTwins(adtHostname);
+        }
+        const data = await Promise.all([getModels(), getTwins()]);
+
+        if (data[0]) {
+            setModelJsonContent(data[0]);
+            stopLoadModels();
+        }
+        if (data[1]) {
+            setTwinJsonContent(data[1]);
+            stopLoadTwins();
+        }
+    }, []);
 
     const simpleIconStyles = {
         root: {
@@ -125,6 +169,38 @@ export function DtInputContainer(props: NodeViewerProps) {
         <ErrorBoundary>
             <div className='file-viewer-container group-wrapper twins-wrapper'>
                 <div className='section-header group-header'>Digital Twins</div>
+                {!useFiles &&
+                    <div className='margin-bottom-xsmall'>
+                        <Dropdown label='Load from instance' options={adtItems} onClick={async (e) => {
+                            startLoadInstances();
+                            const armToken = await window.electron.getToken('https://management.azure.com/user_impersonation');
+                            const params = {
+                                method: 'GET',
+                                headers: {
+                                    Authorization: `Bearer ${armToken}`
+                                }
+                            };
+                            const subResp = await fetch(`https://management.azure.com/subscriptions?api-version=${API_VERSIONS.ResourceManager}`, params);
+                            const subs = (await subResp.json()).value;
+                            const resources = await Promise.all(subs.map(async (sub) => {
+                                const resResp = await fetch(`https://management.azure.com/subscriptions/${sub.subscriptionId}/resources?api-version=${API_VERSIONS.ResourceManager}&$filter=resourceType eq 'Microsoft.DigitalTwins/digitalTwinsInstances'`, params);
+                                const resources = (await resResp.json()).value;
+                                return resources;
+                            }));
+                            stopLoadInstances();
+                            setAdtItems(resources.flat().map(r => ({
+                                key: r.id,
+                                text: r.name,
+                                data: r
+                            })));
+                        }} onRenderPlaceholder={onInstancesLoading}
+                            onChange={onInstanceSelected}
+                        />
+                    </div>
+                }
+                <div className='option-toggle'>
+                    <Toggle label="Load from files" inlineLabel onText="On" offText="Off" onChange={toggleFiles} />
+                </div>
                 <div className='horizontal-group expand no-scroll-parent'>
                     <div className='vertical-group twins-viewer margin-end-xsmall'>
                         <div className='flatten-toggle horizontal-group justify-ends'>
@@ -159,7 +235,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 onChange={(_, value) => setModelSearchFilter(value)}
                             />}
                             <DtModelViewer
-                                jsonContent={modelJsonContent}
+                                models={modelJsonContent}
                                 onSelect={onModelSelect}
                                 selectedModelKey={selectedModelKey}
                                 styles={styles}
@@ -192,18 +268,19 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className='horizontal-group margin-bottom-xsmall'>
-                            <FileUpload
-                                onChange={setTwinJsonFile}
-                                iconOnly
-                                iconProps={{ iconName: 'openFile' }}
-                                className='icon-button margin-end-xsmall'
-                                tooltip='Upload Device Twin instances json'
-                            />
-                            <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
-                                {twinJsonFile?.path || 'No file selected'}
+                        {useFiles &&
+                            <div className='horizontal-group margin-bottom-xsmall'>
+                                <FileUpload
+                                    onChange={setTwinJsonFile}
+                                    iconOnly
+                                    iconProps={{ iconName: 'openFile' }}
+                                    className='icon-button margin-end-xsmall'
+                                />
+                                <div className='margin-start-xsmall font-small ellipsis-left' title={twinJsonFile?.path || 'No file selected'}>
+                                    {twinJsonFile?.path || 'No file selected'}
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div className='viewer-container'>
                             {showAdd && <form className='horizontal-group' onSubmit={onSubmit}>
                                 <TextField
@@ -219,7 +296,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                     autoFocus
                                 />
                                 <IconButton
-                                    iconProps={{iconName: 'add'}}
+                                    iconProps={{ iconName: 'add' }}
                                     title='Add entry'
                                     ariaLabel='add'
                                     disabled={addDisabled}
@@ -228,7 +305,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                                     onClick={onAdd}
                                 />
                                 <IconButton
-                                    iconProps={{iconName: 'cancel'}}
+                                    iconProps={{ iconName: 'cancel' }}
                                     title='Clear entry'
                                     ariaLabel='cancel'
                                     disabled={!newTwin}
@@ -242,15 +319,24 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 className='margin-bottom-xsmall search'
                                 onChange={(_, value) => setTwinSearchFilter(value)}
                             />}
-                            <DtTwinsViewer
-                                jsonContent={twinJsonContent}
-                                onSelect={onTwinSelect}
-                                selectedModelId={dtItem?.modelId}
-                                selectedTwinKey={selectedTwinKey}
-                                styles={styles}
-                                customTwin={customTwin}
-                                searchFilter = {twinSearchFilter}
-                            />
+                            {twinsLoading ? <div className='loader'>
+                                <Spinner size={SpinnerSize.large} />
+                            </div> : <>
+                                <SearchBox
+                                    placeholder={'Search'}
+                                    className='margin-bottom-xsmall'
+                                />
+                                <DtTwinsViewer
+                                    twins={twinJsonContent}
+                                    onSelect={onTwinSelect}
+                                    selectedModelId={dtItem?.modelId}
+                                    selectedTwinKey={selectedTwinKey}
+                                    styles={styles}
+                                    customTwin={customTwin}
+                                    searchFilter={twinSearchFilter}
+                                />
+                            </>}
+
                         </div>
                     </div>
                 </div>
