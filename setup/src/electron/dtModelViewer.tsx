@@ -100,7 +100,7 @@ const defaultIndent = 10;
 
 export const DtModelViewer = React.memo(function DtModelViewer(props: DtModelViewerProps) {
 
-    const { models, indentWidth, onSelect, selectedModelKey, styles, searchFilter } = props;
+    const { models, indentWidth, onSelect, selectedModelKey, styles, searchFilter, onRefresh } = props;
 
     const indentPixels = indentWidth ?? defaultIndent;
     const [nodeRows, setNodeRows] = React.useState([]);

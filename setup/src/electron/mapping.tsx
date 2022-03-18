@@ -259,7 +259,7 @@ export const Mapping = React.memo(function Mapping() {
                                     name='opcuaNode'
                                     label='Opc UA Node'
                                     className='margin-end-xsmall'
-                                    value={opcuaItem?.nodeName}
+                                    value={opcuaItem?.nodeName || ''}
                                     readOnly
                                 />
                             </TooltipHost>
@@ -269,15 +269,15 @@ export const Mapping = React.memo(function Mapping() {
                             name='dtModel'
                             label='Model'
                             className='expand ellipsis-left-limited margin-end-xsmall'
-                            value={dtItem?.modelId}
-                            title={dtItem?.modelId}
+                            value={dtItem?.modelId || ''}
+                            title={dtItem?.modelId || ''}
                             readOnly
                         />
                         <TextField
                             name='dtProperty'
                             label='Property'
                             className='margin-start-xsmall expand'
-                            value={dtItem?.propertyName}
+                            value={dtItem?.propertyName || ''}
                             title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
                             readOnly
                         />
