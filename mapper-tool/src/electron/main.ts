@@ -10,6 +10,8 @@ import path from 'path';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+const isMac = process.platform === 'darwin'
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   // eslint-disable-line global-require
@@ -36,26 +38,41 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   isDev && mainWindow.webContents.openDevTools();
+  const aboutMenu = {
+    label: 'About',
+    click: () =>
+      openAboutWindow({
+        icon_path: path.join(__dirname, 'logo.png'),
+        package_json_dir: __dirname,
+        open_devtools: isDev,
+        product_name: 'OPCUA Digital Twins Mapper'
+      })
+  }
   const menu = Menu.buildFromTemplate([
-    {
+    ...(isMac ? [{
       label: 'OPCUA ADT Mapper',
       submenu: [
-        {
-          label: 'About',
-          click: () =>
-            openAboutWindow({
-              icon_path: path.join(__dirname, 'logo.png'),
-              package_json_dir: __dirname,
-              open_devtools: isDev,
-              product_name: 'OPCUA Digital Twins Mapper'
-            })
-        },
+        aboutMenu,
         {
           role: 'quit',
-        },
-      ],
-    },
-  ]);
+          label: 'Quit'
+        }
+      ]
+    }] : [{
+    }, {
+      label: 'File',
+      submenu: [
+        { role: 'quit', label: 'Exit' }
+      ]
+    }, {
+      role: 'help',
+      submenu: [
+        aboutMenu
+      ]
+    }]), ...(isDev ? [{
+      role: 'viewMenu'
+    }] : [])
+  ] as any[]);
   app.applicationMenu = menu;
 };
 
@@ -68,7 +85,7 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (!isMac) {
     app.quit();
   }
 });
