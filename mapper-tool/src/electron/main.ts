@@ -58,20 +58,20 @@ const createWindow = (): void => {
           label: 'Quit'
         }
       ]
-    }] : [{
-    }, {
-      label: 'File',
-      submenu: [
-        { role: 'quit', label: 'Exit' }
-      ]
-    }, {
-      role: 'help',
-      submenu: [
-        aboutMenu
-      ]
-    }]), ...(isDev ? [{
-      role: 'viewMenu'
-    }] : [])
+    }] : [
+      {
+        label: 'File',
+        submenu: [
+          { role: 'quit', label: 'Exit' }
+        ]
+      }, {
+        role: 'help',
+        submenu: [
+          aboutMenu
+        ]
+      }]), ...(isDev ? [{
+        role: 'viewMenu'
+      }] : [])
   ] as any[]);
   app.applicationMenu = menu;
 };
