@@ -29,6 +29,33 @@ export async function getAdtModels(hostname: string, accessToken: string) {
 
 }
 
+export async function getTwinIncomingRelationships(hostname: string, twinId: string, accessToken: string) {
+    let models = [];
+    let url = `https://${hostname}/models?includeModelDefinition=true&api-version=${API_VERSIONS.DigitalTwinsData}`;
+    while (url) {
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        if (res.status !== 200) {
+            throw new Error(res.statusText);
+        }
+        const data: any = await res.json();
+        if (data.value) {
+            models.push(...data.value.map(v => v.model));
+        }
+        if (data.nextLink) {
+            url = data.nextLink;
+        }
+        else {
+            url = null;
+        }
+    }
+    return models;
+
+}
+
 export async function getAdtTwins(hostname: string, accessToken: string, filter?: string) {
     let twins = [];
     let url = `https://${hostname}/query?&api-version=${API_VERSIONS.DigitalTwinsData}`;

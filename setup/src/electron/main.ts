@@ -92,10 +92,16 @@ ipcMain.handle('getToken', async (e, resource) => {
 
 ipcMain.handle('getModels', async (e, hostname) => {
   const token = await getToken(TOKEN_AUDIENCES.ADT);
+  console.log(token);
   return await getAdtModels(hostname, token as string);
 });
 
 ipcMain.handle('getTwins', async (e, hostname, filter?) => {
+  const token = await getToken(TOKEN_AUDIENCES.ADT);
+  return await getAdtTwins(hostname, token as string, filter);
+});
+
+ipcMain.handle('getTwinIncomingRelationships', async (e, hostname, filter?) => {
   const token = await getToken(TOKEN_AUDIENCES.ADT);
   return await getAdtTwins(hostname, token as string, filter);
 });
