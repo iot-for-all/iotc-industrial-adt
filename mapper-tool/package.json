@@ -9,28 +9,46 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make:mac": "electron-forge make --targets @electron-forge/maker-dmg",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "name": "OPCUA-ADT Mapper",
+        "icon": "./mapper-logo.icns"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "setup"
+            "name": "OPCUA ADT Mapper"
           }
         },
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
             "darwin"
-          ]
+          ],
+          "config": {
+            "name": "OPCUA ADT Mapper"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "platforms": [
+            "darwin"
+          ],
+          "config": {
+            "format": "ULFO"
+          }
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "name": "opcua-adt-mapper"
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
@@ -51,7 +69,7 @@
                   "js": "./src/electron/renderer.ts",
                   "name": "main_window",
                   "preload": {
-                    "js": "./src/electron/preload.js"
+                    "js": "./src/electron/preload.ts"
                   }
                 }
               ]
@@ -65,6 +83,7 @@
     "@azure-iot/eslint-config": "^1.0.1",
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
@@ -103,7 +122,9 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "about-window": "^1.15.2",
     "axios": "^0.24.0",
+    "electron-is-dev": "^2.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "immer": "^9.0.12",
     "monaco-editor": "^0.31.1",

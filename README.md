@@ -31,4 +31,4 @@ Instructions to create all required resources like Azure Function and Digital Tw
 
 ## Configuration Tool
 
-The mapping configuration tool is an Electron application for Windows, Mac OS and Linux. We do not provide binary releases, all the steps to get it running are detailed [here](./setup/README.md).
+The mapping configuration tool is an Electron application available for Windows, Mac OS and Linux. We do not provide binary releases, all the steps to get it running are detailed [here](./mapper-tool/README.md).
