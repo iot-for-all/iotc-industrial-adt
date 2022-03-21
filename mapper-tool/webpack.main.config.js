@@ -8,6 +8,9 @@ module.exports = {
   module: {
     rules: require('./webpack.rules'),
   },
+  externals: {
+    aboutWindow: 'about-window'
+  },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
   }
