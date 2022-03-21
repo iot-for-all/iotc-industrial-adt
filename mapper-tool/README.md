@@ -123,3 +123,5 @@ The current version of this tool makes the following assumptions:
 - To update a mapped row, first select it by hovering over the row and clicking the check-circle that appears at the start of the row. The checked row's contents will be filled into the working row and the corresponding rows in the input columns will be highlighted. Choose the desired input row(s) and then press the 'Update' button.
 - Hover over a mapped row to see the details of mapping.
 - The **Filter** field can be used to filter the view of the mapped rows.
+
+![tool](../media/tool.png)
