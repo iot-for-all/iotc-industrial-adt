@@ -44,7 +44,6 @@ const createWindow = (): void => {
       openAboutWindow({
         icon_path: path.join(__dirname, 'logo.png'),
         package_json_dir: __dirname,
-        open_devtools: isDev,
         product_name: 'OPCUA Digital Twins Mapper'
       })
   }
