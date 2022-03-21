@@ -49,7 +49,7 @@ az functionapp create \
   --resource-group myResourceGroup \
   --os-type linux \
   --runtime node \
-  --runtime-version 14
+  --runtime-version 14 \
   --functions-version 4
 ```
 
