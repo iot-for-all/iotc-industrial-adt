@@ -39,12 +39,15 @@ The current version of this tool makes the following assumptions:
 
 - **OPCUA**: An array containing (possibly nested) objects.
 
-  - There are two types of objects: 1) namespace object, which is a parent node in a node hierarchy and does not contain telemetry, and 2) tag node, which represents telemetry.
-  - A namespace object should contain a key for each nested object where the key is the node id or name of the nested object. If the namespace object contains telemetry (tag nodes), it should provide the tag nodes in an array under the key, 'tags'.
-  - A tag node must include a node id and type. It may optionally include a name.
-    - If the type is a complex type, the tag node should include a 'properties' key that contains an array of the properties.
-    - Properties are objects that contain a name and type. The type can recursively be complex.
-  - Following is sample input:
+  - There are three types of objects: 
+     1) namespace object, which is a parent node in a node hierarchy and does not contain telemetry,
+     2) tag node, which represents telemetry, and
+     3) property, which describes a field of a complex type.
+  - A namespace object should contain a key for each node it contains, where the key is the node id or name. If the namespace object represents an asset and do directly contains tag nodes (telemetry), it should list the tag nodes in an array under the key, 'tags'.
+  - A tag node, which represents a telemetry value, must include a node id and type. It may optionally include a name.
+    - If the node type is a complex type, the tag node should include a 'properties' key that contains an array of property objects.
+    - Properties are objects that contain a name and type. The type can recursively be complex, that is, if the type of the property is 'complex', it should contain a 'properties' key that lists the property objects of that type.
+  - Following is an excerpt of sample input:
   <pre>
   [
       {
@@ -105,23 +108,31 @@ The current version of this tool makes the following assumptions:
                       },
   </pre>
 
-- **ADT Twin Instances**: Digital twin instances should come in the format described by ...
-- **ADT Models**: DTDL models for the twin instances should be provided...
+- **ADT Twin Instances**: The format of the Digital twin instances input is a subset of the response returned by the Digital Twin's [Query Twins REST API](https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/query/querytwins). The response properties required for the Twins input file are **$dtId**, **$metadata** (and its contents) and optionally, **name**. The API response can be directly used as input; any unneeded properties will be ignored. Note that  **continuationToken**, if present, will also be ignored. That means that if your twins query returns multiple pages of responses, you will need to concatenate all the responses'  **value** arrays into a single array.
+
+- **ADT Models**: The DTDL models for the twin instances should be provided as the input. These models can be retrieved by calling the [DigitalTwinsModels List](https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/models/digitaltwinmodels_list#list-models-(include-dependencies-and-definitions)) API and including the **includeModelDefinition** URI parameter. 
 
 #### Mapping
 
 1. Start by loading the JSON files for the OPC-UA nodes, the Digital Twin instances and the Digital Twin models that describe those instances.
-   Select the file load buttons at the top of each input column to open the file load dialog, navigate to and select the desired input file.
+   Select the file load buttons \
+ ![load_button](../media/load_button.png) \
+ at the top of each input column to open the file load dialog, navigate to and select the desired input file.
 
 2. After loading the input files, mapping the nodes is fairly straightforward:
-   - In the OPCUA column, click on the tag node (telemetry) you want to map.
-   - In the Twin instances column, click on the instance to which you want to map the selected OPCUA node's telemetry.
-   - In the Models column, click on the property of the twin that should receive the telemetry data.
 
-- Each clicked row will be highlighted. To deselect it, click it again.
-- When a row is selected, its pertinent content (needed to generate the JQ transformation) is loaded into the working row in the **Add/Update Mapping** section. Once the working row has all three inputs, the **Add** button will be enabled and you can save the mapped row.
+   ![step1](../media/step1.png) In the OPCUA column, click on the tag node (telemetry) you want to map.
+   
+   ![step2](../media/step2.png) In the Twin instances column, click on the instance to which you want to map the selected OPCUA node's telemetry.
+   
+   ![step3](../media/step3.png) In the Models column, click on the property of the twin that should receive the telemetry data.
+
+   Each clicked row will be highlighted. To deselect it, click it again.
+
+   ![step4](../media/step4.png) When a row is selected, its pertinent content (needed to generate the JQ transformation) is loaded into the working row in the **Add/Update Mapping** section. Once the working row has all three inputs, the **Add** button will be enabled and you can save the mapped row.
+
+![tool](../media/tool.png)
+
 - To update a mapped row, first select it by hovering over the row and clicking the check-circle that appears at the start of the row. The checked row's contents will be filled into the working row and the corresponding rows in the input columns will be highlighted. Choose the desired input row(s) and then press the 'Update' button.
 - Hover over a mapped row to see the details of mapping.
 - The **Filter** field can be used to filter the view of the mapped rows.
-
-![tool](../media/tool.png)
