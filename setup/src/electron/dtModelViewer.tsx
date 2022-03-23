@@ -7,7 +7,7 @@ import { DtStyleScheme } from "./models";
 import "./dtViewer.css";
 
 export interface DtModelViewerProps {
-  models: Interface[];
+  models: (Model | Interface)[];
   theme?: "light" | "dark";
   className?: string;
   indentWidth?: number;
@@ -57,7 +57,7 @@ interface ComplexProperties {
 }
 
 // DT Model input shapes
-interface Model {
+export interface Model {
   model: Interface;
 }
 
@@ -195,21 +195,28 @@ export const DtModelViewer = React.memo(function DtModelViewer(
   );
 });
 
-function useProcessJson(models: Interface[]): ProcessedInput {
+export function normalizeModelInput(models: (Interface | Model)[] | object) {
+  // we expect the input to be an object with 'value' property that holds an array of interface objects
+  const rawArray: (Model | Interface)[] = !Array.isArray(models)
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (models as { value: Model[] }).value ??
+      ((models as Interface)["@type"] === "Interface" && [
+        models as Interface,
+      ]) ??
+      null
+    : (models as (Interface | Model)[]);
+  return rawArray.map((rawObj) =>
+    (rawObj as Model).model ? (rawObj as Model).model : (rawObj as Interface)
+  );
+}
+
+function useProcessJson(models: (Interface | Model)[]): ProcessedInput {
   return React.useMemo(() => {
     if (!models) {
       return undefined;
     }
 
-    // we expect the input to be an object with 'value' property that holds an array of interface objects
-    const rawArray: (Model | Interface)[] = !Array.isArray(models)
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (models as { value: Model[] }).value ??
-        ((models as Interface)["@type"] === "Interface" && [
-          models as Interface,
-        ]) ??
-        null
-      : (models as (Model | Interface)[]);
+    const rawArray = normalizeModelInput(models);
 
     if (!rawArray || !Array.isArray(rawArray)) {
       return undefined;
@@ -220,13 +227,9 @@ function useProcessJson(models: Interface[]): ProcessedInput {
     const idToKeyMap: IdToKeyMap = {}; // for linking related and component interfaces
 
     // create a rootArray containing only Interface objects
-    const rootArray: Interface[] = rawArray
-      .map((rawObj) =>
-        (rawObj as Model).model
-          ? (rawObj as Model).model
-          : (rawObj as Interface)
-      )
-      .filter((rawObj) => rawObj["@type"] === "Interface");
+    const rootArray: Interface[] = rawArray.filter(
+      (rawObj) => rawObj["@type"] === "Interface"
+    );
 
     // we'll assume there's a depth limit built into DTDL so we won't go
     // to deep and blow the stack. All top-level models should be interfaces.

@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 
 export async function getAdtModels(hostname: string, accessToken: string) {
-    let models = [];
+    const models = [];
     let url = `https://${hostname}/models?includeModelDefinition=true&api-version=${API_VERSIONS.DigitalTwinsData}`;
     while (url) {
         const res = await fetch(url, {
@@ -28,36 +28,8 @@ export async function getAdtModels(hostname: string, accessToken: string) {
     return models;
 
 }
-
-export async function getTwinIncomingRelationships(hostname: string, twinId: string, accessToken: string) {
-    let models = [];
-    let url = `https://${hostname}/models?includeModelDefinition=true&api-version=${API_VERSIONS.DigitalTwinsData}`;
-    while (url) {
-        const res = await fetch(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
-        if (res.status !== 200) {
-            throw new Error(res.statusText);
-        }
-        const data: any = await res.json();
-        if (data.value) {
-            models.push(...data.value.map(v => v.model));
-        }
-        if (data.nextLink) {
-            url = data.nextLink;
-        }
-        else {
-            url = null;
-        }
-    }
-    return models;
-
-}
-
 export async function getAdtTwins(hostname: string, accessToken: string, filter?: string) {
-    let twins = [];
+    const twins = [];
     let url = `https://${hostname}/query?&api-version=${API_VERSIONS.DigitalTwinsData}`;
     const body = {
         "query": `SELECT * FROM DIGITALTWINS${filter ? ` WHERE ${filter}` : ''}`
@@ -87,5 +59,33 @@ export async function getAdtTwins(hostname: string, accessToken: string, filter?
         }
     }
     return twins;
+
+}
+
+
+export async function getTwinIncomingRelationships(hostname: string, accessToken: string, twinId: string) {
+    const relationships = [];
+    let url = `https://${hostname}/digitaltwins/${twinId}/incomingrelationships?&api-version=${API_VERSIONS.DigitalTwinsData}`;
+    while (url) {
+        const res = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        if (res.status !== 200) {
+            throw new Error(res.statusText);
+        }
+        const data: any = await res.json();
+        if (data.value) {
+            relationships.push(...data.value);
+        }
+        if (data.nextLink) {
+            url = data.nextLink;
+        }
+        else {
+            url = null;
+        }
+    }
+    return relationships;
 
 }

@@ -1,6 +1,11 @@
 import React from "react";
 import { generateId } from "./core/generateId";
-import { CustomTwin, DtStyleScheme } from "./models";
+import {
+  CustomTwin,
+  DtStyleScheme,
+  ParentRelationship,
+  Relationship,
+} from "./models";
 
 import "./dtViewer.css";
 import { TooltipHost } from "@fluentui/react";
@@ -14,7 +19,6 @@ export interface TwinsViewerProps {
   noWrap?: boolean;
   styles?: DtStyleScheme;
   onSelect: (selectedNode: Node) => void;
-  getRelationships: (modelId: string, twinId: string) => void;
   selectedModelId: string;
   selectedTwinKey: string;
   customTwin: CustomTwin;
@@ -31,13 +35,15 @@ export interface Node {
   hide?: boolean; // for descendents, set to true if an ancestor has collapsed === true; used in render to determine whether to show the row
   isNew?: boolean;
   isSeparator?: boolean;
+  parentRels?: ParentRelationship[];
 }
 
 // List Twins shapes
 export interface Twin {
   $dtId: string;
   $metadata: TwinMetaData;
-  name: string;
+  name?: string;
+  relationships?: Relationship[];
 }
 
 interface TwinMetaData {
@@ -159,6 +165,16 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer(
   );
 });
 
+export function normalizeTwinInput(twins: Twin[] | object) {
+  // we expect the input to be an object with 'value' property that holds an array of interface objects
+  return !Array.isArray(twins)
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (twins as { value: Twin[] }).value ??
+        ((twins as Twin)["@$dtId"] && [twins as Twin]) ??
+        null
+    : (twins as Twin[]);
+}
+
 function useProcessJson(jsonContent: Twin[]): ProcessedInput {
   return React.useMemo(() => {
     if (!jsonContent) {
@@ -166,12 +182,7 @@ function useProcessJson(jsonContent: Twin[]): ProcessedInput {
     }
 
     // we expect the input to be an object with 'value' property that holds an array of interface objects
-    const rawArray: Twin[] = !Array.isArray(jsonContent)
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (jsonContent as { value: Twin[] }).value ??
-        ((jsonContent as Twin)["@$dtId"] && [jsonContent as Twin]) ??
-        null
-      : (jsonContent as Twin[]);
+    const rawArray = normalizeTwinInput(jsonContent);
 
     if (!rawArray || !Array.isArray(rawArray)) {
       return undefined;
@@ -200,6 +211,10 @@ function useProcessJson(jsonContent: Twin[]): ProcessedInput {
         name: rawNode.name ?? rawNode.$dtId,
         isModel: false,
         hide: true,
+        parentRels: rawNode.relationships?.map((r) => ({
+          name: r.$relationshipName,
+          source: r.$sourceId,
+        })),
       });
     }
 
@@ -251,7 +266,7 @@ function useGetCustomRows(
     const allRows: Node[] = [...inputRows];
 
     if (customTwin?.modelId && customTwin.twinId) {
-      const { modelId, twinId } = customTwin;
+      const { modelId, twinId, parentRels } = customTwin;
 
       // modelTwinsMap has a key that is a modelId and a value that is an array of existing twins for that modelId.
       // new twins should not be in this array. they will be stored in the array for the map key that is equal to
@@ -326,6 +341,7 @@ function useGetCustomRows(
         isModel: false,
         collapsed: separatorNode.collapsed,
         isNew: true,
+        parentRels,
       });
       // Add in all twins to rows
       allRows.splice(modelRowIdx, 0, ...newTwins);
@@ -402,7 +418,16 @@ function TwinsList({
                   <span style={styles?.twinId}>{node.id}</span>
                 </div>
                 <div style={styles?.twinName}>{node.name}</div>
-                <div>Parents: </div>
+                <div>
+                  Parent:
+                  <br />
+                  {node.parentRels?.map((relationship, idx) => (
+                    <span key={`parentrel-${idx}`} className="indent1">
+                      - {relationship.source} (
+                      {relationship.displayName ?? relationship.name})
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
             {node.isSeparator && (

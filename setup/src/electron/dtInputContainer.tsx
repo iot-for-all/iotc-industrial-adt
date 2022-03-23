@@ -1,5 +1,6 @@
 import {
   Dropdown,
+  DropdownMenuItemType,
   IconButton,
   IDropdownOption,
   SearchBox,
@@ -9,11 +10,27 @@ import {
   TextField,
   Toggle,
 } from "@fluentui/react";
-import React, { Dispatch, SetStateAction, useCallback, useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { FileUpload } from "./core/controls/fileUpload";
-import { CustomTwin, DtItem, DtStyleScheme } from "./models";
-import { DtModelViewer, Interface, Node as ModelNode } from "./dtModelViewer";
-import { DtTwinsViewer, Node as TwinNode, Twin } from "./dtTwinsViewer";
+import {
+  CustomTwin,
+  DtItem,
+  DtStyleScheme,
+  ParentRelationship,
+} from "./models";
+import {
+  DtModelViewer,
+  Model,
+  Interface,
+  Node as ModelNode,
+  normalizeModelInput,
+} from "./dtModelViewer";
+import {
+  DtTwinsViewer,
+  Node as TwinNode,
+  normalizeTwinInput,
+  Twin,
+} from "./dtTwinsViewer";
 
 import "./inputContainer.css";
 import { useBoolean } from "@fluentui/react-hooks";
@@ -30,11 +47,11 @@ export interface NodeViewerProps {
   setModelJsonContent: Dispatch<SetStateAction<Interface[]>>;
   setTwinJsonContent: Dispatch<SetStateAction<Twin[]>>;
   twinJsonContent: Twin[];
-  modelJsonContent: Interface[];
+  modelJsonContent: (Model | Interface)[];
   onSelect: (selectedNode: DtItem) => void;
   dtItem: DtItem;
   styles?: DtStyleScheme;
-  onAddNewTwin: (twinId: string) => void;
+  onAddNewTwin: (twin: CustomTwin) => void;
   customTwin: CustomTwin;
 }
 
@@ -68,10 +85,16 @@ export function DtInputContainer(props: NodeViewerProps) {
   ] = useBoolean(false);
   const [twinsLoading, { setTrue: startLoadTwins, setFalse: stopLoadTwins }] =
     useBoolean(false);
+  const [hostname, setHostname] = React.useState<string | null>(null);
+
+  // new twin
   const [showAdd, setShowAdd] = useBoolean(false);
-  const [newTwin, setNewTwin] = React.useState<string>();
+  const [newTwin, setNewTwin] = React.useState<CustomTwin>({
+    twinId: "",
+    modelId: "",
+  });
   const [invalidName, setInvalidName] = useBoolean(false);
-  const [hostname, setHostname] = useState(null);
+  const [showAddRel, setShowAddRel] = useBoolean(false);
 
   // search
   const [showModelSearch, setShowModelSearch] = useBoolean(false);
@@ -88,8 +111,53 @@ export function DtInputContainer(props: NodeViewerProps) {
     return [selectedTwinKey, selectedModelKey];
   }, [dtItem]);
 
+  const relationshipsOpts = React.useMemo(() => {
+    const options: IDropdownOption[] = [];
+    const incomingRels = getIncomingRelationshipsFromModel(
+      normalizeModelInput(modelJsonContent),
+      dtItem?.modelId
+    );
+    incomingRels.forEach((rel) => {
+      options.push(
+        {
+          key: rel.name,
+          text: rel.displayName ?? rel.name,
+          itemType: DropdownMenuItemType.Header,
+        },
+        ...normalizeTwinInput(twinJsonContent)
+          .filter((twin) => twin.$metadata.$model === rel.source)
+          .map((t) => ({
+            key: t.$dtId,
+            text: t.name ?? t.$dtId,
+            data: { relName: rel.name, relDisplayName: rel.displayName },
+          }))
+      );
+    });
+    return options;
+  }, [dtItem?.modelId, modelJsonContent, twinJsonContent]);
+
+  const onRelDropdownRenderOption = (option: IDropdownOption) => (
+    <div className="row font-small margin-bottom-xsmall">
+      {option.itemType === DropdownMenuItemType.Header ? (
+        <>
+          <span style={styles.twinId}>{option.text}</span>
+          {option.text && (
+            <span style={styles.propertySchema}> ({option.key})</span>
+          )}
+        </>
+      ) : (
+        <>
+          <span style={styles.interfaceId}>{option.text} - </span>
+          {option.text && (
+            <span style={styles.propertySchema}>{option.key}</span>
+          )}
+        </>
+      )}
+    </div>
+  );
+
   // fetch
-  const getModels = useCallback(
+  const fetchModels = React.useCallback(
     async (hostname) => {
       const models = await window.electron.getModels(hostname);
       setModelJsonContent(models);
@@ -98,9 +166,21 @@ export function DtInputContainer(props: NodeViewerProps) {
     [setModelJsonContent, stopLoadModels]
   );
 
-  const getTwins = useCallback(
+  const fetchTwins = React.useCallback(
     async (hostname) => {
-      const twins = await window.electron.getTwins(hostname);
+      let twins = await window.electron.getTwins(hostname);
+      twins = await Promise.all(
+        twins.map(async (twin) => {
+          const rels = await window.electron.getTwinIncomingRelationships(
+            hostname,
+            twin.$dtId
+          );
+          if (rels) {
+            twin.relationships = rels;
+          }
+          return twin;
+        })
+      );
       setTwinJsonContent(twins);
       stopLoadTwins();
     },
@@ -122,6 +202,7 @@ export function DtInputContainer(props: NodeViewerProps) {
         twinId: twinNode?.id,
         twinName: twinNode?.name,
         modelId: twinNode?.modelId,
+        parentRels: twinNode?.parentRels,
       });
     },
     [dtItem, onSelect, selectedModelKey]
@@ -186,10 +267,10 @@ export function DtInputContainer(props: NodeViewerProps) {
         armParams
       );
       const adtHostname = (await instanceResp.json()).properties.hostName;
-      await Promise.all([getModels(adtHostname), getTwins(adtHostname)]);
+      await Promise.all([fetchModels(adtHostname), fetchTwins(adtHostname)]);
       setHostname(adtHostname);
     },
-    [setHostname]
+    [fetchModels, fetchTwins, startLoadModels, startLoadTwins]
   );
 
   const onDropDownOpen = React.useCallback(
@@ -231,11 +312,6 @@ export function DtInputContainer(props: NodeViewerProps) {
     [startLoadInstances, stopLoadInstances, setAdtItems]
   );
 
-  // relationships
-  const getRelationships = React.useCallback((modelId, twinId) => {
-    modelJsonContent;
-  }, []);
-
   const simpleIconStyles = {
     root: {
       width: "24px",
@@ -251,7 +327,7 @@ export function DtInputContainer(props: NodeViewerProps) {
   const addDisabled = !newTwin || !dtItem?.modelId || invalidName;
   const onAdd = React.useCallback(() => {
     onAddNewTwin(newTwin);
-    setNewTwin("");
+    setNewTwin({ twinId: "", modelId: "" });
   }, [newTwin, onAddNewTwin]);
 
   const onSubmit = React.useCallback(
@@ -313,7 +389,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                   iconProps={{ iconName: "Sync" }}
                   onClick={async () => {
                     startLoadModels();
-                    await getModels(hostname);
+                    await fetchModels(hostname);
                   }}
                 />
                 <TooltipIconButton
@@ -384,7 +460,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                     iconProps={{ iconName: "Sync" }}
                     onClick={async () => {
                       startLoadTwins();
-                      await getTwins(hostname);
+                      await fetchTwins(hostname);
                     }}
                   />
                 </div>
@@ -421,26 +497,87 @@ export function DtInputContainer(props: NodeViewerProps) {
             <div className="viewer-container">
               {showAdd && (
                 <form className="horizontal-group" onSubmit={onSubmit}>
-                  <TextField
-                    name="newTwin"
-                    label=""
-                    title={
-                      !dtItem?.modelId
-                        ? "Choose model first, then enter new twin name"
-                        : "Enter name of new twin"
-                    }
-                    className="margin-bottom-xsmall add-input margin-end-xsmall"
-                    value={newTwin}
-                    onChange={(_, twinId) => setNewTwin(twinId)}
-                    placeholder={
-                      !dtItem?.modelId
-                        ? "Choose from Models first"
-                        : "Enter name of new twin"
-                    }
-                    disabled={!dtItem?.modelId}
-                    onGetErrorMessage={onTwinNameError}
-                    autoFocus
-                  />
+                  {dtItem?.modelId && (
+                    <IconButton
+                      iconProps={{
+                        iconName: showAddRel ? "ChevronDown" : "ChevronRight",
+                      }}
+                      className="simple-icon-button-small margin-end-xsmall"
+                      styles={simpleIconStyles}
+                      onClick={setShowAddRel.toggle}
+                    />
+                  )}
+                  <div className="vertical-group expand">
+                    <TextField
+                      name="newTwin"
+                      label=""
+                      title={
+                        !dtItem?.modelId
+                          ? "Choose model first, then enter new twin name"
+                          : "Enter name of new twin"
+                      }
+                      className="margin-bottom-xsmall add-input margin-end-xsmall"
+                      value={newTwin.twinId}
+                      onChange={(_, twinId) =>
+                        setNewTwin((current) => ({ ...current, twinId }))
+                      }
+                      placeholder={
+                        !dtItem?.modelId
+                          ? "Choose from Models first"
+                          : "Enter name of new twin"
+                      }
+                      disabled={!dtItem?.modelId}
+                      onGetErrorMessage={onTwinNameError}
+                      autoFocus
+                    />
+                    {showAddRel && (
+                      <>
+                        <span className="font-small viewer-row-label">
+                          Relationships:
+                        </span>
+                        <Dropdown
+                          options={relationshipsOpts}
+                          multiSelect
+                          selectedKeys={
+                            newTwin.parentRels
+                              ? newTwin.parentRels.map((r) => r.source)
+                              : []
+                          }
+                          onRenderOption={onRelDropdownRenderOption}
+                          className="margin-bottom-xsmall add-input margin-end-xsmall"
+                          onChange={(_, parentOption) => {
+                            if (parentOption) {
+                              setNewTwin((current) =>
+                                parentOption.selected
+                                  ? {
+                                      ...current,
+                                      parentRels: [
+                                        ...(current.parentRels ?? []),
+                                        {
+                                          source: parentOption.key as string,
+                                          name: parentOption.data?.relName,
+                                          displayName:
+                                            parentOption.data?.relDisplayName,
+                                        },
+                                      ],
+                                    }
+                                  : {
+                                      ...current,
+                                      parentRels: current.parentRels.filter(
+                                        (p) =>
+                                          p.name !==
+                                            parentOption.data?.relName &&
+                                          p.source !==
+                                            (parentOption.key as string)
+                                      ),
+                                    }
+                              );
+                            }
+                          }}
+                        />
+                      </>
+                    )}
+                  </div>
                   <IconButton
                     iconProps={{ iconName: "add" }}
                     title="Add entry"
@@ -457,7 +594,7 @@ export function DtInputContainer(props: NodeViewerProps) {
                     disabled={!newTwin}
                     className="simple-icon-button-small"
                     styles={simpleIconStyles}
-                    onClick={() => setNewTwin("")}
+                    onClick={() => setNewTwin({ twinId: "", modelId: "" })}
                   />
                 </form>
               )}
@@ -476,7 +613,6 @@ export function DtInputContainer(props: NodeViewerProps) {
                 <DtTwinsViewer
                   twins={twinJsonContent}
                   onSelect={onTwinSelect}
-                  getRelationships={getRelationships}
                   selectedModelId={dtItem?.modelId}
                   selectedTwinKey={selectedTwinKey}
                   styles={styles}
@@ -490,4 +626,28 @@ export function DtInputContainer(props: NodeViewerProps) {
       </div>
     </ErrorBoundary>
   );
+}
+
+function getIncomingRelationshipsFromModel(
+  models: Interface[],
+  targetModelId: string
+) {
+  const rels: ParentRelationship[] = [];
+  models.forEach((model) => {
+    if (model.contents) {
+      model.contents.forEach((content: any) => {
+        if (
+          content["@type"] === "Relationship" &&
+          content.target === targetModelId
+        ) {
+          rels.push({
+            name: content.name,
+            source: model["@id"],
+            displayName: content.displayName?.en ?? content.name,
+          });
+        }
+      });
+    }
+  });
+  return rels;
 }

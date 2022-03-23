@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "module": "commonjs",
-    "strict": false,  
+    "strict": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
@@ -14,9 +14,16 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": [
+        "node_modules/*"
+      ]
     },
   },
-  "include": ["src/electron"],
-  "exclude": ["node_modules", "json "]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "json "
+  ]
 }

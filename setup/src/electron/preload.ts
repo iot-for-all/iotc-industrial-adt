@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld(
     signOut: () => ipcRenderer.invoke('signOut'),
     getToken: (resource: string) => ipcRenderer.invoke('getToken', resource),
     getModels: (hostname: string) => ipcRenderer.invoke('getModels', hostname),
-    getTwins: (hostname: string, filter?: string) => ipcRenderer.invoke('getTwins', hostname, filter)
+    getTwins: (hostname: string, filter?: string) => ipcRenderer.invoke('getTwins', hostname, filter),
+    getTwinIncomingRelationships: (hostname: string, twinId: string) => ipcRenderer.invoke('getTwinIncomingRelationships', hostname, twinId)
   }
 );
