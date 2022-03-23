@@ -4,6 +4,7 @@ import { TOKEN_AUDIENCES } from './core/constants';
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as fs from 'fs';
 import isDev from 'electron-is-dev';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const openAboutWindow = require('aboutWindow').default;
 import path from 'path';
 
@@ -56,28 +57,28 @@ const createMainWindow = (): void => {
       submenu: [
         aboutMenu,
         {
-          role: 'quit',
+          role: 'quit' as const,
           label: 'Quit'
         }
       ]
     }, isDev ? {
-      role: 'viewMenu'
+      role: 'viewMenu' as const
     } : undefined] : [
       {
         label: 'File',
         submenu: [
-          { role: 'quit', label: 'Exit' }
+          { role: 'quit' as const, label: 'Exit' }
         ]
       },
       isDev ? {
-        role: 'viewMenu'
+        role: 'viewMenu' as const
       } : undefined, {
-        role: 'help',
+        role: 'help' as const,
         submenu: [
           aboutMenu
         ]
       }])
-  ] as any[]);
+  ]);
   app.applicationMenu = menu;
 };
 
@@ -118,7 +119,7 @@ ipcMain.handle('loadFile', async (e, filePath) => {
   return await fs.promises.readFile(filePath, 'utf8');
 });
 
-ipcMain.handle('signIn', async (e) => {
+ipcMain.handle('signIn', async () => {
   const authWindow = createAuthWindow();
   // mainWindow.setOpacity(1.0);
   const account = await login(authWindow);
@@ -127,7 +128,7 @@ ipcMain.handle('signIn', async (e) => {
   return account;
 });
 
-ipcMain.handle('getToken', async (e, resource) => {
+ipcMain.handle('getToken', async (_, resource) => {
   const token = await getToken(resource);
   return token;
 });

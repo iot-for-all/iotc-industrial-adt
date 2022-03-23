@@ -5,14 +5,13 @@ import {
   IPersonaSharedProps,
   Persona,
   PersonaSize,
-  PrimaryButton,
   Spinner,
   SpinnerSize,
 } from "@fluentui/react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Mapping } from "./mapping";
-import "./App.css";
+import "./app.css";
 import { useBoolean, useId } from "@fluentui/react-hooks";
 
 declare global {
