@@ -15,21 +15,19 @@ import { useBoolean, useId } from "@fluentui/react-hooks";
 import { OpcuaStyleScheme, TagNode } from "./opcuaViewer";
 import { OpcuaInputContainer } from "./opcuaInputContainer";
 import { DtInputContainer } from "./dtInputContainer";
-import { DtStyleScheme, OpcuaItem, DtItem, CustomTwin } from "./models";
+import { DtStyleScheme, OpcuaItem, DtItem } from "./models";
 import { JqModal } from "./jqModal";
 import { downloadFile } from "./core/controls/downloadFile";
-import { Twin } from "./dtTwinsViewer";
-import { Interface } from "./dtModelViewer";
 
 export const Mapping = React.memo(function Mapping() {
   const [opcuaFile, setOpcuaFile] = React.useState<File>(); // json input file for opcua definitions
   const [opcuaJson, setOpcuaJson] = React.useState<object>({}); // json content from the opcua input file
 
   const [dtTwinsFile, setDtTwinsFile] = React.useState<File>(); // json input file for dt definitions
-  const [dtTwinsJson, setDtTwinsJson] = React.useState<Twin[]>([]); // json content from the dt input file
+  const [dtTwinsJson, setDtTwinsJson] = React.useState<object>({}); // json content from the dt input file
 
   const [dtModelsFile, setDtModelsFile] = React.useState<File>(); // json input file for dt definitions
-  const [dtModelsJson, setDtModelsJson] = React.useState<Interface[]>([]); // json content from the dt input file
+  const [dtModelsJson, setDtModelsJson] = React.useState<object>({}); // json content from the dt input file
 
   const [selectedKey, setSelectedKey] = React.useState<string | number>(); // tracks the selected row key in the grid (make sure item keys aren't changing)
 
@@ -50,9 +48,7 @@ export const Mapping = React.memo(function Mapping() {
   const [showJqModal, setShowJqModal] = useBoolean(false);
   const [copyResult, setCopyResult] = React.useState<string>();
   const [resultClass, setResultClass] = React.useState<string>();
-
   const [customTwin, setCustomTwin] = React.useState<CustomTwin>();
-
   // if a file has been selected, opcuaFile will be updated with the File object.
   // Get the content of the file as JSON
   React.useEffect(() => {
@@ -143,8 +139,7 @@ export const Mapping = React.memo(function Mapping() {
     [items]
   );
 
-  // callback for adding the contents of the opcua and dt items to the grid either as a new row
-  // or as an update to an existing (selected) row
+  // callback for confirming (button click) the entries in the node pair input fields
   const onUpdateGrid = React.useCallback(() => {
     if (opcuaItem && dtItem) {
       if (selectedKey) {
@@ -303,19 +298,19 @@ export const Mapping = React.memo(function Mapping() {
                 readOnly
               />
               <TextField
-                name="dtProperty"
-                label="Property"
-                className="margin-start-xsmall expand"
-                value={dtItem?.propertyName || ""}
-                title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
-                readOnly
-              />
-              <TextField
                 name="dtTwin"
                 label="Digital Twin Id"
                 className="margin-start-xsmall expand"
                 value={dtItem?.twinId || ""}
                 title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
+                readOnly
+              />
+              <TextField
+                name="dtProperty"
+                label="Property"
+                className="margin-start-xsmall expand"
+                value={dtItem?.propertyName || ""}
+                title={`${dtItem?.propertyName} (${dtItem?.propertyId})`}
                 readOnly
               />
               <TextField

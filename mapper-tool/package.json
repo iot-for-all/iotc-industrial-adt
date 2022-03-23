@@ -3,34 +3,56 @@
   "version": "0.1.0",
   "private": true,
   "main": ".webpack/main",
+  "homepage": "https://github.com/iot-for-all/iotc-industrial-adt",
+  "bugs": {
+    "url": "https://github.com/iot-for-all/iotc-industrial-adt/issues"
+  },
   "author": "jahollie",
   "description": "OPC-UA node to Azure Digital Twin mapper",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make:mac": "electron-forge make --targets @electron-forge/maker-dmg",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ./src"
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "name": "OPCUA-ADT Mapper",
+        "icon": "./mapper-logo.icns"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "setup"
+            "name": "OPCUA ADT Mapper"
           }
         },
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
             "darwin"
-          ]
+          ],
+          "config": {
+            "name": "OPCUA ADT Mapper"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "platforms": [
+            "darwin"
+          ],
+          "config": {
+            "format": "ULFO"
+          }
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "name": "opcua-adt-mapper"
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
@@ -65,6 +87,7 @@
     "@azure-iot/eslint-config": "^1.0.1",
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
@@ -83,6 +106,7 @@
     "eslint-plugin-import": "^2.25.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "filemanager-webpack-plugin": "^6.1.7",
     "fork-ts-checker-webpack-plugin": "^6.0.1",
     "node-loader": "^2.0.0",
     "node-sass": "^7.0.1",
@@ -104,7 +128,9 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "about-window": "^1.15.0",
     "axios": "^0.24.0",
+    "electron-is-dev": "^2.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "immer": "^9.0.12",
     "monaco-editor": "^0.31.1",

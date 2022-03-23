@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   DetailsList,
   DetailsRow,
@@ -11,10 +11,9 @@ import {
 import { getTheme } from "@fluentui/react/lib/Styling";
 import { MarqueeSelection } from "@fluentui/react/lib/MarqueeSelection";
 import { useBoolean, useId } from "@fluentui/react-hooks";
-
+import { ParentRelationship } from "./models";
 import "./mappingGrid.css";
 import { TooltipHost } from "@fluentui/react";
-import { ParentRelationship } from "./models";
 
 const theme = getTheme();
 
@@ -109,14 +108,14 @@ export const MappingGrid = React.memo(function MappingGrid(
         onRender: (_) => "->",
       },
       {
-        key: "dtmodel",
-        name: "Twin Model",
-        fieldName: "model",
+        key: "dttwin",
+        name: "Twin Id",
+        fieldName: "twin",
         minWidth: 100,
         maxWidth: 200,
         isResizable: true,
         onRender: (item: MappingGridItem) => (
-          <MappedItemDetail name={item.dtModelId} detail={item} />
+          <MappedItemDetail name={item.dtId} detail={item} />
         ),
       },
       {
@@ -128,17 +127,6 @@ export const MappingGrid = React.memo(function MappingGrid(
         isResizable: true,
         onRender: (item: MappingGridItem) => (
           <MappedItemDetail name={item.dtPropertyName} detail={item} />
-        ),
-      },
-      {
-        key: "dttwin",
-        name: "Twin Id",
-        fieldName: "twin",
-        minWidth: 100,
-        maxWidth: 200,
-        isResizable: true,
-        onRender: (item: MappingGridItem) => (
-          <MappedItemDetail name={item.dtId} detail={item} />
         ),
       },
       {
@@ -223,8 +211,7 @@ function useFilteredItems(
             (i) =>
               i.opcuaNodeId.toLowerCase().indexOf(normalizeText) > -1 ||
               i.dtId.toLowerCase().indexOf(normalizeText) > -1 ||
-              i.dtPropertyName.toLowerCase().indexOf(normalizeText) > -1 ||
-              i.dtModelId.toLocaleLowerCase().indexOf(normalizeText)
+              i.dtPropertyName.toLowerCase().indexOf(normalizeText) > -1
           )
         : items,
     [items, normalizeText]

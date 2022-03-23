@@ -14,14 +14,6 @@
   max-height: 100%;
 }
 
-.search {
-  border-color: #ddd;
-}
-
-.search-toggle {
-  fill: rgb(0, 120, 212);
-}
-
 .input-container {
   display: flex;
   flex-direction: column;
@@ -66,10 +58,6 @@
   margin-bottom: 0.5rem;
   font-size: medium;
   height: 1.5rem;
-}
-
-.section-header.align-bottom {
-  line-height: 2rem;
 }
 
 .viewer-card {
@@ -119,7 +107,6 @@
 
 .menu-icon {
   width: 1rem;
-  min-width: 1rem;
   height: 1rem;
   display: flex;
   justify-content: center;
@@ -185,14 +172,6 @@
   text-align: left;
 }
 
-.ellipsis-left-limited {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  direction: rtl;
-  text-align: left;
-}
-
 .align-center {
   align-items: flex-start;
 }
@@ -224,8 +203,4 @@
 .no-scroll-parent {
   max-height: 100%;
   overflow: hidden;
-}
-
-input::placeholder {
-  font-style: italic;
 }

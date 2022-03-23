@@ -2,14 +2,15 @@
 
 Clone this repository to get sample code for the Azure Function to be used as export destination in IoT Central.
 
-## Environment
+## Resources
 
-1. Azure Digital Twin
-2. Azure Function
+1. Azure Digital Twins
+2. Azure Functions
+3. Azure IoT Central
 
 ## 1. Deploy Azure Digital Twins
 
-If you already have an ADT instance you can skip to step 2, otherwise follow the instructions in ["Set up an instance and authentication"](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance-portal).
+If you already have an ADT instance you can skip to [step 2](#2-deploy-the-sample-function), otherwise follow the instructions in ["Set up an instance and authentication"](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-set-up-instance-portal).
 
 After you set up your instance, make a note of the following values. You'll need these values to connect to the instance later:
 
@@ -49,7 +50,7 @@ az functionapp create \
   --resource-group myResourceGroup \
   --os-type linux \
   --runtime node \
-  --runtime-version 14
+  --runtime-version 14 \
   --functions-version 4
 ```
 

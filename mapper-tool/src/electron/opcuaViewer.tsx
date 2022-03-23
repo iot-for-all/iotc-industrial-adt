@@ -3,7 +3,7 @@ import { useId } from '@fluentui/react-hooks';
 import React from 'react';
 import { generateId } from './core/generateId';
 
-export interface Node {
+xexport interface Node {
     key: string;
     id: string;
     namespace: string[];
