@@ -39,8 +39,8 @@ export const Mapping = React.memo(function Mapping() {
 
     // Jq state
     const [ showJqModal, setShowJqModal ] = useBoolean(false);
-    const [copyResult, setCopyResult] = React.useState<string>();
-    const [resultClass, setResultClass] = React.useState<string>();
+    const [ copyResult, setCopyResult ] = React.useState<string>();
+    const [ resultClass, setResultClass ] = React.useState<string>();
 
     // if a file has been selected, opcuaFile will be updated with the File object.
     // Get the content of the file as JSON
