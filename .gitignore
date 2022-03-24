@@ -1,5 +1,14 @@
 # vscode
-.vscode/
 
 # MACOS
 .DS_Store
+
+mapper-tool/node_modules/
+mapper-tool/.webpack/
+
+tasks.json
+settings.json
+launch.json
+extensions.json
+uploader/obj/
+console.log
