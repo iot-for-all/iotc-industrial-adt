@@ -1,168 +1,162 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "adtname": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the Azure Digital Twin Instance"
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adtname": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure Digital Twin Instance"
+      }
+    }
+  },
+  "variables": {
+    "adtApiVersion": "2020-12-01",
+    "functionApiVersion": "2020-12-01",
+    "idApiVersion": "2018-11-30",
+    "storageApiVersion": "2021-06-01",
+    "roleApiVersion": "2021-04-01-preview",
+    "serverFarmApi": "2021-02-01",
+    "prefix": "iotcopc",
+    "identityName": "[concat(parameters('adtname'),'-manid')]",
+    "storageAccount": {
+      "name": "[concat(variables('prefix'),'sa')]"
     },
-    "variables": {
-        "adtApiVersion": "2020-12-01",
-        "functionApiVersion": "2020-12-01",
-        "idApiVersion": "2018-11-30",
-        "storageApiVersion": "2021-06-01",
-        "roleApiVersion": "2021-04-01-preview",
-        "serverFarmApi": "2021-02-01",
-        "prefix": "iotcopc",
-        "identityName": "[concat(parameters('adtname'),'-manid')]",
-        "storageAccount": {
-            "name": "[concat(variables('prefix'),'sa')]"
-        },
-        "hostingPlan": {
-            "name": "[concat(variables('prefix'),'hp')]"
-        },
-        "functionapp": {
-            "name": "[concat(variables('prefix'), 'DTFunctions')]",
-            "nodeVersion": "Node|14",
-            "zipurl": "https://github.com/Azure-Samples/digital-twins-samples/blob/master/HandsOnLab/TwinInputFunction/twinfunction.zip?raw=true"
-        },
-        "dataOwnerRoleId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'bcd981a7-7f74-457b-83e1-cceb9e632ffe')]",
-        "resourceOwnerRoleId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-        "roleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), variables('resourceOwnerRoleId'), resourceGroup().id)]", // ADT Resource Owner role
-        "adtRoleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), variables('dataOwnerRoleId'), resourceGroup().id)]", // ADT Data Owner role
-        "fnRoleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('functionapp').name), variables('dataOwnerRoleId'), resourceGroup().id)]" // ADT
+    "hostingPlan": {
+      "name": "[concat(variables('prefix'),'hp')]"
     },
-    "resources": [
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "[variables('storageApiVersion')]",
-            "name": "[variables('storageAccount').name]",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Standard_LRS"
+    "functionapp": {
+      "name": "[concat(variables('prefix'), 'DTFunctions')]",
+      "nodeVersion": "Node|14",
+      "zipurl": "https://github.com/Azure-Samples/digital-twins-samples/blob/master/HandsOnLab/TwinInputFunction/twinfunction.zip?raw=true"
+    },
+    "dataOwnerRoleId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'bcd981a7-7f74-457b-83e1-cceb9e632ffe')]",
+    "resourceOwnerRoleId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+    "roleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), variables('resourceOwnerRoleId'), resourceGroup().id)]", // ADT Resource Owner role
+    "adtRoleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), variables('dataOwnerRoleId'), resourceGroup().id)]", // ADT Data Owner role
+    "fnRoleDefinitionName": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('functionapp').name), variables('dataOwnerRoleId'), resourceGroup().id)]" // ADT
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "name": "[variables('storageAccount').name]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "[variables('idApiVersion')]",
+      "name": "[variables('identityName')]",
+      "location": "[resourceGroup().location]"
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "[variables('roleApiVersion')]",
+      "name": "[variables('roleDefinitionName')]",
+      "dependsOn": ["[variables('identityName')]"],
+      "properties": {
+        "roleDefinitionId": "[variables('resourceOwnerRoleId')]",
+        "principalId": "[reference(variables('identityName')).principalId]",
+        "scope": "[resourceGroup().id]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "[variables('roleApiVersion')]",
+      "name": "[variables('adtRoleDefinitionName')]",
+      "dependsOn": ["[variables('identityName')]"],
+      "properties": {
+        "roleDefinitionId": "[variables('dataOwnerRoleId')]",
+        "principalId": "[reference(variables('identityName')).principalId]",
+        "scope": "[resourceGroup().id]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.DigitalTwins/digitalTwinsInstances",
+      "apiVersion": "[variables('adtApiVersion')]",
+      "name": "[parameters('adtname')]",
+      "location": "[resourceGroup().location]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": ["[variables('identityName')]"]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "[variables('serverFarmApi')]",
+      "name": "[variables('hostingPlan').name]",
+      "location": "[resourceGroup().location]",
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      },
+      "sku": {
+        "Tier": "Standard",
+        "Name": "S1"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "[variables('functionApiVersion')]",
+      "name": "[variables('functionapp').name]",
+      "location": "[resourceGroup().location]",
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlan').name)]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccount').name, environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccount').name), variables('storageApiVersion')).keys[0].value)]"
             },
-            "kind": "StorageV2",
-            "properties": {
-                "isHnsEnabled": false
-            }
-        },
-        {
-            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-            "apiVersion": "[variables('idApiVersion')]",
-            "name": "[variables('identityName')]",
-            "location": "[resourceGroup().location]"
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "[variables('roleApiVersion')]",
-            "name": "[variables('roleDefinitionName')]",
-            "dependsOn": [
-                "[variables('identityName')]"
-            ],
-            "properties": {
-                "roleDefinitionId": "[variables('resourceOwnerRoleId')]",
-                "principalId": "[reference(variables('identityName')).principalId]",
-                "scope": "[resourceGroup().id]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "[variables('roleApiVersion')]",
-            "name": "[variables('adtRoleDefinitionName')]",
-            "dependsOn": [
-                "[variables('identityName')]"
-            ],
-            "properties": {
-                "roleDefinitionId": "[variables('dataOwnerRoleId')]",
-                "principalId": "[reference(variables('identityName')).principalId]",
-                "scope": "[resourceGroup().id]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.DigitalTwins/digitalTwinsInstances",
-            "apiVersion": "[variables('adtApiVersion')]",
-            "name": "[parameters('adtname')]",
-            "location": "[resourceGroup().location]",
-            "identity": {
-                "type": "SystemAssigned"
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "node"
             },
-            "dependsOn": [
-                "[variables('identityName')]"
-            ]
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "[variables('serverFarmApi')]",
-            "name": "[variables('hostingPlan').name]",
-            "location": "[resourceGroup().location]",
-            "kind": "linux",
-            "properties": {
-                "reserved": true
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
             },
-            "sku": {
-                "Tier": "Standard",
-                "Name": "S1"
+            {
+              "name": "ADT_INSTANCE",
+              "value": "[concat('https://', reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances', parameters('adtname'))).hostName)]"
             }
+          ],
+          "linuxFxVersion": "[variables('functionapp').nodeVersion]"
         },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "[variables('functionApiVersion')]",
-            "name": "[variables('functionapp').name]",
-            "location": "[resourceGroup().location]",
-            "kind": "functionapp,linux",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlan').name)]",
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccount').name, environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccount').name), variables('storageApiVersion')).keys[0].value)]"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "node"
-                        },
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        },
-                        {
-                            "name": "ADT_INSTANCE",
-                            "value": "[concat('https://', reference(resourceId('Microsoft.DigitalTwins/digitalTwinsInstances', parameters('adtname'))).hostName)]"
-                        }
-                    ],
-                    "linuxFxVersion": "[variables('functionapp').nodeVersion]"
-                },
-                "httpsOnly": true
-            },
-            "dependsOn": [
-                "[variables('identityName')]",
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlan').name)]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccount').name)]"
-            ]
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "[variables('roleApiVersion')]",
-            "name": "[variables('fnRoleDefinitionName')]",
-            "dependsOn": [
-                "[variables('identityName')]",
-                "[variables('functionapp').name]"
-            ],
-            "properties": {
-                "roleDefinitionId": "[variables('dataOwnerRoleId')]",
-                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionapp').name), variables('functionApiVersion'), 'Full').identity.principalId]",
-                "scope": "[resourceGroup().id]",
-                "principalType": "ServicePrincipal"
-            }
-        }
-    ]
+        "httpsOnly": true
+      },
+      "dependsOn": [
+        "[variables('identityName')]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlan').name)]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccount').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "[variables('roleApiVersion')]",
+      "name": "[variables('fnRoleDefinitionName')]",
+      "dependsOn": [
+        "[variables('identityName')]",
+        "[variables('functionapp').name]"
+      ],
+      "properties": {
+        "roleDefinitionId": "[variables('dataOwnerRoleId')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionapp').name), variables('functionApiVersion'), 'Full').identity.principalId]",
+        "scope": "[resourceGroup().id]",
+        "principalType": "ServicePrincipal"
+      }
+    }
+  ]
 }

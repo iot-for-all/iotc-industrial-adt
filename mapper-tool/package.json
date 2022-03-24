@@ -15,7 +15,9 @@
     "make": "electron-forge make",
     "make:mac": "electron-forge make --targets @electron-forge/maker-dmg",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ./src"
+    "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./src",
+    "format": "prettier --write src/",
+    "build": "npm run format && npm run lint"
   },
   "config": {
     "forge": {
@@ -110,6 +112,7 @@
     "fork-ts-checker-webpack-plugin": "^6.0.1",
     "node-loader": "^2.0.0",
     "node-sass": "^7.0.1",
+    "prettier": "^2.6.0",
     "sass-loader": "^12.4.0",
     "style-loader": "^3.0.0",
     "ts-loader": "^9.2.2",

@@ -13,22 +13,13 @@ import * as ReactDOM from "react-dom";
 import { Mapping } from "./mapping";
 import "./app.css";
 import { useBoolean, useId } from "@fluentui/react-hooks";
+import { AccountInfo, ElectronBridge } from "./models";
 
 declare global {
   interface Window {
-    electron: any;
+    electron: ElectronBridge;
   }
 }
-
-type AccountInfo = {
-  homeAccountId: string;
-  environment: string;
-  tenantId: string;
-  username: string;
-  localAccountId: string;
-  name?: string;
-  idTokenClaims?: object;
-};
 
 const UserCard = React.memo<{
   user: AccountInfo & { image?: string };

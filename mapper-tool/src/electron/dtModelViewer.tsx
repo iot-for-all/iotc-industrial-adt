@@ -2,7 +2,7 @@ import { TooltipHost } from "@fluentui/react";
 import { useId } from "@fluentui/react-hooks";
 import React from "react";
 import { generateId } from "./core/generateId";
-import { DtStyleScheme } from "./models";
+import { DataContent, DtStyleScheme } from "./models";
 
 import "./dtViewer.css";
 
@@ -68,9 +68,15 @@ export interface Interface {
   contents: HasType[];
 }
 
-interface HasType {
-  "@type": "Property" | "Interface" | "Relationship" | "Component";
-}
+export type HasType = {
+  name: string;
+  displayName: string | { en?: string };
+  "@type": "Property" | "Interface" | "Component" | "Relationship";
+  schema?: string;
+  minMultiplicity?: number;
+  maxMultiplicity?: number;
+  target?: string;
+};
 
 // an interface Property has both a @type and a schema.
 // a property of a complex object only has an @type (and fields)
@@ -195,7 +201,7 @@ export const DtModelViewer = React.memo(function DtModelViewer(
   );
 });
 
-export function normalizeModelInput(models: (Interface | Model)[] | object) {
+export function normalizeModelInput(models: DataContent<object>) {
   // we expect the input to be an object with 'value' property that holds an array of interface objects
   const rawArray: (Model | Interface)[] = !Array.isArray(models)
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -264,9 +270,8 @@ function useProcessJson(models: (Interface | Model)[]): ProcessedInput {
   }, [models]);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function processObject(
-  rawNode: any,
+  rawNode: HasType,
   nodeMap: InputData,
   idToKeyMap: IdToKeyMap,
   parentNode: Node,
@@ -284,7 +289,9 @@ function processObject(
     id: rawNode["@id"],
     modelId: parentNode.modelId,
     name: rawNode.name,
-    displayName: rawNode.displayName,
+    displayName:
+      (rawNode.displayName as { en?: string }).en ??
+      (rawNode.displayName as string),
     schema: rawNode.schema, // only Property type and complex schemas have a 'schema' value
     namespace,
     children: [],

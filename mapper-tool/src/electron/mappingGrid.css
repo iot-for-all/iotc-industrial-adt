@@ -1,19 +1,20 @@
 .dismiss-button {
-    border: solid 1px #a19f9d;
-    box-shadow: rgba(60, 64, 67, 0, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-    background-color: #faf9f8;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3px;
+  border: solid 1px #a19f9d;
+  box-shadow: rgba(60, 64, 67, 0, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  background-color: #faf9f8;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
 }
 
 .dismiss-button:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .margin-end-xsmall {
-    margin-inline-end: 0.5rem;
+  margin-inline-end: 0.5rem;
 }

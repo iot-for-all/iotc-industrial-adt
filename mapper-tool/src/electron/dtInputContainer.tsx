@@ -14,14 +14,18 @@ import React, { Dispatch, SetStateAction } from "react";
 import { FileUpload } from "./core/controls/fileUpload";
 import {
   CustomTwin,
+  DataContent,
   DtItem,
   DtStyleScheme,
   ParentRelationship,
+  RelationshipBasic,
+  TwinBasic,
 } from "./models";
 import {
   DtModelViewer,
   Model,
   Interface,
+  HasType,
   Node as ModelNode,
   normalizeModelInput,
 } from "./dtModelViewer";
@@ -44,8 +48,8 @@ export interface NodeViewerProps {
   modelJsonFile: File;
   setTwinJsonFile: Dispatch<SetStateAction<File>>;
   setModelJsonFile: Dispatch<SetStateAction<File>>;
-  setModelJsonContent: Dispatch<SetStateAction<Interface[]>>;
-  setTwinJsonContent: Dispatch<SetStateAction<Twin[]>>;
+  setModelJsonContent: Dispatch<SetStateAction<DataContent<object>>>;
+  setTwinJsonContent: Dispatch<SetStateAction<DataContent<object>>>;
   twinJsonContent: Twin[];
   modelJsonContent: (Model | Interface)[];
   onSelect: (selectedNode: DtItem) => void;
@@ -54,6 +58,8 @@ export interface NodeViewerProps {
   onAddNewTwin: (twin: CustomTwin) => void;
   customTwin: CustomTwin;
 }
+
+type TwinExtended = TwinBasic & { relationships: RelationshipBasic[] };
 
 export function DtInputContainer(props: NodeViewerProps) {
   const {
@@ -176,7 +182,7 @@ export function DtInputContainer(props: NodeViewerProps) {
             twin.$dtId
           );
           if (rels) {
-            twin.relationships = rels;
+            (twin as TwinExtended).relationships = rels;
           }
           return twin;
         })
@@ -231,24 +237,17 @@ export function DtInputContainer(props: NodeViewerProps) {
     [dtItem, onSelect, selectedTwinKey]
   );
 
-  const onInstancesLoading = React.useCallback(
-    (props) => {
-      return (
-        <Stack
-          horizontal
-          verticalAlign="center"
-          horizontalAlign="space-between"
-        >
-          <span>Select Azure Digital Twins instance</span>
-          <Spinner
-            size={SpinnerSize.small}
-            style={{ visibility: loadingInstances ? "visible" : "hidden" }}
-          />
-        </Stack>
-      );
-    },
-    [loadingInstances]
-  );
+  const onInstancesLoading = React.useCallback(() => {
+    return (
+      <Stack horizontal verticalAlign="center" horizontalAlign="space-between">
+        <span>Select Azure Digital Twins instance</span>
+        <Spinner
+          size={SpinnerSize.small}
+          style={{ visibility: loadingInstances ? "visible" : "hidden" }}
+        />
+      </Stack>
+    );
+  }, [loadingInstances]);
 
   const onInstanceSelected = React.useCallback(
     async (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) => {
@@ -273,44 +272,41 @@ export function DtInputContainer(props: NodeViewerProps) {
     [fetchModels, fetchTwins, startLoadModels, startLoadTwins]
   );
 
-  const onDropDownOpen = React.useCallback(
-    async (e) => {
-      startLoadInstances();
-      const armToken = await window.electron.getToken(
-        "https://management.azure.com/user_impersonation"
-      );
-      const params = {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${armToken}`,
-        },
-      };
-      const subResp = await fetch(
-        `https://management.azure.com/subscriptions?api-version=${API_VERSIONS.ResourceManager}`,
-        params
-      );
-      const subs = (await subResp.json()).value;
-      const resources = await Promise.all(
-        subs.map(async (sub) => {
-          const resResp = await fetch(
-            `https://management.azure.com/subscriptions/${sub.subscriptionId}/resources?api-version=${API_VERSIONS.ResourceManager}&$filter=resourceType eq 'Microsoft.DigitalTwins/digitalTwinsInstances'`,
-            params
-          );
-          const resources = (await resResp.json()).value;
-          return resources;
-        })
-      );
-      stopLoadInstances();
-      setAdtItems(
-        resources.flat().map((r) => ({
-          key: r.id,
-          text: r.name,
-          data: r,
-        }))
-      );
-    },
-    [startLoadInstances, stopLoadInstances, setAdtItems]
-  );
+  const onDropDownOpen = React.useCallback(async () => {
+    startLoadInstances();
+    const armToken = await window.electron.getToken(
+      "https://management.azure.com/user_impersonation"
+    );
+    const params = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${armToken}`,
+      },
+    };
+    const subResp = await fetch(
+      `https://management.azure.com/subscriptions?api-version=${API_VERSIONS.ResourceManager}`,
+      params
+    );
+    const subs = (await subResp.json()).value;
+    const resources = await Promise.all(
+      subs.map(async (sub) => {
+        const resResp = await fetch(
+          `https://management.azure.com/subscriptions/${sub.subscriptionId}/resources?api-version=${API_VERSIONS.ResourceManager}&$filter=resourceType eq 'Microsoft.DigitalTwins/digitalTwinsInstances'`,
+          params
+        );
+        const resources = (await resResp.json()).value;
+        return resources;
+      })
+    );
+    stopLoadInstances();
+    setAdtItems(
+      resources.flat().map((r) => ({
+        key: r.id,
+        text: r.name,
+        data: r,
+      }))
+    );
+  }, [startLoadInstances, stopLoadInstances, setAdtItems]);
 
   const simpleIconStyles = {
     root: {
@@ -635,7 +631,7 @@ function getIncomingRelationshipsFromModel(
   const rels: ParentRelationship[] = [];
   models.forEach((model) => {
     if (model.contents) {
-      model.contents.forEach((content: any) => {
+      model.contents.forEach((content: HasType) => {
         if (
           content["@type"] === "Relationship" &&
           content.target === targetModelId
@@ -643,7 +639,10 @@ function getIncomingRelationshipsFromModel(
           rels.push({
             name: content.name,
             source: model["@id"],
-            displayName: content.displayName?.en ?? content.name,
+            displayName:
+              (content.displayName as { en?: string })?.en ??
+              (content.displayName as string) ??
+              content.name,
           });
         }
       });

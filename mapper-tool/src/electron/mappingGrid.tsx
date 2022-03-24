@@ -105,7 +105,7 @@ export const MappingGrid = React.memo(function MappingGrid(
         minWidth: 20,
         maxWidth: 20,
         isResizable: false,
-        onRender: (_) => "->",
+        onRender: () => "->",
       },
       {
         key: "dttwin",

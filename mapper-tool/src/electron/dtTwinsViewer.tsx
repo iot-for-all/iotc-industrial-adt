@@ -2,6 +2,7 @@ import React from "react";
 import { generateId } from "./core/generateId";
 import {
   CustomTwin,
+  DataContent,
   DtStyleScheme,
   ParentRelationship,
   Relationship,
@@ -165,7 +166,7 @@ export const DtTwinsViewer = React.memo(function DtTwinsViewer(
   );
 });
 
-export function normalizeTwinInput(twins: Twin[] | object) {
+export function normalizeTwinInput(twins: DataContent<object>) {
   // we expect the input to be an object with 'value' property that holds an array of interface objects
   return !Array.isArray(twins)
     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,7 +176,7 @@ export function normalizeTwinInput(twins: Twin[] | object) {
     : (twins as Twin[]);
 }
 
-function useProcessJson(jsonContent: Twin[]): ProcessedInput {
+function useProcessJson(jsonContent: DataContent<object>): ProcessedInput {
   return React.useMemo(() => {
     if (!jsonContent) {
       return undefined;

@@ -1,20 +1,20 @@
-import { SelectableOptionMenuItemType } from '@fluentui/react';
+import { SelectableOptionMenuItemType } from "@fluentui/react";
 
-export type DropdownOption<T = any> = {
-    displayName: string;
-    title?: string;
-    value: T;
+export type DropdownOption<T = unknown> = {
+  displayName: string;
+  title?: string;
+  value: T;
 };
 
-export type EnumValue<T = any> = DropdownOption<T> & {
-    hidden?: boolean;
-    disabled?: boolean;
+export type EnumValue<T = unknown> = DropdownOption<T> & {
+  hidden?: boolean;
+  disabled?: boolean;
 
-    /** Describes the type of option. */
-    itemType?: SelectableOptionMenuItemType;
+  /** Describes the type of option. */
+  itemType?: SelectableOptionMenuItemType;
 
-    /* Add subtext to radio option */
-    subText?: string;
+  /* Add subtext to radio option */
+  subText?: string;
 
-    [extraField: string]: any;
+  [extraField: string]: unknown;
 };

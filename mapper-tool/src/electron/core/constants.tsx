@@ -6,19 +6,21 @@
  * ### Description
  * Use this app level constant to avoid creating new references or to reuse the same reference for some computed 'empty' value
  */
-export const EMPTY_ARRAY = Object.freeze([]) as any[]; // Cast to `any` type for ease of consumption.
+export const EMPTY_ARRAY = Object.freeze([]) as unknown[]; // Cast to `unknown` type for ease of consumption.
 
 /**
  * ### Description
  * Use this app level constant to avoid creating new references or to reuse the same reference for some computed 'empty' value
  */
-export const EMPTY_OBJECT = Object.freeze({}) as any; // Cast to `any` type for ease of consumption.
+export const EMPTY_OBJECT = Object.freeze({}) as unknown; // Cast to `unknown` type for ease of consumption.
 
 /**
  * ### Description
  * A function that takes no parameters, returns void, and performs no action
  */
-export const EMPTY_FUNC = () => {};
+export const EMPTY_FUNC = () => {
+  // do nothing
+};
 
 /**
  * ### Description

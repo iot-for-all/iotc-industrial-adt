@@ -1,4 +1,4 @@
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
+import { initializeIcons } from "@fluentui/font-icons-mdl2";
 
 /**
  * This file will automatically be loaded by webpack and run in the "renderer" context.
@@ -28,5 +28,5 @@ import { initializeIcons } from '@fluentui/font-icons-mdl2';
  * ```
  */
 initializeIcons();
-import './index.css';
-import './app';
+import "./index.css";
+import "./app";
