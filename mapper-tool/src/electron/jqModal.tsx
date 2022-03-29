@@ -166,6 +166,8 @@ export function generateQuery(mappings: MappingGridItem[]) {
     }" then {twinRawId:"${mapping["dtId"]}/${
       mapping.dtComponent ? mapping.dtComponent + "/" : ""
     }${mapping.dtPropertyName}",modelId:"${mapping["dtModelId"]}"${
+      mapping["dtName"] ? `, twinName:"${mapping["dtName"]}"` : ""
+    }${
       mapping["dtParentRelationships"] &&
       mapping["dtParentRelationships"].length > 0
         ? `, parentRelationships:${JSON.stringify(

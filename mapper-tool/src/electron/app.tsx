@@ -38,9 +38,9 @@ const UserCard = React.memo<{
 
   return (
     <Callout
-      isBeakVisible={false}
+      isBeakVisible={true}
       target={`#${target}`}
-      className="height-200 width-300 vertical-center-text"
+      className="height-200 width-300 vertical-center-text white-background margin-top-10"
     >
       <div className="flex-center">
         <Persona {...personaConfig} />

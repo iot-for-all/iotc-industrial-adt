@@ -100,7 +100,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     modelId: "",
   });
   const [invalidName, setInvalidName] = useBoolean(false);
-  const [showAddRel, setShowAddRel] = useBoolean(false);
+  const [showExtended, setShowExtended] = useBoolean(false);
 
   // search
   const [showModelSearch, setShowModelSearch] = useBoolean(false);
@@ -496,11 +496,11 @@ export function DtInputContainer(props: NodeViewerProps) {
                   {dtItem?.modelId && (
                     <IconButton
                       iconProps={{
-                        iconName: showAddRel ? "ChevronDown" : "ChevronRight",
+                        iconName: showExtended ? "ChevronDown" : "ChevronRight",
                       }}
                       className="simple-icon-button-small margin-end-xsmall"
                       styles={simpleIconStyles}
-                      onClick={setShowAddRel.toggle}
+                      onClick={setShowExtended.toggle}
                     />
                   )}
                   <div className="vertical-group expand">
@@ -509,8 +509,8 @@ export function DtInputContainer(props: NodeViewerProps) {
                       label=""
                       title={
                         !dtItem?.modelId
-                          ? "Choose model first, then enter new twin name"
-                          : "Enter name of new twin"
+                          ? "Choose model first, then enter new twin id"
+                          : "Enter id of new twin"
                       }
                       className="margin-bottom-xsmall add-input margin-end-xsmall"
                       value={newTwin.twinId}
@@ -520,58 +520,89 @@ export function DtInputContainer(props: NodeViewerProps) {
                       placeholder={
                         !dtItem?.modelId
                           ? "Choose from Models first"
-                          : "Enter name of new twin"
+                          : "Enter id of new twin"
                       }
                       disabled={!dtItem?.modelId}
                       onGetErrorMessage={onTwinNameError}
                       autoFocus
                     />
-                    {showAddRel && (
-                      <>
-                        <span className="font-small viewer-row-label">
-                          Relationships:
-                        </span>
-                        <Dropdown
-                          options={relationshipsOpts}
-                          multiSelect
-                          selectedKeys={
-                            newTwin.parentRels
-                              ? newTwin.parentRels.map((r) => r.source)
-                              : []
-                          }
-                          onRenderOption={onRelDropdownRenderOption}
-                          className="margin-bottom-xsmall add-input margin-end-xsmall"
-                          onChange={(_, parentOption) => {
-                            if (parentOption) {
-                              setNewTwin((current) =>
-                                parentOption.selected
-                                  ? {
-                                      ...current,
-                                      parentRels: [
-                                        ...(current.parentRels ?? []),
-                                        {
-                                          source: parentOption.key as string,
-                                          name: parentOption.data?.relName,
-                                          displayName:
-                                            parentOption.data?.relDisplayName,
-                                        },
-                                      ],
-                                    }
-                                  : {
-                                      ...current,
-                                      parentRels: current.parentRels.filter(
-                                        (p) =>
-                                          p.name !==
-                                            parentOption.data?.relName &&
-                                          p.source !==
-                                            (parentOption.key as string)
-                                      ),
-                                    }
-                              );
+                    {showExtended && (
+                      <div className="vertical-group expand">
+                        <div>
+                          <span className="font-small viewer-row-label">
+                            Name:
+                          </span>
+                          <TextField
+                            name="newTwin"
+                            label=""
+                            title={
+                              !dtItem?.modelId
+                                ? "Choose model first, then enter new twin name"
+                                : "Enter name of new twin"
                             }
-                          }}
-                        />
-                      </>
+                            className="margin-bottom-xsmall add-input margin-end-xsmall"
+                            value={newTwin.twinName}
+                            onChange={(_, twinName) =>
+                              setNewTwin((current) => ({
+                                ...current,
+                                twinName,
+                              }))
+                            }
+                            placeholder={
+                              !dtItem?.modelId
+                                ? "Choose from Models first"
+                                : "Enter name of new twin"
+                            }
+                            disabled={!dtItem?.modelId}
+                            autoFocus
+                          />
+                        </div>
+                        <div>
+                          <span className="font-small viewer-row-label">
+                            Relationship(s):
+                          </span>
+                          <Dropdown
+                            options={relationshipsOpts}
+                            multiSelect
+                            selectedKeys={
+                              newTwin.parentRels
+                                ? newTwin.parentRels.map((r) => r.source)
+                                : []
+                            }
+                            onRenderOption={onRelDropdownRenderOption}
+                            className="margin-bottom-xsmall add-input margin-end-xsmall"
+                            onChange={(_, parentOption) => {
+                              if (parentOption) {
+                                setNewTwin((current) =>
+                                  parentOption.selected
+                                    ? {
+                                        ...current,
+                                        parentRels: [
+                                          ...(current.parentRels ?? []),
+                                          {
+                                            source: parentOption.key as string,
+                                            name: parentOption.data?.relName,
+                                            displayName:
+                                              parentOption.data?.relDisplayName,
+                                          },
+                                        ],
+                                      }
+                                    : {
+                                        ...current,
+                                        parentRels: current.parentRels.filter(
+                                          (p) =>
+                                            p.name !==
+                                              parentOption.data?.relName &&
+                                            p.source !==
+                                              (parentOption.key as string)
+                                        ),
+                                      }
+                                );
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                   <IconButton

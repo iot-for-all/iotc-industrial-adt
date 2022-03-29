@@ -12,6 +12,9 @@ div.rsw_3G {
 .flex-align-right {
   margin-left: auto;
 }
+.white-background {
+  background-color: white;
+}
 
 .masthead {
   height: 3rem;
@@ -231,4 +234,8 @@ div.rsw_3G {
 
 .box {
   border: 1px solid black;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
 }

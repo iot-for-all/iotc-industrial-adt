@@ -267,7 +267,7 @@ function useGetCustomRows(
     const allRows: Node[] = [...inputRows];
 
     if (customTwin?.modelId && customTwin.twinId) {
-      const { modelId, twinId, parentRels } = customTwin;
+      const { modelId, twinId, twinName, parentRels } = customTwin;
 
       // modelTwinsMap has a key that is a modelId and a value that is an array of existing twins for that modelId.
       // new twins should not be in this array. they will be stored in the array for the map key that is equal to
@@ -338,7 +338,7 @@ function useGetCustomRows(
         key: generateId(),
         id: twinId,
         modelId: modelId,
-        name: twinId,
+        name: twinName ?? twinId,
         isModel: false,
         collapsed: separatorNode.collapsed,
         isNew: true,

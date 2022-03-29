@@ -112,6 +112,7 @@ export interface ParentRelationship {
 export interface CustomTwin {
   twinId: string;
   modelId: string;
+  twinName?: string;
   parentRels?: ParentRelationship[];
 }
 

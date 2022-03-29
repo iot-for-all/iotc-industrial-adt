@@ -301,9 +301,13 @@ export const Mapping = React.memo(function Mapping() {
               />
               <TextField
                 name="dtTwin"
-                label="Digital Twin Id"
+                label="Digital Twin"
                 className="margin-start-xsmall expand"
-                value={dtItem?.twinId || ""}
+                value={
+                  dtItem?.twinId
+                    ? `${dtItem.twinName ?? dtItem.twinId} (${dtItem.twinId})`
+                    : ""
+                }
                 title={`${dtItem?.twinId}: ${dtItem?.twinName}`}
                 readOnly
               />
@@ -317,7 +321,7 @@ export const Mapping = React.memo(function Mapping() {
               />
               <TextField
                 name="dtParent"
-                label="Digital Twin Parent Ids"
+                label="Digital Twin Parent Id(s)"
                 className="margin-start-xsmall expand"
                 value={
                   dtItem?.parentRels

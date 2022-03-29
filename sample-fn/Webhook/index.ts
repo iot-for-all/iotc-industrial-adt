@@ -1,4 +1,4 @@
-import { DigitalTwinsClient } from "@azure/digital-twins-core";
+import { DigitalTwinsClient, IncomingRelationship, } from "@azure/digital-twins-core";
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import {
   ClientSecretCredential,
@@ -34,7 +34,13 @@ type ParsedId = {
 
 type Payload = {
   twinRawId: string,
-  model?: string,
+  modelId?: string,
+  twinName?: string,
+  parentRelationships?: {
+    name: string;
+    displayName?: string;
+    source: string;
+  }[],
   value: any
 };
 
@@ -116,9 +122,10 @@ const httpTrigger: AzureFunction = async function (
           },
         },
       ];
-      // if (payload.model) {
-      //   await createTwin(payload, context);
-      // }
+      if (payload.modelId) {
+        twin = await createTwin(payload, context);
+        await createRelationships(payload, twin, context);
+      }
     }
     else {
       context.res.status = 401;
@@ -142,7 +149,7 @@ const httpTrigger: AzureFunction = async function (
    *
    */
   if (twin) {
-    const patch = buildPatchBody(twin, parsed, payload.value);
+    const patch = buildPatchBody(twin, parsed, payload);
     try {
       const update = await client.updateDigitalTwin(parsed.twinId, patch);
       context.res.status = 200;
@@ -177,14 +184,18 @@ const httpTrigger: AzureFunction = async function (
 function buildPatchBody(
   twin: any,
   parsed: ParsedId,
-  value: any
+  payload: Payload
 ) {
 
   return [{
     op: twin[parsed.propertyName] ? "replace" : "add",
     path: `/${parsed.componentName ? `${parsed.componentName}/` : ""}${parsed.propertyName}`,
-    value: value,
-  }];
+    value: payload.value,
+  }, ...(payload.twinName ? [{
+    op: twin['name'] ? "replace" : "add",
+    path: '/name',
+    value: payload.twinName,
+  }] : [])];
 }
 
 function parseTwinId(rawId: string): ParsedId | null {
@@ -202,6 +213,136 @@ function parseTwinId(rawId: string): ParsedId | null {
   }
   return res as ParsedId;
 
+}
+
+async function createRelationships(payload: Payload, twin: any, context: Context) {
+  /**
+     * CREATE RELATIONSHIP
+     */
+  if (payload.parentRelationships && payload.parentRelationships.length > 0) {
+    // fetch existing relationships
+    const existingRelationships: { [sourceId: string]: IncomingRelationship } = {};
+    if (twin) {
+      const rels = client.listIncomingRelationships(twin.$dtId);
+      for await (const rel of rels) {
+        existingRelationships[rel.sourceId] = rel;
+      }
+      return await Promise.all(payload.parentRelationships.map(async newRel => {
+        const existingRel = existingRelationships[newRel.source];
+        if (existingRel && existingRel.relationshipName === newRel.name) {
+          // relationship already exists. skip
+          return existingRel;
+        }
+        else {
+          try {
+            const $relationshipId = uuid4();
+            const relResponse = await client.upsertRelationship(newRel.source, $relationshipId, {
+              $sourceId: newRel.source,
+              $targetId: twin.$dtId,
+              $relationshipName: newRel.name,
+              $relationshipId
+            });
+            context.res.status = 201;
+            context.res.body = [...context.res.body, {
+              operation: 'CreateRelationship',
+              status: 'Success',
+              data: relResponse.body,
+              request: {
+                parent: newRel.source,
+                relationshipName: newRel.displayName ?? newRel.name
+              }
+            }];
+          }
+          catch (e) {
+            context.res.status = 400;
+            context.res.body = [...context.res.body, {
+              operation: 'CreateRelationship',
+              status: 'Fail',
+              data: e.message,
+              request: {
+                parent: newRel.source,
+                relationshipName: newRel.displayName ?? newRel.name
+              }
+            }];
+          }
+        }
+      }));
+    }
+  }
+}
+
+async function createTwin(payload: Payload, context: Context) {
+  /**
+   * CREATE
+   * Support twin creation when model is passed
+   */
+  if (payload.twinRawId && payload.modelId) {
+    context.log(`Model has been passed. Creating the twin if does not exists.`);
+
+    // fetch model to init right values
+    const modelDef = await client.getModel(payload.modelId, true);
+    const modelComponents = modelDef.model.contents?.filter((content) => content['@type'] === 'Component');
+    const modelProperties = modelDef.model.contents?.filter((content) => content['@type'] === 'Property');
+    const parsedPath = parseTwinId(payload.twinRawId);
+
+    let createOpts = {
+      $dtId: parsedPath.twinId,
+      $metadata: {
+        $model: payload.modelId
+      }
+    };
+
+    // init components
+    modelComponents.forEach(component => {
+      let compValue: any;
+      // property in component. need to initialize every component
+      if (parsedPath.componentName && parsedPath.componentName === component.name) {
+        compValue = { [parsedPath.propertyName]: payload.value }
+      }
+      createOpts[component.name] = {
+        $metadata: {},
+        ...(payload.twinName ? { name: payload.twinName } : {}),
+        ...(compValue ?? {})
+      }
+    });
+
+    //init properties
+    modelProperties.forEach(property => {
+      // property not in component
+      if (!parsedPath.componentName && parsedPath.propertyName === property.name) {
+        createOpts[property.name] = payload.value
+      }
+    });
+
+    try {
+      const twinResponse = await client.upsertDigitalTwin(parsedPath.twinId, JSON.stringify(createOpts));
+      context.res.status = 201;
+      context.res.body = [...context.res.body, {
+        operation: 'CreateTwin',
+        status: 'Success',
+        data: twinResponse,
+        request: {
+          id: parsedPath.twinId,
+          options: createOpts
+        }
+      }];
+      return twinResponse.body;
+    }
+    catch (e) {
+      context.log(`Error creating digital twin with id '${parsedPath.twinId}'.`);
+      context.res.status = 500;
+      context.res.body = [...context.res.body, {
+        operation: 'CreateTwin',
+        status: 'Fail',
+        data: e.message,
+        request: {
+          id: parsedPath.twinId,
+          options: createOpts
+        }
+      }]
+      return;
+    }
+  }
 }
 
 export default httpTrigger;
