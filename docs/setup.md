@@ -67,7 +67,7 @@ npm i -g azure-functions-core-tools@4 --unsafe-perm true
 
 Below is a required step to point the Azure Function to the Azure Digital Twins endpoint.
 
-Edit the _local.settings.json_ file in the function root folder and replace the value for the ADT_INSTANCE with the Digital Twins endpoint URL.
+Edit the _local.settings.json_ file in the function root folder ( or create if it does not exist) and replace the value for the ADT_INSTANCE with the Digital Twins endpoint URL.
 
 _e.g._
 

@@ -39,10 +39,10 @@ The current version of this tool makes the following assumptions:
 
 - **OPCUA**: An array containing (possibly nested) objects.
 
-  - There are three types of objects:
-    1.  namespace object, which is a parent node in a node hierarchy and does not contain telemetry,
-    2.  tag node, which represents telemetry, and
-    3.  property, which describes a field of a complex type.
+  - There are three types of objects: 
+     1) namespace object, which is a parent node in a node hierarchy and does not contain telemetry,
+     2) tag node, which represents telemetry, and
+     3) property, which describes a field of a complex type.
   - A namespace object should contain a key for each node it contains, where the key is the node id or name. If the namespace object represents an asset and do directly contains tag nodes (telemetry), it should list the tag nodes in an array under the key, 'tags'.
   - A tag node, which represents a telemetry value, must include a node id and type. It may optionally include a name.
     - If the node type is a complex type, the tag node should include a 'properties' key that contains an array of property objects.
@@ -108,23 +108,23 @@ The current version of this tool makes the following assumptions:
                       },
   </pre>
 
-- **ADT Twin Instances**: The format of the Digital twin instances input is a subset of the response returned by the Digital Twin's [Query Twins REST API](https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/query/querytwins). The response properties required for the Twins input file are **$dtId**, **$metadata** (and its contents) and optionally, **name**. The API response can be directly used as input; any unneeded properties will be ignored. Note that **continuationToken**, if present, will also be ignored. That means that if your twins query returns multiple pages of responses, you will need to concatenate all the responses' **value** arrays into a single array.
+- **ADT Twin Instances**: The format of the Digital twin instances input is a subset of the response returned by the Digital Twin's [Query Twins REST API](https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/query/querytwins). The response properties required for the Twins input file are **$dtId** and **$metadata** (and its contents). If a property called **name**  is defined for the twin, this property will be used as the twin's friendly name and displayed in the mapping tool. The API response can be directly used as input; any unneeded properties will be ignored. Note that  **continuationToken**, if present, will also be ignored. That means that if your twins query returns multiple pages of responses, you will need to concatenate all the responses'  **value** arrays into a single array.
 
-- **ADT Models**: The DTDL models for the twin instances should be provided as the input. These models can be retrieved by calling the [DigitalTwinsModels List](<https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/models/digitaltwinmodels_list#list-models-(include-dependencies-and-definitions)>) API and including the **includeModelDefinition** URI parameter.
+- **ADT Models**: The DTDL models for the twin instances should be provided as the input. These models can be retrieved by calling the [DigitalTwinsModels List](https://docs.microsoft.com/en-us/rest/api/digital-twins/dataplane/models/digitaltwinmodels_list#list-models-(include-dependencies-and-definitions)) API and including the **includeModelDefinition** URI parameter. 
 
 #### Mapping
 
 1. Start by loading the JSON files for the OPC-UA nodes, the Digital Twin instances and the Digital Twin models that describe those instances.
    Select the file load buttons \
-   ![load_button](../media/load_button.png) \
-   at the top of each input column to open the file load dialog, navigate to and select the desired input file.
+ ![load_button](../media/load_button.png) \
+ at the top of each input column to open the file load dialog, navigate to and select the desired input file.
 
 2. After loading the input files, mapping the nodes is fairly straightforward:
 
    ![step1](../media/step1.png) In the OPCUA column, click on the tag node (telemetry) you want to map.
-
+   
    ![step2](../media/step2.png) In the Twin instances column, click on the instance to which you want to map the selected OPCUA node's telemetry.
-
+   
    ![step3](../media/step3.png) In the Models column, click on the property of the twin that should receive the telemetry data.
 
    Each clicked row will be highlighted. To deselect it, click it again.
