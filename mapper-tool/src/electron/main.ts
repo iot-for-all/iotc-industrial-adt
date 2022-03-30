@@ -29,6 +29,7 @@ if (require("electron-squirrel-startup")) {
 let mainWindow: BrowserWindow;
 
 const createMainWindow = (): void => {
+  console.log("Creating main window");
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 768,
@@ -58,37 +59,63 @@ const createMainWindow = (): void => {
   const menu = Menu.buildFromTemplate([
     ...(isMac
       ? [
-          {
-            label: "OPCUA ADT Mapper",
-            submenu: [
-              aboutMenu,
-              {
-                role: "quit" as const,
-                label: "Quit",
-              },
-            ],
-          },
-          isDev
-            ? {
-                role: "viewMenu" as const,
-              }
-            : undefined,
-        ]
+        {
+          label: "OPCUA ADT Mapper",
+          submenu: [
+            aboutMenu,
+            {
+              role: "quit" as const,
+              label: "Quit",
+            },
+          ],
+        },
+        {
+          role: "editMenu" as const,
+          label: "Edit",
+          submenu: [
+            {
+              label: "Cut",
+              accelerator: "CmdOrCtrl+X",
+              role: "cut" as const,
+            },
+            {
+              label: "Copy",
+              accelerator: "CmdOrCtrl+C",
+              role: "copy" as const,
+            },
+            {
+              label: "Paste",
+              accelerator: "CmdOrCtrl+V",
+              role: "paste" as const,
+            },
+            {
+              label: "Select All",
+              accelerator: "CmdOrCtrl+A",
+              role: "selectAll" as const,
+            },
+          ],
+        },
+        isDev
+          ? {
+            role: "viewMenu" as const,
+          }
+          : undefined,
+      ]
       : [
-          {
-            label: "File",
-            submenu: [{ role: "quit" as const, label: "Exit" }],
-          },
-          isDev
-            ? {
-                role: "viewMenu" as const,
-              }
-            : undefined,
-          {
-            role: "help" as const,
-            submenu: [aboutMenu],
-          },
-        ]),
+        {
+          label: "File",
+          submenu: [{ role: "quit" as const, label: "Exit" }],
+        },
+        isDev
+          ? {
+            role: "viewMenu" as const,
+          }
+          : undefined,
+        {
+          role: "help" as const,
+          submenu: [aboutMenu],
+        },
+      ]),
   ]);
   app.applicationMenu = menu;
 };
@@ -168,5 +195,9 @@ ipcMain.handle("signInSilent", async () => {
 });
 
 ipcMain.handle("signOut", async () => {
-  await logout();
+  const authWindow = createAuthWindow();
+  if (isDev) {
+    authWindow.webContents.openDevTools();
+  }
+  return await logout(authWindow);
 });

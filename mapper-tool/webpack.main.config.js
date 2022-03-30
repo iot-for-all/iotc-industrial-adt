@@ -1,3 +1,5 @@
+const plugins = require('./webpack.plugins');
+const rules = require('./webpack.rules')
 module.exports = {
   /**
    * This is the main entry point for your application, it's the first file
@@ -6,8 +8,9 @@ module.exports = {
   entry: './src/electron/main.ts',
   // Put your normal webpack config below here
   module: {
-    rules: require('./webpack.rules'),
+    rules
   },
+  plugins,
   externals: {
     aboutWindow: 'about-window'
   },

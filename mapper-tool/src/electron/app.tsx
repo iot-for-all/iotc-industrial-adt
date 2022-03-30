@@ -14,6 +14,7 @@ import { Mapping } from "./mapping";
 import "./app.css";
 import { useBoolean, useId } from "@fluentui/react-hooks";
 import { AccountInfo, ElectronBridge } from "./models";
+import useIsAuthAvailable from "./core/hooks/useIsAuthAvailable";
 
 declare global {
   interface Window {
@@ -51,7 +52,8 @@ const UserCard = React.memo<{
 });
 
 const App = React.memo(function App() {
-  const [user, setUser] = React.useState<AccountInfo>();
+  const isAuthAvailable = useIsAuthAvailable();
+  const [user, setUser] = React.useState<AccountInfo | null>();
   const [userCardVisible, { toggle }] = useBoolean(false);
   const userIconId = useId();
 
@@ -63,46 +65,53 @@ const App = React.memo(function App() {
       }
       setUser(data);
     };
-    if (!user) {
+    if (isAuthAvailable && !user) {
       fn();
     }
-  }, [setUser, user]);
+  }, [isAuthAvailable, setUser, user]);
 
-  if (user) {
+  if (isAuthAvailable) {
     return (
-      <div>
-        <div className="masthead">
-          <h3 className="padding-horizontal flex1">OPCUA to DT Mapping Tool</h3>
-          <div className="right-align-flex">
-            <div className="link" onClick={toggle}>
-              <span className="margin-right-sm">
-                {user.name || user.username}
-              </span>
-              <div id={userIconId} className="round-border inline-block">
-                <Icon iconName="Contact" className="icon-30" />
-                {userCardVisible && (
-                  <UserCard
-                    target={userIconId}
-                    user={user}
-                    logout={async () => {
-                      const data = await window.electron.signOut();
-                      setUser(data);
-                    }}
-                  />
-                )}
+      <>
+        {user ? (
+          <div>
+            <div className="masthead">
+              <h3 className="padding-horizontal flex1">
+                OPCUA to DT Mapping Tool
+              </h3>
+              <div className="right-align-flex">
+                <div className="link" onClick={toggle}>
+                  <span className="margin-right-sm">
+                    {user.name || user.username}
+                  </span>
+                  <div id={userIconId} className="round-border inline-block">
+                    <Icon iconName="Contact" className="icon-30" />
+                    {userCardVisible && (
+                      <UserCard
+                        target={userIconId}
+                        user={user}
+                        logout={async () => {
+                          toggle();
+                          await window.electron.signOut();
+                          setUser(null);
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+            <Mapping />
           </div>
-        </div>
-        <Mapping />
-      </div>
+        ) : (
+          <div className="flex-center full-height justify-center">
+            <Spinner size={SpinnerSize.large} />
+          </div>
+        )}
+      </>
     );
   }
-  return (
-    <div className="flex-center full-height justify-center">
-      <Spinner size={SpinnerSize.large} />
-    </div>
-  );
+  return <Mapping />;
 });
 
 function render() {

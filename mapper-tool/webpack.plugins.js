@@ -1,5 +1,7 @@
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
 
 module.exports = [new ForkTsCheckerWebpackPlugin(),
 new FileManagerPlugin({
@@ -17,4 +19,7 @@ new FileManagerPlugin({
             ],
         },
     },
-}),];
+}),
+new webpack.EnvironmentPlugin({
+    ...dotenv.config().parsed
+})];

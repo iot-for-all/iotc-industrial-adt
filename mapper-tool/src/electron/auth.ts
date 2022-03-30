@@ -4,15 +4,22 @@ import {
   AuthorizationUrlRequest,
   Configuration,
   CryptoProvider,
+  ICachePlugin,
   PublicClientApplication,
   TokenCacheContext,
 } from "@azure/msal-node";
-import { CACHE_LOCATION, REDIRECT_URL } from "./core/constants";
+import {
+  CACHE_LOCATION,
+  CLIENT_ID,
+  TENANT_ID,
+  REDIRECT_URL,
+} from "./core/constants";
 import fs from "fs/promises";
 import path from "path";
 import { BrowserWindow, protocol } from "electron";
+import isDev from "electron-is-dev";
 
-const cachePlugin = {
+const cachePlugin: ICachePlugin = {
   beforeCacheAccess: async (cacheContext: TokenCacheContext) => {
     try {
       const data = await fs.readFile(CACHE_LOCATION, "utf-8");
@@ -30,9 +37,8 @@ const cachePlugin = {
 
 const MSAL_CONFIG: Configuration = {
   auth: {
-    clientId: "3e9a455b-b362-4872-a159-7b769ad497fe",
-    authority:
-      "https://login.microsoftonline.com/4ac2d501-d648-4bd0-8486-653a65f90fc7",
+    clientId: CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${TENANT_ID}`,
   },
   cache: {
     cachePlugin,
@@ -77,7 +83,7 @@ async function listenForAuthCode(
       const requestUrl = new URL(req.url);
       // parsing redirect query string to get auth code
       const authCode = requestUrl.searchParams.get("code");
-      if (authCode) {
+      if (requestUrl.hostname === "auth" && authCode) {
         protocol.unregisterProtocol(REDIRECT_URL);
         res(authCode);
       } else {
@@ -85,7 +91,9 @@ async function listenForAuthCode(
       }
       callback(path.normalize(`${__dirname}/${requestUrl.pathname}`));
     });
-    authWindow.webContents.openDevTools();
+    if (isDev) {
+      authWindow.webContents.openDevTools();
+    }
     authWindow.loadURL(navigateUrl);
   });
 }
@@ -167,9 +175,39 @@ export async function loginSilent(): Promise<AccountInfo> {
   return account;
 }
 
-export async function logout(): Promise<void> {
+export async function logout(authWindow: BrowserWindow): Promise<void | null> {
+  const LOGOUT_URL = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/logoutsession`;
   if (account) {
     await msalInstance.getTokenCache().removeAccount(account);
+    await fs.rm(CACHE_LOCATION);
     account = null;
+    try {
+      await new Promise<void>((resolve, reject) => {
+        let loggedOut = false;
+        authWindow.webContents.on("did-navigate", (_, url) => {
+          if (url === LOGOUT_URL) {
+            // navigated to signout
+            loggedOut = true;
+          }
+        });
+        authWindow.on("closed", () => {
+          console.log(`Loggedout: ${loggedOut}`);
+          if (loggedOut) {
+            resolve();
+          } else {
+            reject();
+          }
+        });
+        if (isDev) {
+          authWindow.webContents.openDevTools();
+        }
+        authWindow.loadURL(
+          `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/logout`
+        );
+      });
+      return null;
+    } catch (e) {
+      return;
+    }
   }
 }

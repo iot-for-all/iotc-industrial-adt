@@ -42,6 +42,7 @@ import { TooltipIconButton } from "./core/controls/tooltipIconButton";
 import { ErrorBoundary } from "./core/controls/errorBoundary";
 import { HideSearch } from "./hideSearchSvg";
 import { API_VERSIONS, TOKEN_AUDIENCES } from "./core/constants";
+import useIsAuthAvailable from "./core/hooks/useIsAuthAvailable";
 
 export interface NodeViewerProps {
   twinJsonFile: File;
@@ -83,7 +84,8 @@ export function DtInputContainer(props: NodeViewerProps) {
     loadingInstances,
     { setTrue: startLoadInstances, setFalse: stopLoadInstances },
   ] = useBoolean(false);
-  const [useFiles, { toggle: toggleFiles }] = useBoolean(false);
+  const isAuthAvailable = useIsAuthAvailable();
+  const [useFiles, { toggle: toggleFiles }] = useBoolean(!isAuthAvailable);
   const [adtItems, setAdtItems] = React.useState<IDropdownOption[]>([]);
   const [
     modelsLoading,
@@ -367,27 +369,31 @@ export function DtInputContainer(props: NodeViewerProps) {
             />
           </div>
         )}
-        <div className="option-toggle">
-          <Toggle
-            label="Load from files"
-            inlineLabel
-            onText="On"
-            offText="Off"
-            onChange={toggleFiles}
-          />
-        </div>
+        {isAuthAvailable && (
+          <div className="option-toggle">
+            <Toggle
+              label="Load from files"
+              inlineLabel
+              onText="On"
+              offText="Off"
+              onChange={toggleFiles}
+            />
+          </div>
+        )}
         <div className="horizontal-group expand no-scroll-parent">
           <div className="vertical-group twins-viewer margin-end-xsmall">
             <div className="flatten-toggle horizontal-group justify-ends">
               <div className="section-header align-bottom">Models</div>
               <div className="horizontal-group search-toggle margin-end-xsmall">
-                <IconButton
-                  iconProps={{ iconName: "Sync" }}
-                  onClick={async () => {
-                    startLoadModels();
-                    await fetchModels(hostname);
-                  }}
-                />
+                {isAuthAvailable && (
+                  <IconButton
+                    iconProps={{ iconName: "Sync" }}
+                    onClick={async () => {
+                      startLoadModels();
+                      await fetchModels(hostname);
+                    }}
+                  />
+                )}
                 <TooltipIconButton
                   onClick={setShowModelSearch.toggle}
                   iconProps={{
@@ -452,13 +458,15 @@ export function DtInputContainer(props: NodeViewerProps) {
                     tooltip="Show/hide add input field"
                     className="add"
                   />
-                  <IconButton
-                    iconProps={{ iconName: "Sync" }}
-                    onClick={async () => {
-                      startLoadTwins();
-                      await fetchTwins(hostname);
-                    }}
-                  />
+                  {isAuthAvailable && (
+                    <IconButton
+                      iconProps={{ iconName: "Sync" }}
+                      onClick={async () => {
+                        startLoadTwins();
+                        await fetchTwins(hostname);
+                      }}
+                    />
+                  )}
                 </div>
                 <div className="vertical-group search-toggle margin-end-xsmall">
                   <TooltipIconButton

@@ -8,9 +8,10 @@
     "url": "https://github.com/iot-for-all/iotc-industrial-adt/issues"
   },
   "author": "jahollie",
-  "description": "OPC-UA node to Azure Digital Twin mapper",
+  "description": "OPC-UA nodes to Azure Digital Twins mapper",
   "scripts": {
     "start": "electron-forge start",
+    "debug": "electron-forge start --inspect-electron",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make:mac": "electron-forge make --targets @electron-forge/maker-dmg",
@@ -102,6 +103,7 @@
     "@typescript-eslint/parser": "^5.0.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.0",
     "css-loader": "^6.0.0",
+    "dotenv": "^16.0.0",
     "electron": "16.0.7",
     "eslint": "^8.0.1",
     "eslint-plugin-etc": "^2.0.2",
