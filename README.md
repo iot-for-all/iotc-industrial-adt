@@ -15,6 +15,8 @@ The sample function in this repository, accepts POST requests with a payload def
 ```json
 {
   "twinRawId": "<DIGITAL_TWIN_COMPLEX_ID>",
+  "twinName": "[FRIENDLY_NAME (OPTIONAL)]",
+  "modelId": "[DTDL_MODEL_ID (OPTIONAL)]",
   "value": "<PROPERTY_VALUE>"
 }
 ```
