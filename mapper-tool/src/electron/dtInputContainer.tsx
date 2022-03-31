@@ -374,6 +374,7 @@ export function DtInputContainer(props: NodeViewerProps) {
             <Toggle
               label="Load from files"
               inlineLabel
+              checked={useFiles}
               onText="On"
               offText="Off"
               onChange={toggleFiles}

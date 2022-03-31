@@ -4,7 +4,12 @@ import {
   getAdtTwins,
   getTwinIncomingRelationships,
 } from "./azure";
-import { TOKEN_AUDIENCES } from "./core/constants";
+import {
+  TOKEN_AUDIENCES,
+  CLIENT_ID,
+  TENANT_ID,
+  REDIRECT_URL,
+} from "./core/constants";
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import * as fs from "fs";
 import isDev from "electron-is-dev";
@@ -59,63 +64,63 @@ const createMainWindow = (): void => {
   const menu = Menu.buildFromTemplate([
     ...(isMac
       ? [
-        {
-          label: "OPCUA ADT Mapper",
-          submenu: [
-            aboutMenu,
-            {
-              role: "quit" as const,
-              label: "Quit",
-            },
-          ],
-        },
-        {
-          role: "editMenu" as const,
-          label: "Edit",
-          submenu: [
-            {
-              label: "Cut",
-              accelerator: "CmdOrCtrl+X",
-              role: "cut" as const,
-            },
-            {
-              label: "Copy",
-              accelerator: "CmdOrCtrl+C",
-              role: "copy" as const,
-            },
-            {
-              label: "Paste",
-              accelerator: "CmdOrCtrl+V",
-              role: "paste" as const,
-            },
-            {
-              label: "Select All",
-              accelerator: "CmdOrCtrl+A",
-              role: "selectAll" as const,
-            },
-          ],
-        },
-        isDev
-          ? {
-            role: "viewMenu" as const,
-          }
-          : undefined,
-      ]
+          {
+            label: "OPCUA ADT Mapper",
+            submenu: [
+              aboutMenu,
+              {
+                role: "quit" as const,
+                label: "Quit",
+              },
+            ],
+          },
+          {
+            role: "editMenu" as const,
+            label: "Edit",
+            submenu: [
+              {
+                label: "Cut",
+                accelerator: "CmdOrCtrl+X",
+                role: "cut" as const,
+              },
+              {
+                label: "Copy",
+                accelerator: "CmdOrCtrl+C",
+                role: "copy" as const,
+              },
+              {
+                label: "Paste",
+                accelerator: "CmdOrCtrl+V",
+                role: "paste" as const,
+              },
+              {
+                label: "Select All",
+                accelerator: "CmdOrCtrl+A",
+                role: "selectAll" as const,
+              },
+            ],
+          },
+          isDev
+            ? {
+                role: "viewMenu" as const,
+              }
+            : undefined,
+        ]
       : [
-        {
-          label: "File",
-          submenu: [{ role: "quit" as const, label: "Exit" }],
-        },
-        isDev
-          ? {
-            role: "viewMenu" as const,
-          }
-          : undefined,
-        {
-          role: "help" as const,
-          submenu: [aboutMenu],
-        },
-      ]),
+          {
+            label: "File",
+            submenu: [{ role: "quit" as const, label: "Exit" }],
+          },
+          isDev
+            ? {
+                role: "viewMenu" as const,
+              }
+            : undefined,
+          {
+            role: "help" as const,
+            submenu: [aboutMenu],
+          },
+        ]),
   ]);
   app.applicationMenu = menu;
 };
@@ -157,6 +162,10 @@ ipcMain.handle("loadFile", async (e, filePath) => {
     throw new Error("Forbidden");
   }
   return await fs.promises.readFile(filePath, "utf8");
+});
+
+ipcMain.handle("isAuthAvailable", () => {
+  return !!CLIENT_ID && !!TENANT_ID && !!REDIRECT_URL;
 });
 
 ipcMain.handle("signIn", async () => {

@@ -1,6 +1,7 @@
 import { ipcRenderer, contextBridge } from "electron";
 
 contextBridge.exposeInMainWorld("electron", {
+  isAuthAvailable: () => ipcRenderer.invoke("isAuthAvailable"),
   loadFile: (filePath: string) => ipcRenderer.invoke("loadFile", filePath),
   signIn: () => ipcRenderer.invoke("signIn"),
   signInSilent: () => ipcRenderer.invoke("signInSilent"),

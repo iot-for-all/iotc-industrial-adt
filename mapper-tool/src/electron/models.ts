@@ -49,6 +49,7 @@ export type RelationshipBasic = {
 };
 
 export interface ElectronBridge {
+  isAuthAvailable: () => boolean;
   loadFile: (filePath: string) => Promise<string>;
   signIn: () => Promise<AccountInfo>;
   signInSilent: () => Promise<AccountInfo>;

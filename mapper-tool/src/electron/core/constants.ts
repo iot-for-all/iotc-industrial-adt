@@ -1,4 +1,3 @@
-// import "dotenv/config";
 // This file contains definitions for app level constants used across all folder types.
 // Experience, shell, or other specific constants should be placed elsewhere.
 // These constants are used to prevent performing work multiple times and avoiding creating new references.
@@ -27,12 +26,12 @@ export const EMPTY_FUNC = () => {
  * AUTHENTICATION PARAMETERS
  * replace with valid values
  */
-// export const CLIENT_ID = "3e9a455b-b362-4872-a159-7b769ad497fe";
-// export const TENANT_ID = "4ac2d501-d648-4bd0-8486-653a65f90fc7";
-// export const REDIRECT_URL = "msal3e9a455b-b362-4872-a159-7b769ad497fe";
-export const CLIENT_ID = process.env.CLIENT_ID || ""; // AAD Application Id
-export const TENANT_ID = process.env.TENANT_ID || ""; // Azure Tenant Id or Name
-export const REDIRECT_URL = process.env.REDIRECT_URL || ""; // AAD Application redirect (MSAL)
+export const CLIENT_ID =
+  typeof window !== "undefined" ? "" : process.env.CLIENT_ID || ""; // AAD Application Id
+export const TENANT_ID =
+  typeof window !== "undefined" ? "" : process.env.TENANT_ID || ""; // Azure Tenant Id or Name
+export const REDIRECT_URL =
+  typeof window !== "undefined" ? "" : process.env.REDIRECT_URL || ""; // AAD Application redirect (MSAL)
 
 export const CACHE_LOCATION = "./data/cache.json";
 
