@@ -14,8 +14,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-If you see 'unable to load preload.js' in the console, make a small edit to app.tsx (e.g., add a space after the first global declaration) and save. The error will go away on hot reload. This issue only occurs in development mode.
-
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\
@@ -43,10 +41,10 @@ The current version of this tool makes the following assumptions:
     1.  namespace object, which is a parent node in a node hierarchy and does not contain telemetry,
     2.  tag node, which represents telemetry, and
     3.  property, which describes a field of a complex type.
-  - A namespace object should contain a key for each node it contains, where the key is the node id or name. If the namespace object represents an asset and do directly contains tag nodes (telemetry), it should list the tag nodes in an array under the key, 'tags'.
+  - A namespace object should contain a key for each node it contains, where the key is the node id or name. If the namespace object represents an asset and directly contains tag nodes (telemetry), it should list the tag nodes in an array under the key, 'tags'.
   - A tag node, which represents a telemetry value, must include a node id and type. It may optionally include a name.
     - If the node type is a complex type, the tag node should include a 'properties' key that contains an array of property objects.
-    - Properties are objects that contain a name and type. The type can recursively be complex, that is, if the type of the property is 'complex', it should contain a 'properties' key that lists the property objects of that type.
+    - Properties are objects that contain a name and type. The type can recursively be complex; that is, if the type of the property is 'complex', it should contain a 'properties' key that lists the property objects of that type.
   - Following is an excerpt of sample input:
   <pre>
   [
@@ -120,8 +118,10 @@ Follow these steps to configure the tool before building it:
 
 1. Create an Azure App Registration ([https://docs.microsoft.com/en-gb/graph/auth-register-app-v2](https://docs.microsoft.com/en-gb/graph/auth-register-app-v2)).
    - Make sure to add "Mobile and desktop applications" platform and select the "MSAL only" redirect URI provided by default. Also copy its value as will be needed for configuration.
-2. Edit required permissions in application manifest.
-   Add below items under the _"requiredResourceAccess"_ section:
+   ![platform](../media/aad_platform.png)
+   ![platform2](../media/aad_platform2.png)
+2. Edit required permissions in the application manifest.
+   Under the _"requiredResourceAccess"_ section, add the items shown below:
    ![manifest](../media/aad_manifest.png)
 
 ```json
@@ -154,8 +154,8 @@ Follow these steps to configure the tool before building it:
 		}
 ```
 
-3. Copy "Redirect URI" from step above and both "Application (client) ID" and "Directory (tenant) ID" from the _Overview_ tab of the application in the portal.
-4. Create a file called _".env"_ in the tool root folder and add these lines replacing values with inputs from previous steps:
+3. Copy "Redirect URI" from the step above and both "Application (client) ID" and "Directory (tenant) ID" from the _Overview_ tab of the application in the portal.
+4. Create a file called _".env"_ in the tool root folder and add these lines replacing values with inputs from the previous steps:
 
 ```env
 CLIENT_ID = <APPLICATION_CLIENT_ID>
