@@ -119,9 +119,9 @@ Follow these steps to configure the tool before building it:
 1. Create an Azure App Registration ([https://docs.microsoft.com/en-gb/graph/auth-register-app-v2](https://docs.microsoft.com/en-gb/graph/auth-register-app-v2)).
    - Make sure to add "Mobile and desktop applications" platform and select the "MSAL only" redirect URI provided by default. Also copy its value as will be needed for configuration.
    
-   <!-- --> | <!-- -->
-   :---|---:
-   ![platform](../media/aad_platform.png)|![platform2](../media/aad_platform2.png)
+   | <!-- --> | <!-- --> |
+   |---|---|
+   |![platform](../media/aad_platform.png)|![platform2](../media/aad_platform2.png)|
 2. 
 Edit required permissions in the application manifest.
    Under the _"requiredResourceAccess"_ section, add the items shown below:
