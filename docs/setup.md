@@ -131,6 +131,35 @@ az functionapp identity show --resource-group <FUNCTION_RESOURCE_GROUP_NAME> --n
 az dt role-assignment create --dt-name <ADT_NAME> --assignee "<principal-ID>" --role "Azure Digital Twins Data Owner"
 ```
 
+## Upload models ontology to Digital Twins
+If you did not already load your Digital Twins instance with models you need to upload them before starting the export flow, otherwise twins cannot be created.
+You can search for automated tools to upload an entire ontology directly to ADT or you can manually setup it using the Web Explorer currently in preview ([https://docs.microsoft.com/en-US/azure/digital-twins/concepts-azure-digital-twins-explorer](https://docs.microsoft.com/en-US/azure/digital-twins/concepts-azure-digital-twins-explorer)).
+
+### Special properties
+This solution and the mapping configuration tool can optionally use a particular property of each model to be considered as a _display name_ for the twin getting created. This allows, for instance, to select the property in the Twins Explorer and show twin names instead of ids.
+In order to achieve that, your models should have a property called "name" of type "string" in the root interface or in an inherited one. If the property is defined in a component, that will not work.
+
+e.g.
+```json
+{
+            "@id": "dtmi:com:microsoft:iot:central:opc_ua:factory;1",
+            "@type": "Interface",
+            "displayName": "OPC Factory",
+            "@context": "dtmi:dtdl:context;2",
+            "contents": [
+                {
+                    "@type": "Property",
+                    "name": "name",
+                    "displayName": {
+                        "en": "Factory Name"
+                    },
+                    "schema": "string"
+                },
+                ...
+            ]
+}
+```
+
 ## Create a compatible IoT Central Export
 
 Create a new destination of "Webhook" type and provide the Azure Function "Invoke url" obtained before.

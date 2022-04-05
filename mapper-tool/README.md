@@ -195,7 +195,7 @@ The tool allows to define mappings containing details needed for automatic creat
 2. Click on the "+" icon of the "Twin Instances" to show the "New Twin" form.
    ![newtwin](../media/newtwin.png)
 3. Insert the Id for the twin to be created.
-   - (optional) advanced options are available by expanding the form clicking on the left arrow icon; those include a friendly name for the twin (see #TODO) and available parent relationships.
+   - (optional) advanced options are available by expanding the form clicking on the left arrow icon; those include a friendly name for the twin (see [Special Properties](../docs/setup.md#special-properties)) and available parent relationships.
      ![newtwinadv](../media/newtwin_advanced.png)
 4. Click on the "+" button to save the new twin.
 

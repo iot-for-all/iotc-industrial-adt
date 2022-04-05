@@ -25,7 +25,7 @@ where _<DIGITAL_TWIN_COMPLEX_ID>_ is the unique identifier of a property in a Tw
 
 Then it parses the _id_ to build the right API URL and update the property with the requested value.
 
-The _jq_ transformation query to produce such an input can be quite complex and hard to manually define without incurring in errors. For this reason, we provide a [multi-platform configuration tool](#configuration-tool) to help.
+The _jq_ transformation query to produce such an input can be quite complex and hard to manually define without incurring in errors. For this reason, we provide a __multi-platform configuration tool__ (see below) to help.
 
 ## Resources Setup
 
