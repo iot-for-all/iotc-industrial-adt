@@ -21,7 +21,7 @@ import { downloadFile } from "./core/controls/downloadFile";
 import { Twin } from "./dtTwinsViewer";
 import { Interface } from "./dtModelViewer";
 
-export const Mapping = React.memo(function Mapping() {
+export const Mapping = React.memo<{ isAuthAvailable: boolean }>(function Mapping({ isAuthAvailable }) {
   const [opcuaFile, setOpcuaFile] = React.useState<File>(); // json input file for opcua definitions
   const [opcuaJson, setOpcuaJson] = React.useState<object>({}); // json content from the opcua input file
 
@@ -126,11 +126,11 @@ export const Mapping = React.memo(function Mapping() {
   const onSelectOpcuaInput = React.useCallback((tagNode: TagNode) => {
     const opcua: OpcuaItem = tagNode
       ? {
-          key: tagNode.key,
-          nodeId: tagNode.id,
-          nodeName: tagNode.name,
-          namespace: tagNode.namespace,
-        }
+        key: tagNode.key,
+        nodeId: tagNode.id,
+        nodeName: tagNode.name,
+        namespace: tagNode.namespace,
+      }
       : undefined;
     setOpcuaItem(opcua);
   }, []);
@@ -258,6 +258,7 @@ export const Mapping = React.memo(function Mapping() {
             selectedItemKey={opcuaItem?.key}
           />
           <DtInputContainer
+            isAuthAvailable={isAuthAvailable}
             twinJsonFile={dtTwinsFile}
             setTwinJsonFile={setDtTwinsFile}
             twinJsonContent={dtTwinsJson}

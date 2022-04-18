@@ -38,7 +38,7 @@ const cachePlugin: ICachePlugin = {
 const MSAL_CONFIG: Configuration = {
   auth: {
     clientId: CLIENT_ID,
-    authority: `https://login.microsoftonline.com/${TENANT_ID}`,
+    authority: `https://login.microsoftonline.com/${TENANT_ID}`
   },
   cache: {
     cachePlugin,

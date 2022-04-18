@@ -52,7 +52,7 @@ const UserCard = React.memo<{
 });
 
 const App = React.memo(function App() {
-  const isAuthAvailable = useIsAuthAvailable();
+  const [initializing, isAuthAvailable] = useIsAuthAvailable();
   const [user, setUser] = React.useState<AccountInfo | null>();
   const [userCardVisible, { toggle }] = useBoolean(false);
   const userIconId = useId();
@@ -70,7 +70,7 @@ const App = React.memo(function App() {
     }
   }, [isAuthAvailable, setUser, user]);
 
-  if (isAuthAvailable) {
+  if (initializing || isAuthAvailable) {
     return (
       <>
         {user ? (
@@ -101,7 +101,7 @@ const App = React.memo(function App() {
                 </div>
               </div>
             </div>
-            <Mapping />
+            <Mapping isAuthAvailable={isAuthAvailable} />
           </div>
         ) : (
           <div className="flex-center full-height justify-center">
@@ -111,7 +111,7 @@ const App = React.memo(function App() {
       </>
     );
   }
-  return <Mapping />;
+  return <Mapping isAuthAvailable={isAuthAvailable} />;
 });
 
 function render() {
