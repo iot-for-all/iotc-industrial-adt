@@ -30,7 +30,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "OPCUA ADT Mapper"
+            "name": "OpcuaAdtMapper"
           }
         },
         {

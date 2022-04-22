@@ -16,6 +16,14 @@ new FileManagerPlugin({
                     source: './src/mapper-logo.png',
                     destination: './.webpack/main/logo.png',
                 },
+                {
+                    source: './node_modules/about-window/src',
+                    destination: './.webpack/main/native_modules/src',
+                },
+                {
+                    source: './node_modules/about-window/styles',
+                    destination: './.webpack/main/native_modules/styles',
+                },
             ],
         },
     },
