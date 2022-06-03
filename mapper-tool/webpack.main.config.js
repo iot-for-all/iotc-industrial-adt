@@ -11,6 +11,9 @@ module.exports = {
     rules
   },
   plugins,
+  externals: {
+    aboutWindow: 'commonjs about-window'
+  },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
   }

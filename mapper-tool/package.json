@@ -15,6 +15,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make:mac": "electron-forge make --targets @electron-forge/maker-dmg",
+    "make:win": "electron-forge make --targets @electron-forge/maker-squirrel",
     "publish": "electron-forge publish",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./src",
     "format": "prettier --write src/",
@@ -24,6 +25,7 @@
     "forge": {
       "packagerConfig": {
         "name": "OPCUA-ADT Mapper",
+        "executableName": "opcdt-mapper",
         "icon": "./mapper-logo.icns"
       },
       "makers": [
@@ -53,13 +55,9 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {
-            "name": "opcua-adt-mapper"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "platforms": [
+            "linux"
+          ]
         }
       ],
       "plugins": [

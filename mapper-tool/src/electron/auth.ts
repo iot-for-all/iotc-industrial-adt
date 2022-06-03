@@ -25,11 +25,13 @@ const cachePlugin: ICachePlugin = {
       const data = await fs.readFile(CACHE_LOCATION, "utf-8");
       return cacheContext.tokenCache.deserialize(data);
     } catch (ex) {
+      await fs.mkdir(path.dirname(CACHE_LOCATION), { recursive: true });
       await fs.writeFile(CACHE_LOCATION, cacheContext.tokenCache.serialize());
     }
   },
   afterCacheAccess: async (cacheContext: TokenCacheContext) => {
     if (cacheContext.cacheHasChanged) {
+      await fs.mkdir(path.dirname(CACHE_LOCATION), { recursive: true });
       await fs.writeFile(CACHE_LOCATION, cacheContext.tokenCache.serialize());
     }
   },
