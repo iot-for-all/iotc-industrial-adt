@@ -1,0 +1,27 @@
+{
+    "@id": "dtmi:com:microsoft:iot:central:opc_ua:floor;1",
+    "@type": "Interface",
+    "displayName": "OPC Factory - Floor",
+    "@context": [
+        "dtmi:dtdl:context;2"
+    ],
+    "extends": "dtmi:com:microsoft:iot:central:opc_ua:name;1",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "rooms",
+            "displayName": {
+                "en": "# Rooms"
+            },
+            "schema": "integer"
+        },
+        {
+            "@type": "Relationship",
+            "displayName": {
+                "en": "Has assets"
+            },
+            "name": "contains",
+            "target": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1"
+        }
+    ]
+}

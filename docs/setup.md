@@ -28,29 +28,31 @@ For Azure CLI, this become as simple as running this script:
 #!/bin/bash
 
 # Function app and storage account names must be unique.
-storageName=mystorageaccount$RANDOM
-functionAppName=myserverlessfunc$RANDOM
-region=westeurope
+SUBSCRIPTION_ID="<subscription_id>"
+RESOURCE_GROUP="<resource_group_name>"
+STORAGE_NAME="<storage_account_name>"
+FUNCTION_APP_NAME="<functionapp_name>"
+REGION="<region_name>"
 
 # Create a resource group.
-az group create --name myResourceGroup --location $region
+az group create --name "$RESOURCE_GROUP" --location "$REGION"
 
 # Create an Azure storage account in the resource group.
 az storage account create \
-  --name $storageName \
-  --location $region \
-  --resource-group myResourceGroup \
+  --name "$STORAGE_NAME" \
+  --location "$REGION" \
+  --resource-group "$RESOURCE_GROUP" \
   --sku Standard_LRS
 
 # Create a serverless function app in the resource group.
 az functionapp create \
-  --name $functionAppName \
-  --storage-account $storageName \
-  --consumption-plan-location $region \
-  --resource-group myResourceGroup \
+  --name "$FUNCTION_APP_NAME" \
+  --storage-account "$STORAGE_NAME" \
+  --consumption-plan-location "$REGION" \
+  --resource-group "$RESOURCE_GROUP" \
   --os-type linux \
   --runtime node \
-  --runtime-version 14 \
+  --runtime-version 16 \
   --functions-version 4
 ```
 
@@ -134,6 +136,8 @@ az dt role-assignment create --dt-name <ADT_NAME> --assignee "<principal-ID>" --
 ## Upload models ontology to Digital Twins
 If you did not already load your Digital Twins instance with models you need to upload them before starting the export flow, otherwise twins cannot be created.
 You can search for automated tools to upload an entire ontology directly to ADT or you can manually setup it using the Web Explorer currently in preview ([https://docs.microsoft.com/en-US/azure/digital-twins/concepts-azure-digital-twins-explorer](https://docs.microsoft.com/en-US/azure/digital-twins/concepts-azure-digital-twins-explorer)).
+
+The [_samples_](../samples/) folder contains a simple factory ontology to use for testing purposes.
 
 ### Special properties
 This solution and the mapping configuration tool can optionally use a particular property of each model to be considered as a _display name_ for the twin getting created. This allows, for instance, to select the property in the Twins Explorer and show twin names instead of ids.

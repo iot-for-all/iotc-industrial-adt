@@ -1,0 +1,55 @@
+{
+    "@id": "dtmi:com:microsoft:iot:central:opc_ua:widget_maker;1",
+    "@type": "Interface",
+    "displayName": "OPC Factory - Widget Maker",
+    "@context": [
+        "dtmi:dtdl:context;2"
+    ],
+    "extends": "dtmi:com:microsoft:iot:central:opc_ua:name;1",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "widget_count",
+            "displayName": {
+                "en": "Widget Count"
+            },
+            "schema": "integer",
+            "writable": true
+        },
+        {
+            "@type": "Property",
+            "name": "spindle_rpm",
+            "displayName": {
+                "en": "Spindle RPM"
+            },
+            "schema": "float",
+            "writable": true
+        },
+        {
+            "@type": "Property",
+            "name": "coolant_temp",
+            "displayName": {
+                "en": "Coolant Temperature"
+            },
+            "schema": "float",
+            "writable": true
+        },
+        {
+            "@type": "Property",
+            "name": "error_count",
+            "displayName": {
+                "en": "Error count"
+            },
+            "schema": "integer",
+            "writable": true
+        },
+        {
+            "@type": "Property",
+            "name": "humidity",
+            "displayName": {
+                "en": "Tape humidity"
+            },
+            "schema": "float"
+        }
+    ]
+}

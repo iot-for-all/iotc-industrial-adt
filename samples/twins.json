@@ -1,0 +1,53 @@
+{
+    "value": [
+        {
+            "$dtId": "factory",
+            "name": "Contoso Factory",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:factory;1"
+            }
+        },
+        {
+            "$dtId": "bl01",
+            "name": "Building 01",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:building;1"
+            }
+        },
+        {
+            "$dtId": "bl01fl01",
+            "name": "Floor 01",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+            }
+        },
+        {
+            "$dtId": "bl01fl02",
+            "name": "Floor 02",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+            }
+        },
+        {
+            "$dtId": "bl02",
+            "name": "Building 02",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:building;1"
+            }
+        },
+        {
+            "$dtId": "bl02fl01",
+            "name": "Floor 01",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+            }
+        },
+        {
+            "$dtId": "bl02fl02",
+            "name": "Floor 02",
+            "$metadata": {
+                "$model": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+            }
+        }
+    ]
+}

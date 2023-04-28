@@ -1,0 +1,250 @@
+[
+    {
+        "ContosoFactory": {
+            "Bulding01": {
+                "Floor01": {
+                    "Widget_Maker_1": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=13",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=12",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=11",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=10",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=9",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    },
+                    "Widget_Maker_2": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=19",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=18",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=17",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=16",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=15",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    }
+                },
+                "Floor02": {
+                    "Widget_Maker_1": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=26",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=25",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=24",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=23",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=22",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    },
+                    "Widget_Maker_2": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=32",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=31",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=30",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=29",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=28",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    }
+                }
+            },
+            "Bulding02": {
+                "Floor01": {
+                    "Widget_Maker_1": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=40",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=39",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=38",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=37",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=36",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    },
+                    "Widget_Maker_2": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=46",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=45",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=44",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=43",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=42",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    }
+                },
+                "Floor02": {
+                    "Widget_Maker_1": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=53",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=52",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=51",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=50",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=49",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    },
+                    "Widget_Maker_2": {
+                        "tags": [
+                            {
+                                "nodeId": "ns=2;i=59",
+                                "name": "vibration_3d",
+                                "type": "ExtensionObject"
+                            },
+                            {
+                                "nodeId": "ns=2;i=58",
+                                "name": "error_count",
+                                "type": "Int32"
+                            },
+                            {
+                                "nodeId": "ns=2;i=57",
+                                "name": "coolant_temp",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=56",
+                                "name": "spindle_rpm",
+                                "type": "Float"
+                            },
+                            {
+                                "nodeId": "ns=2;i=55",
+                                "name": "widget_count",
+                                "type": "Int32"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+]

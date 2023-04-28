@@ -1,0 +1,19 @@
+{
+    "@id": "dtmi:com:microsoft:iot:central:opc_ua:building;1",
+    "@type": "Interface",
+    "displayName": "OPC Factory - Building",
+    "@context": [
+        "dtmi:dtdl:context;2"
+    ],
+    "extends": "dtmi:com:microsoft:iot:central:opc_ua:name;1",
+    "contents": [
+        {
+            "@type": "Relationship",
+            "displayName": {
+                "en": "Has floors"
+            },
+            "name": "contains",
+            "target": "dtmi:com:microsoft:iot:central:opc_ua:floor;1"
+        }
+    ]
+}

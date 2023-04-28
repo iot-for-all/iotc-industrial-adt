@@ -77,7 +77,7 @@ export function DtInputContainer(props: NodeViewerProps) {
     styles,
     onAddNewTwin,
     customTwin,
-    isAuthAvailable
+    isAuthAvailable,
   } = props;
 
   // loadings
@@ -118,7 +118,6 @@ export function DtInputContainer(props: NodeViewerProps) {
       hyphenIdx > 0 ? dtItem.key.substring(hyphenIdx + 1) : undefined;
     return [selectedTwinKey, selectedModelKey];
   }, [dtItem]);
-
 
   const relationshipsOpts = React.useMemo(() => {
     const options: IDropdownOption[] = [];
@@ -586,27 +585,27 @@ export function DtInputContainer(props: NodeViewerProps) {
                                 setNewTwin((current) =>
                                   parentOption.selected
                                     ? {
-                                      ...current,
-                                      parentRels: [
-                                        ...(current.parentRels ?? []),
-                                        {
-                                          source: parentOption.key as string,
-                                          name: parentOption.data?.relName,
-                                          displayName:
-                                            parentOption.data?.relDisplayName,
-                                        },
-                                      ],
-                                    }
+                                        ...current,
+                                        parentRels: [
+                                          ...(current.parentRels ?? []),
+                                          {
+                                            source: parentOption.key as string,
+                                            name: parentOption.data?.relName,
+                                            displayName:
+                                              parentOption.data?.relDisplayName,
+                                          },
+                                        ],
+                                      }
                                     : {
-                                      ...current,
-                                      parentRels: current.parentRels.filter(
-                                        (p) =>
-                                          p.name !==
-                                          parentOption.data?.relName &&
-                                          p.source !==
-                                          (parentOption.key as string)
-                                      ),
-                                    }
+                                        ...current,
+                                        parentRels: current.parentRels.filter(
+                                          (p) =>
+                                            p.name !==
+                                              parentOption.data?.relName &&
+                                            p.source !==
+                                              (parentOption.key as string)
+                                        ),
+                                      }
                                 );
                               }
                             }}
